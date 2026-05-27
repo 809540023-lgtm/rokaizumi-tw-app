@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: rokaizumi-tw
+    runtime: node
+    plan: starter # 7 USD/月（含 0.5GB RAM、自動 HTTPS、自訂網域）
+    region: singapore # singapore | oregon | frankfurt
+    branch: main
+    rootDir: .
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false # 從 Render dashboard 設定
+      - key: JWT_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+databases:
+  - name: rokaizumi-mysql
+    plan: starter # 7 USD/月（含 1GB 儲存、自動備份）
+    region: singapore
+    databaseName: rokaizumi
+    user: rokaizumi
