@@ -1,0 +1,245 @@
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+type Language = 'zh' | 'en' | 'ja';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const translations = {
+  zh: {
+    // Header
+    'nav.home': '首頁',
+    'nav.products': '產品',
+    'nav.videos': '影片',
+    'nav.cart': '購物車',
+    
+    // Home page
+    'home.company': 'ろかいずみ合同会社',
+    'home.title': '銀髮生活品質加乘輔具 · 日本精美小商品',
+    'home.subtitle': '日本直送出口，服務台灣與澳洲市場',
+    'home.browseProducts': '瀏覽產品',
+    'home.japanConnection': '日本商品即時連線',
+    'home.whyChooseUs': '為什麼選擇我們',
+    'home.directFromJapan': '日本直採',
+    'home.directFromJapanDesc': '直接從日本採購，確保產品品質和價格優勢。',
+    'home.globalExport': '全球出口',
+    'home.globalExportDesc': '日本直送出口，服務台灣與澳洲市場。',
+    'home.professionalService': '專業服務',
+    'home.professionalServiceDesc': '提供日本精美小商品和銀髮生活品質加乘輔具的專業資詢。',
+    'home.latestVideos': '最新採購影片',
+    'home.viewAll': '查看全部',
+    'home.productCategories': '主要產品類別',
+    'home.hundredYenProducts': '日本精美小商品',
+    'home.hundredYenProductsDesc': '精選日本優質小商品',
+    'home.careEquipment': '銀髮生活品質加乘輔具',
+    'home.careEquipmentDesc': '專業銀髮生活輔具，提升生活品質',
+    
+    // Products page
+    'products.filter': '篩選器',
+    'products.reset': '重置',
+    'products.mainCategory': '主要分類',
+    'products.allProducts': '全部商品',
+    'products.hundredYen': '🛍️ 日本精美小商品',
+    'products.care': '♿ 銀髮生活品質加乘輔具',
+    'products.subCategory': '細分類別',
+    'products.priceRange': '價格範圍',
+    'products.status': '商品狀態',
+    'products.available': '可售',
+    'products.reserved': '預訂',
+    'products.sold': '已售',
+    'products.found': '找到',
+    'products.items': '件商品',
+    'products.viewDetails': '查看詳情',
+    'products.addToCart': '加入購物車',
+    'products.noProducts': '沒有找到符合條件的商品',
+    'products.back': '返回首頁',
+    'products.tryAdjust': '請嘗試調整篩選條件',
+    'products.hundredYenTitle': '🛍️ 日本精美小商品',
+    'products.hundredYenDesc': '精選日本優質小商品，物美價廉',
+    'products.careTitle': '♿ 銀髮生活品質加乘輔具',
+    'products.careDesc': '專業銀髮生活輔具，提升生活品質',
+    'products.allProductsDesc': '瀏覽我們所有的優質商品',
+    'products.filters': '篩選器',
+    'products.showing': '顯示',
+    'products.products': '個產品',
+    'products.resetFilters': '重置篩選器',
+    'home.category1': '日本精美小商品',
+    'home.category2': '銀髮生活品質加乘輔具',
+    
+    // Cart
+    'cart.title': '購物車',
+    'cart.empty': '購物車是空的',
+    'cart.startShopping': '開始購物',
+    'cart.subtotal': '小計',
+    'cart.total': '總計',
+    'cart.checkout': '結帳',
+    'cart.continueShopping': '繼續購物',
+    'cart.remove': '移除',
+    'cart.quantity': '數量',
+    
+    // Categories
+    'category.dailyGoods': '日用百貨',
+    'category.kitchen': '廚房用品',
+    'category.stationery': '文具用品',
+    'category.cleaning': '清潔用品',
+    'category.storage': '收納用品',
+    'category.beauty': '美妝保養',
+    'category.snacks': '食品零食',
+    'category.toys': '玩具雜貨',
+    'category.mobility': '行動輔助',
+    'category.bathroom': '衛浴安全',
+    'category.health': '健康監測',
+    'category.nursing': '護理用品',
+    'category.rehabilitation': '復健器材',
+    'category.livingAids': '生活輔具',
+    'category.bedside': '床邊照護',
+    'category.safety': '安全監控',
+  },
+  en: {
+    // Header
+    'nav.home': 'Home',
+    'nav.products': 'Products',
+    'nav.videos': 'Videos',
+    'nav.cart': 'Cart',
+    
+    // Home page
+    'home.company': 'Rokaizumi LLC',
+    'home.title': 'Japanese 100-Yen Products · Elderly Care Equipment',
+    'home.subtitle': 'Professional Export Worldwide, Including Taiwan',
+    'home.browseProducts': 'Browse Products',
+    'home.japanConnection': 'Japan Live Connection',
+    'home.category1': 'Japanese 100-Yen Products',
+    'home.category2': 'Elderly Care Equipment',
+    
+    // Products page
+    'products.allProducts': 'All Products',
+    'products.allProductsDesc': 'Browse all our quality products',
+    'products.filters': 'Filters',
+    'products.showing': 'Showing',
+    'products.products': 'products',
+    'products.resetFilters': 'Reset Filters',
+    'products.noProducts': 'No products found',
+    'products.back': 'Back to Home',
+    'products.viewDetails': 'View Details',
+    'products.available': 'Available',
+    'products.reserved': 'Reserved',
+    'products.sold': 'Sold',
+  },
+  ja: {
+    // Header
+    'nav.home': 'ホーム',
+    'nav.products': '商品',
+    'nav.videos': '動画',
+    'nav.cart': 'カート',
+    
+    // Home page
+    'home.company': 'ろかいずみ合同会社',
+    'home.title': '日本百円商品・高齢者介護用品',
+    'home.subtitle': '世界中（台湾を含む）への専門輸出',
+    'home.browseProducts': '商品を見る',
+    'home.japanConnection': '日本商品リアルタイム接続',
+    'home.whyChooseUs': '選ばれる理由',
+    'home.directFromJapan': '日本直採',
+    'home.directFromJapanDesc': '日本から直接調達、品質と価格の優位性を保証。',
+    'home.globalExport': 'グローバル輸出',
+    'home.globalExportDesc': '日本の優良商品を台湾を含む世界中へお届けする専門輸出サービス。',
+    'home.professionalService': '専門サービス',
+    'home.professionalServiceDesc': '日本百円商品と高齢者介護用品の専門コンサルティング。',
+    'home.latestVideos': '最新調達動画',
+    'home.viewAll': 'すべて見る',
+    'home.productCategories': '主要商品カテゴリ',
+    'home.hundredYenProducts': '日本百円商品',
+    'home.hundredYenProductsDesc': '日本百円ショップの優良商品を厳選',
+    'home.careEquipment': '高齢者介護用品',
+    'home.careEquipmentDesc': '生活の質を向上させる専門介護用品',
+    
+    // Products page
+    'products.filter': 'フィルター',
+    'products.reset': 'リセット',
+    'products.mainCategory': 'メインカテゴリ',
+    'products.allProducts': 'すべての商品',
+    'products.hundredYen': '🛍️ 日本百円商品',
+    'products.care': '♿ 高齢者介護用品',
+    'products.subCategory': 'サブカテゴリ',
+    'products.priceRange': '価格帯',
+    'products.status': '商品状態',
+    'products.available': '販売中',
+    'products.reserved': '予約済',
+    'products.sold': '売切',
+    'products.found': '見つかりました',
+    'products.items': '件',
+    'products.viewDetails': '詳細を見る',
+    'products.addToCart': 'カートに追加',
+    'products.noProducts': '商品が見つかりません',
+    'products.back': 'ホームに戻る',
+    'products.tryAdjust': 'フィルターを調整してください',
+    'products.hundredYenTitle': '🛍️ 日本百円商品',
+    'products.hundredYenDesc': '日本百円ショップの優良商品をお手頃価格で',
+    'products.careTitle': '♿ 高齢者介護用品',
+    'products.careDesc': '生活の質を向上させる専門介護用品',
+    'products.allProductsDesc': 'すべての優良商品を閲覧',
+    'products.filters': 'フィルター',
+    'products.showing': '表示中',
+    'products.products': '件の商品',
+    'products.resetFilters': 'フィルターをリセット',
+    'home.category1': '日本百円商品',
+    'home.category2': '高齢者介護用品',
+    
+    // Cart
+    'cart.title': 'ショッピングカート',
+    'cart.empty': 'カートは空です',
+    'cart.startShopping': '買い物を始める',
+    'cart.subtotal': '小計',
+    'cart.total': '合計',
+    'cart.checkout': '購入手続き',
+    'cart.continueShopping': '買い物を続ける',
+    'cart.remove': '削除',
+    'cart.quantity': '数量',
+    
+    // Categories
+    'category.dailyGoods': '日用品',
+    'category.kitchen': 'キッチン用品',
+    'category.stationery': '文具',
+    'category.cleaning': '清掃用品',
+    'category.storage': '収納用品',
+    'category.beauty': '美容用品',
+    'category.snacks': '食品・お菓子',
+    'category.toys': 'おもちゃ・雑貨',
+    'category.mobility': '移動補助',
+    'category.bathroom': '浴室安全',
+    'category.health': '健康監視',
+    'category.nursing': '介護用品',
+    'category.rehabilitation': 'リハビリ用品',
+    'category.livingAids': '生活補助具',
+    'category.bedside': 'ベッドサイドケア',
+    'category.safety': '安全監視',
+  },
+};
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('ja');
+
+  const t = (key: string): string => {
+    const translation = translations[language as keyof typeof translations];
+    return (translation as any)[key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within LanguageProvider');
+  }
+  return context;
+}
