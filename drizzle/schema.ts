@@ -7,6 +7,7 @@ import {
   timestamp,
   boolean,
   numeric,
+  real,
   json,
   date,
 } from "drizzle-orm/pg-core";
@@ -68,7 +69,7 @@ export const products = pgTable("products", {
   stock: integer("stock").default(0).notNull(),
   lowStockThreshold: integer("lowStockThreshold").default(5).notNull(),
   salesCount: integer("salesCount").default(0).notNull(),
-  rating: numeric("rating", { precision: 3, scale: 2 }).default("0").notNull(),
+  rating: real("rating").default(0).notNull(),
   reviewCount: integer("reviewCount").default(0).notNull(),
   isTaxExempt: boolean("isTaxExempt").default(false).notNull(),
   // Multi-currency pricing fields
