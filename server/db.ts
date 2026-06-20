@@ -1,14 +1,12 @@
-import { eq, desc, and, gte, lt, lte, avg, sql, or, like } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import { eq, desc, and, gte, lt, lte, avg, sql, or, ilike } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog } from '../drizzle/schema';
 import { ENV } from './_core/env';
 
-// Create database connection
-const pool = mysql.createPool(ENV.databaseUrl);
-export const db = drizzle(pool);
-
-
+// Create database connection (PostgreSQL via postgres-js)
+const client = postgres(ENV.databaseUrl, { max: 10 });
+export const db = drizzle(client);
 
 // ========== Categories ==========
 export async function getAllCategories() {
@@ -21,8 +19,8 @@ export async function getCategoryById(id: number) {
 }
 
 export async function createCategory(data: InsertCategory) {
-  const result = await db.insert(categories).values(data);
-  return result;
+  const result = await db.insert(categories).values(data).returning();
+  return result[0];
 }
 
 // ========== Products ==========
@@ -43,8 +41,8 @@ export async function createProduct(data: InsertProduct) {
   const result = await db.insert(products).values({
     ...data,
     status: data.status || 'available',
-    stock: data.stock || 1,
-    lowStockThreshold: data.lowStockThreshold || 5,
+    stock: data.stock ?? 1,
+    lowStockThreshold: data.lowStockThreshold ?? 5,
     costJPY: data.costJPY || '0',
     priceUSD: data.priceUSD || '0',
     profitTWD: data.profitTWD || '0',
@@ -52,8 +50,8 @@ export async function createProduct(data: InsertProduct) {
     exchangeRateUSDtoTWD: data.exchangeRateUSDtoTWD || '30',
     profitMargin: data.profitMargin || '2.0',
     internationalShippingCost: data.internationalShippingCost || '0',
-  });
-  return result;
+  }).returning();
+  return result[0];
 }
 
 export async function updateProduct(id: number, data: Partial<InsertProduct>) {
@@ -83,8 +81,8 @@ export async function searchProducts(query: string) {
   const searchTerm = `%${query}%`;
   return await db.select().from(products).where(
     or(
-      like(products.name, searchTerm),
-      like(products.description, searchTerm)
+      ilike(products.name, searchTerm),
+      ilike(products.description, searchTerm)
     )
   ).orderBy(desc(products.createdAt));
 }
@@ -100,8 +98,8 @@ export async function getSupplierById(id: number) {
 }
 
 export async function createSupplier(data: InsertSupplier) {
-  const result = await db.insert(suppliers).values(data);
-  return result;
+  const result = await db.insert(suppliers).values(data).returning();
+  return result[0];
 }
 
 export async function updateSupplier(id: number, data: Partial<InsertSupplier>) {
@@ -124,8 +122,8 @@ export async function getPurchasesBySupplier(supplierId: number) {
 }
 
 export async function createPurchase(data: InsertPurchase) {
-  const result = await db.insert(purchases).values(data);
-  return result;
+  const result = await db.insert(purchases).values(data).returning();
+  return result[0];
 }
 
 export async function updatePurchase(id: number, data: Partial<InsertPurchase>) {
@@ -160,7 +158,7 @@ export async function increaseProductStock(id: number, quantity: number) {
 
 export async function getProductsWithLowStock(threshold?: number) {
   return await db.select().from(products).where(
-    threshold 
+    threshold
       ? lte(products.stock, threshold)
       : lte(products.stock, products.lowStockThreshold)
   );
@@ -177,8 +175,8 @@ export async function getTripById(id: number) {
 }
 
 export async function createTrip(data: InsertTrip) {
-  const result = await db.insert(trips).values(data);
-  return result;
+  const result = await db.insert(trips).values(data).returning();
+  return result[0];
 }
 
 export async function updateTrip(id: number, data: Partial<InsertTrip>) {
@@ -240,8 +238,8 @@ export async function addToCart(data: InsertCartItem) {
     return existing[0].id;
   } else {
     // Insert new item
-    const result = await db.insert(cartItems).values(data);
-    return result[0].insertId;
+    const result = await db.insert(cartItems).values(data).returning({ id: cartItems.id });
+    return result[0].id;
   }
 }
 
@@ -263,8 +261,8 @@ export async function clearCart(userId: number) {
 // ========== Orders ==========
 export async function createOrder(orderData: InsertOrder, items: Omit<InsertOrderItem, 'orderId'>[]) {
   // Insert order
-  const orderResult = await db.insert(orders).values(orderData);
-  const orderId = orderResult[0].insertId;
+  const orderResult = await db.insert(orders).values(orderData).returning({ id: orders.id });
+  const orderId = orderResult[0].id;
 
   // Insert order items
   const itemsWithOrderId = items.map(item => ({ ...item, orderId }));
@@ -282,7 +280,7 @@ export async function getOrderById(id: number) {
   if (order.length === 0) return null;
 
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
-  
+
   return {
     ...order[0],
     items,
@@ -290,8 +288,8 @@ export async function getOrderById(id: number) {
 }
 
 export async function createTripVideo(data: InsertTripVideo) {
-  const result = await db.insert(tripVideos).values(data);
-  return result;
+  const result = await db.insert(tripVideos).values(data).returning();
+  return result[0];
 }
 
 export async function deleteTripVideo(id: number) {
@@ -317,7 +315,7 @@ export async function getUserByOpenId(openId: string) {
 
 export async function upsertUser(data: { openId: string; name?: string | null; email?: string | null; loginMethod?: string | null; lastSignedIn?: Date }) {
   const existing = await getUserByOpenId(data.openId);
-  
+
   if (existing) {
     // Update existing user
     const updateData: any = {};
@@ -325,7 +323,7 @@ export async function upsertUser(data: { openId: string; name?: string | null; e
     if (data.email !== undefined) updateData.email = data.email;
     if (data.loginMethod !== undefined) updateData.loginMethod = data.loginMethod;
     if (data.lastSignedIn !== undefined) updateData.lastSignedIn = data.lastSignedIn;
-    
+
     await db.update(users).set(updateData).where(eq(users.openId, data.openId));
     return await getUserByOpenId(data.openId);
   } else {
@@ -353,8 +351,8 @@ export async function getReviewById(id: number) {
 }
 
 export async function createReview(data: InsertReview) {
-  const result = await db.insert(reviews).values(data);
-  return result;
+  const result = await db.insert(reviews).values(data).returning();
+  return result[0];
 }
 
 export async function updateReview(id: number, data: Partial<InsertReview>) {
@@ -372,7 +370,6 @@ export async function getAverageRating(productId: number) {
   return result[0]?.avgRating || 0;
 }
 
-
 // ========== Wishlists ==========
 export async function getWishlistByUser(userId: number) {
   return await db.select().from(wishlists)
@@ -385,13 +382,13 @@ export async function addToWishlist(userId: number, productId: number) {
   const existing = await db.select().from(wishlists)
     .where(and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)))
     .limit(1);
-  
+
   if (existing.length > 0) {
     return existing[0];
   }
-  
-  const result = await db.insert(wishlists).values({ userId, productId });
-  return result;
+
+  const result = await db.insert(wishlists).values({ userId, productId }).returning();
+  return result[0];
 }
 
 export async function removeFromWishlist(userId: number, productId: number) {
@@ -461,11 +458,11 @@ export async function getMonthRevenue() {
  */
 export async function getAllOrdersWithDetails() {
   const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
-  
+
   return Promise.all(allOrders.map(async (order) => {
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
     const user = await getUserById(order.userId);
-    
+
     return {
       ...order,
       items,
@@ -475,9 +472,6 @@ export async function getAllOrdersWithDetails() {
   }));
 }
 
-/**
- * Calculate financial metrics for dashboard
- */
 /**
  * Update order status
  */
@@ -489,13 +483,13 @@ export async function updateOrderStatus(id: number, status: 'pending' | 'paid' |
 export async function getFinancialMetrics(exchangeRateUSDtoTWD: number = 30) {
   const todayData = await getTodayRevenue();
   const monthData = await getMonthRevenue();
-  
+
   // Get all paid orders for total profit calculation
   const allPaidOrders = await db.select().from(orders)
     .where(eq(orders.status, 'paid'));
-  
+
   const totalRevenueUSD = allPaidOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0) / 100;
-  
+
   return {
     today: {
       ordersCount: todayData.count,
@@ -514,7 +508,6 @@ export async function getFinancialMetrics(exchangeRateUSDtoTWD: number = 30) {
   };
 }
 
-
 // ========== Users Management ==========
 export async function getAllUsers() {
   return await db.select().from(users).orderBy(desc(users.createdAt));
@@ -524,7 +517,6 @@ export async function updateUserRole(userId: number, role: 'admin' | 'user') {
   const result = await db.update(users).set({ role }).where(eq(users.id, userId));
   return result;
 }
-
 
 // ========== Announcements ==========
 export async function getActiveAnnouncements() {
@@ -556,8 +548,8 @@ export async function getAnnouncementById(id: number) {
 }
 
 export async function createAnnouncement(data: InsertAnnouncement) {
-  const result = await db.insert(announcements).values(data);
-  return result;
+  const result = await db.insert(announcements).values(data).returning();
+  return result[0];
 }
 
 export async function updateAnnouncement(id: number, data: Partial<InsertAnnouncement>) {
@@ -575,11 +567,10 @@ export async function toggleAnnouncementActive(id: number, isActive: boolean) {
   return result;
 }
 
-
 // ========== API Keys ==========
 export async function createApiKey(data: InsertApiKey) {
-  const result = await db.insert(apiKeys).values(data);
-  return result;
+  const result = await db.insert(apiKeys).values(data).returning();
+  return result[0];
 }
 
 export async function getApiKeyByKey(key: string) {
@@ -608,8 +599,8 @@ export async function deleteApiKey(id: number) {
 
 export async function incrementApiKeyRequestCount(id: number) {
   const result = await db.update(apiKeys)
-    .set({ 
-      requestCount: sql`requestCount + 1`,
+    .set({
+      requestCount: sql`${apiKeys.requestCount} + 1`,
       lastUsedAt: new Date()
     })
     .where(eq(apiKeys.id, id));
@@ -618,8 +609,8 @@ export async function incrementApiKeyRequestCount(id: number) {
 
 // ========== API Logs ==========
 export async function createApiLog(data: InsertApiLog) {
-  const result = await db.insert(apiLogs).values(data);
-  return result;
+  const result = await db.insert(apiLogs).values(data).returning();
+  return result[0];
 }
 
 export async function getApiLogsByKeyId(apiKeyId: number, limit: number = 100) {
@@ -642,20 +633,20 @@ export async function getApiLogs(limit: number = 20, offset: number = 0) {
     .orderBy(desc(apiLogs.createdAt))
     .limit(limit)
     .offset(offset);
-  
+
   // 增強日誌信息，添加 API Key 名稱
   const enrichedLogs = await Promise.all(logs.map(async (log) => {
     const apiKey = await db.select()
       .from(apiKeys)
       .where(eq(apiKeys.id, log.apiKeyId))
       .limit(1);
-    
+
     return {
       ...log,
       apiKeyName: apiKey[0]?.name || 'Unknown',
     };
   }));
-  
+
   return enrichedLogs;
 }
 
@@ -663,16 +654,16 @@ export async function getApiStats() {
   // 獲取今天的統計
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const todayLogs = await db.select()
     .from(apiLogs)
     .where(gte(apiLogs.createdAt, today));
-  
+
   // 計算統計信息
   const totalRequests = todayLogs.length;
   const successfulRequests = todayLogs.filter(log => log.statusCode >= 200 && log.statusCode < 300).length;
   const failedRequests = todayLogs.filter(log => log.statusCode >= 400).length;
-  
+
   // 統計上傳的商品數量（從 responseBody 中提取）
   let totalProductsUploaded = 0;
   for (const log of todayLogs) {
@@ -680,7 +671,7 @@ export async function getApiStats() {
       totalProductsUploaded += (log.responseBody.productsCreated as number) || 0;
     }
   }
-  
+
   // 按 API Key 分組統計
   const byApiKey: Record<string, { requests: number; products: number }> = {};
   for (const log of todayLogs) {
@@ -688,18 +679,18 @@ export async function getApiStats() {
       .from(apiKeys)
       .where(eq(apiKeys.id, log.apiKeyId))
       .limit(1);
-    
+
     const keyName = apiKey[0]?.name || `API Key ${log.apiKeyId}`;
     if (!byApiKey[keyName]) {
       byApiKey[keyName] = { requests: 0, products: 0 };
     }
     byApiKey[keyName].requests += 1;
-    
+
     if (log.responseBody && typeof log.responseBody === 'object' && 'productsCreated' in log.responseBody) {
       byApiKey[keyName].products += (log.responseBody.productsCreated as number) || 0;
     }
   }
-  
+
   return {
     date: today,
     totalRequests,
