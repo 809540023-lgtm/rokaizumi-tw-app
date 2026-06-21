@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'zh' | 'cn' | 'en' | 'ja';
 
@@ -303,6 +303,43 @@ const translations = {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>('ja');
+
+  useEffect(() => {
+    var T2S = "頁页產产購购車车銀银髮发質质輔辅務务灣湾與与場场瀏浏覽览時时連连線线為为麼么選选擇择們们採采從从確确價价優优勢势專专業业資资詢询類类別别篩筛細细範范圍围狀状態态預预訂订詳详沒没條条請请嘗尝試试調调顯显個个開开計计總总結结帳账繼继續续數数貨货廚厨潔洁納纳妝妆養养雜杂動动衛卫監监測测護护復复邊边賣卖";
+    var cmap: any = {}; for (var i = 0; i < T2S.length; i += 2) cmap[T2S[i]] = T2S[i + 1];
+    function t2s(s: string) { var o = ""; for (var j = 0; j < s.length; j++) o += (cmap[s[j]] || s[j]); return o; }
+    var dict: any = {};
+    var zt: any = (translations as any).zh, cnt: any = (translations as any).cn, ent: any = (translations as any).en, jat: any = (translations as any).ja;
+    for (var k in zt) { dict[zt[k]] = { zh: zt[k], cn: cnt[k], en: ent[k], ja: jat[k] }; }
+    var store = new WeakMap();
+    function trNode(root: any) {
+      var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var nodes: any[] = []; var n: any;
+      while ((n = w.nextNode())) nodes.push(n);
+      for (var a = 0; a < nodes.length; a++) {
+        var node = nodes[a];
+        if (!store.has(node)) {
+          var v = node.nodeValue || "";
+          if (!v.trim() || !/[\u4e00-\u9fff]/.test(v)) continue;
+          store.set(node, v);
+        }
+        var src: string = store.get(node);
+        var trimmed = src.trim();
+        var out = src;
+        if (language === "zh") out = src;
+        else if (dict[trimmed]) out = src.replace(trimmed, dict[trimmed][language] || trimmed);
+        else if (language === "cn") out = t2s(src);
+        else out = src;
+        if (node.nodeValue !== out) node.nodeValue = out;
+      }
+    }
+    var scheduled = false;
+    function run() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; try { trNode(document.body); } catch (e) {} }); }
+    run();
+    var obs = new MutationObserver(function () { run(); });
+    obs.observe(document.body, { childList: true, subtree: true });
+    return function () { obs.disconnect(); };
+  }, [language]);
 
   const t = (key: string): string => {
     const translation = translations[language as keyof typeof translations];
