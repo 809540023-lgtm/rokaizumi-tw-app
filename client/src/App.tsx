@@ -6,6 +6,7 @@ import ProductDetail from "./pages/ProductDetail";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
 import Products from "./pages/Products";
 import CategoryProducts from "./pages/CategoryProducts";
 import TripVideos from "./pages/TripVideos";
@@ -49,6 +50,7 @@ function Router() {
       <Route path={"/about"} component={About} />
       <Route path={"/b2b"} component={B2B} />
       <Route path={"/guides"} component={Guides} />
+      <Route path={"/login"} component={Login} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
