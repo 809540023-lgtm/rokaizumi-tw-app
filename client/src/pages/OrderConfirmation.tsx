@@ -15,7 +15,7 @@ export default function OrderConfirmation() {
   const { user, isAuthenticated } = useAuth();
   const [sessionId] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('session_id');
+    return params.get('orderId');
   });
 
   const toggleLanguage = () => {
@@ -38,9 +38,8 @@ export default function OrderConfirmation() {
   };
 
   // Query for order details based on session ID
-  const { data: order, isLoading } = trpc.orders.getBySessionId.useQuery(
-    { sessionId: sessionId || '' },
-    { enabled: !!sessionId && isAuthenticated }
+  const { data: order, isLoading } = trpc.orders.getById.useQuery({ id: Number(sessionId) },
+    { enabled: !!sessionId }
   );
 
   if (!isAuthenticated) {
