@@ -313,6 +313,27 @@ export async function getUserByOpenId(openId: string) {
   return result[0] || null;
 }
 
+export async function getUserByEmail(email: string) {
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result[0] || null;
+}
+
+export async function createLocalUser(data: { openId: string; email: string; name?: string | null; passwordHash: string }) {
+  const result = await db
+    .insert(users)
+    .values({
+      openId: data.openId,
+      email: data.email,
+      name: data.name || null,
+      passwordHash: data.passwordHash,
+      role: 'user',
+      loginMethod: 'local',
+      lastSignedIn: new Date(),
+    })
+    .returning();
+  return result[0];
+}
+
 export async function upsertUser(data: { openId: string; name?: string | null; email?: string | null; loginMethod?: string | null; lastSignedIn?: Date }) {
   const existing = await getUserByOpenId(data.openId);
 
