@@ -11,11 +11,13 @@ import { ProductCard } from '@/components/ProductCard';
 
 export default function CategoryProducts() {
   const [, setLocation] = useLocation();
-  const [, params] = useRoute('/products/:categoryId');
+  const [, params] = useRoute('/category/:categoryId');
+  const [, params2] = useRoute('/products/:categoryId');
   const { language } = useLanguage();
   const { isAuthenticated } = useAuth();
 
-  const categoryId = params?.categoryId ? Number(params.categoryId) : null;
+  const rawCat = params?.categoryId ?? params2?.categoryId;
+  const categoryId = rawCat ? Number(rawCat) : null;
 
   const { data: categories = [] } = trpc.categories.list.useQuery();
   const { data: products = [] } = trpc.products.list.useQuery();
