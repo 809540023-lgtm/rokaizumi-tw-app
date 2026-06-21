@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
-import { COOKIE_NAME, ONE_YEAR_MS } from "./const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
 import * as db from "../db";
