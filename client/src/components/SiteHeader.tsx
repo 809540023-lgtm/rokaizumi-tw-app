@@ -1,6 +1,35 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Search, ShoppingCart, Building2, LogIn, Heart } from "lucide-react";
+import { Search, ShoppingCart, Building2, LogIn, Heart, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+const LANGS: { code: "zh" | "cn" | "ja" | "en"; label: string }[] = [
+  { code: "zh", label: "繁中" },
+  { code: "cn", label: "简中" },
+  { code: "ja", label: "日本語" },
+  { code: "en", label: "EN" },
+];
+
+function LanguageSwitcher() {
+  const { language, setLanguage } = useLanguage();
+  return (
+    <div className="flex items-center gap-1 rounded-lg border border-gray-200 px-1.5 py-1">
+      <Globe className="w-4 h-4 text-gray-400" />
+      {LANGS.map((l) => (
+        <button
+          key={l.code}
+          type="button"
+          onClick={() => setLanguage(l.code as any)}
+          className={`px-1.5 py-0.5 rounded text-xs font-bold transition-colors ${
+            language === l.code ? "bg-[#0ABAB5] text-white" : "text-gray-600 hover:bg-gray-100"
+          }`}
+        >
+          {l.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 interface SiteHeaderProps {
   searchQuery?: string;
@@ -44,6 +73,9 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
         </form>
 
         <nav className="flex items-center gap-2 ml-auto">
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
           <Link
             href="/b2b"
             className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E26D5C] text-[#E26D5C] text-sm font-bold"
