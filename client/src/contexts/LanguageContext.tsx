@@ -334,7 +334,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
     }
     var scheduled = false;
-    function run() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; try { trNode(document.body); } catch (e) {} }); }
+    function run() { if (scheduled) return; scheduled = true; setTimeout(function () { scheduled = false; try { trNode(document.body); } catch (e) {} }, 0); }
     run();
     var obs = new MutationObserver(function () { run(); });
     obs.observe(document.body, { childList: true, subtree: true });
