@@ -40,6 +40,7 @@ function Router() {
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/"} component={Home} />
       <Route path={"/products/:categoryId"} component={CategoryProducts} />
+          <Route path={"/category/:categoryId"} component={CategoryProducts} />
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:productId"} component={ProductDetail} />
       <Route path={"/videos"} component={TripVideos} />
