@@ -76,8 +76,10 @@ export default function Checkout() {
     }
     createOrderMutation.mutate({
       shippingAddress: `${shipping.postalCode} ${shipping.city} ${shipping.address}`,
-      shippingName: shipping.name,
-      shippingPhone: shipping.phone,
+      contactName: shipping.name,
+      contactPhone: shipping.phone,
+      contactEmail: shipping.email,
+      items: cartItems.map((it: any) => ({ productId: it.productId, productName: it.product.name, productPrice: Number(it.product.price), quantity: it.quantity, subtotal: Number(it.product.price) * it.quantity })),
       paymentMethod: payment,
       notes: shipping.notes,
     } as any);
