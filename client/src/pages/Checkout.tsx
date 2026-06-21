@@ -42,7 +42,7 @@ export default function Checkout() {
   const createOrderMutation = trpc.orders.create.useMutation({
     onSuccess: (order: any) => {
       toast.success('訂單已建立');
-      setLocation(`/order-confirmation?orderId=${order.id}`);
+      setLocation(`/order-confirmation?orderId=${order.orderId}`);
     },
     onError: (e: any) => toast.error(e.message || '下單失敗'),
   });
