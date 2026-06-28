@@ -7,35 +7,7 @@ interface Props {
   onSearchSubmit: () => void;
 }
 
-const heroProducts = [
-  {
-    rotate: '-rotate-3',
-    pos: 'top-0 left-0',
-    width: 'w-[260px]',
-    emoji: '🦽',
-    cat: '車椅子・移乗支援',
-    name: '輕量摺疊介助輪椅 NEO-2',
-    price: 'NT$ 24,800',
-  },
-  {
-    rotate: 'rotate-2',
-    pos: 'top-[60px] right-0 z-10',
-    width: 'w-[280px]',
-    emoji: '🛏️',
-    cat: '介護ベッド・寝具',
-    name: '3 馬達電動介護床（含床墊）',
-    price: 'NT$ 38,500',
-  },
-  {
-    rotate: 'rotate-4',
-    pos: 'bottom-0 left-20',
-    width: 'w-[220px]',
-    emoji: '🚿',
-    cat: '入浴・お風呂用品',
-    name: 'シャワーチェア D 型',
-    price: 'NT$ 8,990',
-  },
-];
+const heroProducts: any[] = [];
 
 export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Props) {
   return (
