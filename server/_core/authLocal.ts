@@ -62,7 +62,7 @@ export function registerLocalAuthRoutes(app: Express) {
       res.json({ ok: true, email: owner.email });
     } catch (e) {
       console.error("[auth] bootstrap-admin error", e);
-      res.status(500).json({ ok: false, error: "failed" });
+      res.status(500).json({ ok: false, error: String((e as any)?.message || e) });
     }
   });
 
