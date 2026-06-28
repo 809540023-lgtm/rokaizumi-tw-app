@@ -58,7 +58,7 @@ export function registerLocalAuthRoutes(app: Express) {
     try {
       const owner = await db.getUserByEmail("cia8885@gmail.com");
       if (!owner) { res.json({ ok: false, error: "owner account not found" }); return; }
-      await db.updateUser(owner.id, "admin" as any);
+      await db.updateUserRole(owner.id, "admin" as any);
       res.json({ ok: true, email: owner.email });
     } catch (e) {
       console.error("[auth] bootstrap-admin error", e);
