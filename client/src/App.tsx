@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from "./pages/Orders";
 import Daiko from "./pages/Daiko";
+import Selection from "./pages/Selection";
 import Profile from "./pages/Profile";
 import AIChat from "./components/AIChat";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
@@ -51,6 +52,7 @@ function Router() {
       <Route path={"/order-confirmation"} component={OrderConfirmation} />
           <Route path={"/orders"} component={Orders} />
           <Route path={"/daiko"} component={Daiko} />
+          <Route path={"/selection"} component={Selection} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/about"} component={About} />
       <Route path={"/b2b"} component={B2B} />
