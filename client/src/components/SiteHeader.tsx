@@ -64,7 +64,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Heart className="w-7 h-7 text-[#E26D5C] fill-[#E26D5C]" />
           <div className="leading-tight">
-            <div className="font-bold text-lg">ろかいずみ合同会社</div>
+            <div className="font-bold text-lg">ろかいずみ</div>
             <div className="text-xs text-gray-500">日本介護用品專賣</div>
           </div>
         </Link>
