@@ -5,6 +5,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerLocalAuthRoutes } from "./authLocal";
+import { registerDaikoRoutes } from "./daiko";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -39,6 +40,7 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   registerLocalAuthRoutes(app);
+  registerDaikoRoutes(app);
   // OpenClaw API
   app.use("/api/openclaw", openclawRouter);
   // tRPC API
