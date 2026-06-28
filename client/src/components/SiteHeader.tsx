@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Search, ShoppingCart, Building2, LogIn, Heart, Globe } from "lucide-react";
+import { Search, ShoppingCart, Building2, LogIn, LogOut, User, Heart, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const LANGS: { code: "zh" | "cn" | "ja" | "en"; label: string }[] = [
   { code: "zh", label: "繁中" },
@@ -39,10 +40,22 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }: SiteHeaderProps) {
   const [local, setLocal] = useState(searchQuery);
+  const { user, logout } = useAuth() as any;
   const value = onSearchChange ? searchQuery : local;
   const setValue = (v: string) => {
     if (onSearchChange) onSearchChange(v);
     else setLocal(v);
+  };
+
+  const handleLogout = () => {
+    try {
+      if (typeof logout === "function") logout();
+    } catch (e) {
+      /* ignore */
+    }
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 200);
   };
 
   return (
@@ -82,12 +95,33 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           >
             <Building2 className="w-4 h-4" /> 企業合作
           </Link>
-          <Link
-            href="/login"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold"
-          >
-            <LogIn className="w-4 h-4" /> 登入
-          </Link>
+
+          {user ? (
+            <>
+              <Link
+                href="/profile"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold text-gray-700 max-w-[160px]"
+              >
+                <User className="w-4 h-4 shrink-0" />
+                <span className="truncate">{user.name || user.email}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold"
+              >
+                <LogOut className="w-4 h-4" /> 登出
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold"
+            >
+              <LogIn className="w-4 h-4" /> 登入
+            </Link>
+          )}
+
           <Link
             href="/cart"
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold"
