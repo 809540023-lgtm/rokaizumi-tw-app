@@ -54,6 +54,18 @@ async function setSession(req: Request, res: Response, openId: string, name: str
 }
 
 export function registerLocalAuthRoutes(app: Express) {
+  app.post("/api/auth/bootstrap-admin", async (_req: Request, res: Response) => {
+    try {
+      const owner = await db.getUserByEmail("cia8885@gmail.com");
+      if (!owner) { res.json({ ok: false, error: "owner account not found" }); return; }
+      await db.updateUser(owner.id, { role: "admin" } as any);
+      res.json({ ok: true, email: owner.email });
+    } catch (e) {
+      console.error("[auth] bootstrap-admin error", e);
+      res.status(500).json({ ok: false, error: "failed" });
+    }
+  });
+
   app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
       const body = await readJsonBody(req);
