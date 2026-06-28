@@ -51,7 +51,7 @@ export const appRouter = router({
         description: z.string().optional(),
         price: z.number(),
         categoryId: z.number(),
-        imageUrl: z.string().optional(),
+        imageUrl: z.string().optional(), images: z.array(z.string()).optional(),
         status: z.enum(['available', 'sold', 'reserved']).optional(),
         specifications: z.string().optional(),
       }))
@@ -67,7 +67,7 @@ export const appRouter = router({
         description: z.string().optional(),
         price: z.number().optional(),
         categoryId: z.number().optional(),
-        imageUrl: z.string().optional(),
+        imageUrl: z.string().optional(), images: z.array(z.string()).optional(),
         status: z.enum(['available', 'sold', 'reserved']).optional(),
         specifications: z.string().optional(),
       }))
