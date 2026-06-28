@@ -121,7 +121,7 @@ export default function Home() {
       />
 
       {/* 4. 信任徽章 */}
-      <TrustRow />
+      {/* TrustRow 已移除（待替換）*/}
 
       {/* 5. 11 大分類 */}
       <section id="categories" className="py-16">
@@ -220,7 +220,7 @@ export default function Home() {
       <Testimonials />
 
       {/* 12. FAQ */}
-      <FAQ />
+      {/* FAQ 已移除（待替換）*/}
 
       {/* 13. 電子報訂閱 */}
       <Newsletter />
