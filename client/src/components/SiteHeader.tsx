@@ -90,6 +90,12 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
             <LanguageSwitcher />
           </div>
           <Link
+            href="/daiko"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#E26D5C]/10 text-[#E26D5C] text-sm font-bold"
+          >
+            代購
+          </Link>
+          <Link
             href="/b2b"
             className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E26D5C] text-[#E26D5C] text-sm font-bold"
           >
