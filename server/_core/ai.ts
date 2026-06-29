@@ -73,7 +73,7 @@ export function registerAiRoutes(app: Express) {
         '{"name":"商品名稱","features":["賣點1","賣點2","賣點3"],' +
         '"description":"一段約 80–150 字的商品說明","suggestedCategory":"建議分類","estimatedJPY":數字或null}';
 
-      const model = process.env.AI_MODEL || "gemini-2.0-flash";
+      const model = process.env.AI_MODEL || "gemini-2.0-flash-lite";
 
       let apiResp: any;
       try {
