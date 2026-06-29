@@ -11,7 +11,20 @@ const heroProducts: any[] = [];
 
 export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Props) {
   return (
-    <section className="bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] overflow-hidden">
+    <section className="relative bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] overflow-hidden">
+      {/* 姊妹站入口：日本媽媽省省購（即時拼團直購） */}
+      <a
+        href="https://nihon-mama-savebuy.onrender.com/"
+        target="_blank"
+        rel="noreferrer"
+        title="日本媽媽省省購 — 即時拼團・代購 0 元"
+        className="group hidden lg:flex absolute z-30 right-[6%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#E6C9A0] hover:scale-105 transition-transform duration-200"
+      >
+        <span className="text-[11px] font-bold text-[#B8895A] leading-none">日本媽媽</span>
+        <span className="text-2xl font-extrabold text-[#C49A5E] leading-tight mt-0.5">省省購</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">即時拼團・代購 0 元</span>
+        <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#D8B98A] px-2 py-0.5 rounded-full group-hover:bg-[#caa874]">前往逛逛 →</span>
+      </a>
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-12 lg:py-20">
           {/* 左側內容 */}
