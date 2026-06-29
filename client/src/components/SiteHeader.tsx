@@ -104,6 +104,14 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
 
           {user ? (
             <>
+              {user.role === "admin" && (
+                <Link
+                  href="/manage"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5]/10 text-[#0ABAB5] text-sm font-bold"
+                >
+                  後台
+                </Link>
+              )}
               <Link
                 href="/profile"
                 className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold text-gray-700 max-w-[160px]"
