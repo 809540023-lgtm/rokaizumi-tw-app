@@ -514,6 +514,8 @@ export const appRouter = router({
   }),
 
   admin: router({
+    users: adminProcedure.query(() => db.getAllUsers()),
+    setUserRole: adminProcedure.input(z.object({ userId: z.number(), role: z.string() })).mutation(({ input }) => db.updateUserRole(input.userId, input.role)),
     // Financial Dashboard
     financialMetrics: protectedProcedure
       .input(z.object({
