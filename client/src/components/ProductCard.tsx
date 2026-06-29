@@ -57,9 +57,6 @@ export function ProductCard({
           )}
 
           {/* 價格 badge */}
-          <div className="absolute top-3 left-3 bg-[#DC2626] text-white px-3 py-1 rounded-full text-[13px] font-bold shadow-[0_2px_8px_rgba(220,38,38,0.3)]">
-            {formatPrice(product.price, language)}
-          </div>
 
           {/* 分類 tag */}
           {product.categoryName && (
