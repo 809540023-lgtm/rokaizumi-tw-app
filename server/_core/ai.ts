@@ -1,13 +1,12 @@
 import type { Express, Request, Response } from "express";
 
 /**
- * AI 選品助理：上傳商品照片/截圖，透過 Google Gemini 看圖辨識，
+ * AI 選品助理：上傳商品照片/截圖，透過 Mistral（Pixtral 視覺模型）看圖辨識，
  * 產生「原創」的繁體中文商品草稿（品名、特色、說明、建議分類）。
  *
  * 文案皆由模型用自己的話重新撰寫，不照抄任何網站既有文案。
- * 金鑰放 Render 環境變數 GEMINI_API_KEY。
- * 預設會自動輪流嘗試多個模型，哪個有額度就用哪個；
- * 也可用 AI_MODEL 指定單一模型。
+ * 金鑰放 Render 環境變數 MISTRAL_API_KEY。
+ * 預設自動輪流嘗試多個模型；也可用 AI_MODEL 指定單一模型。
  */
 
 async function readJsonBody(req: Request): Promise<any> {
@@ -45,11 +44,11 @@ function extractJson(text: string): any | null {
 export function registerAiRoutes(app: Express) {
   app.post("/api/ai/product-draft", async (req: Request, res: Response) => {
     try {
-      const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+      const key = process.env.MISTRAL_API_KEY;
       if (!key) {
         res.status(503).json({
           ok: false,
-          error: "尚未設定 AI 金鑰，請在 Render 環境變數新增 GEMINI_API_KEY。",
+          error: "尚未設定 AI 金鑰，請在 Render 環境變數新增 MISTRAL_API_KEY。",
         });
         return;
       }
@@ -66,6 +65,7 @@ export function registerAiRoutes(app: Express) {
         res.status(400).json({ ok: false, error: "缺少圖片資料。" });
         return;
       }
+      const dataUrl = "data:" + mediaType + ";base64," + imageBase64;
 
       const instruction =
         "你是專業的日本商品選品助理。請看這張商品照片或截圖，判斷這是什麼商品，" +
@@ -76,25 +76,17 @@ export function registerAiRoutes(app: Express) {
 
       const models = process.env.AI_MODEL
         ? [process.env.AI_MODEL]
-        : [
-            "gemini-2.0-flash-lite",
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-8b",
-            "gemini-2.0-flash",
-            "gemini-2.5-flash",
-          ];
+        : ["pixtral-12b-latest", "pixtral-large-latest", "pixtral-12b-2409"];
 
-      const reqBody = JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { inline_data: { mime_type: mediaType, data: imageBase64 } },
-              { text: instruction },
-            ],
-          },
-        ],
-        generationConfig: { maxOutputTokens: 1024, temperature: 0.4 },
-      });
+      const messages = [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: instruction },
+            { type: "image_url", image_url: dataUrl },
+          ],
+        },
+      ];
 
       let lastErr = "";
       let quotaHit = false;
@@ -102,14 +94,15 @@ export function registerAiRoutes(app: Express) {
       for (const model of models) {
         let apiResp: any;
         try {
-          apiResp = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
-            {
-              method: "POST",
-              headers: { "x-goog-api-key": key, "content-type": "application/json" },
-              body: reqBody,
-            }
-          );
+          apiResp = await fetch("https://api.mistral.ai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + key,
+              "content-type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify({ model, messages, max_tokens: 1024, temperature: 0.4 }),
+          });
         } catch (e) {
           lastErr = "連線失敗";
           continue;
@@ -118,9 +111,9 @@ export function registerAiRoutes(app: Express) {
         const data: any = await apiResp.json().catch(() => null);
 
         if (apiResp.ok) {
-          const parts = data?.candidates?.[0]?.content?.parts;
-          const text = Array.isArray(parts) ? parts.map((p: any) => p.text || "").join("\n") : "";
-          const draft = extractJson(text);
+          const text = data?.choices?.[0]?.message?.content || "";
+          const content = typeof text === "string" ? text : Array.isArray(text) ? text.map((p: any) => p.text || "").join("\n") : "";
+          const draft = extractJson(content);
           if (!draft) {
             lastErr = "回傳格式無法解析";
             continue;
@@ -139,16 +132,21 @@ export function registerAiRoutes(app: Express) {
           return;
         }
 
-        const msg = String((data && (data.error?.message || data.message)) || "錯誤");
+        const msg = String(
+          (data && (data.error?.message || data.message || data.detail)) || ("HTTP " + apiResp.status)
+        );
         lastErr = msg;
-        if (/quota|exceeded|RESOURCE_EXHAUSTED|rate/i.test(msg)) quotaHit = true;
-        // 換下一個模型再試
+        if (/quota|exceeded|rate|limit|capacity|429/i.test(msg) || apiResp.status === 429) quotaHit = true;
+        if (apiResp.status === 401 || apiResp.status === 403) {
+          res.json({ ok: false, error: "AI 金鑰無效或未授權，請確認 MISTRAL_API_KEY。" });
+          return;
+        }
       }
 
       res.json({
         ok: false,
         error: quotaHit
-          ? "所有模型的免費額度都用完了。請到該 Google 專案開啟計費（Billing）後再試。"
+          ? "AI 服務暫時達到使用上限，請稍候再試。"
           : "AI 服務錯誤：" + lastErr.slice(0, 160),
       });
     } catch (error) {
