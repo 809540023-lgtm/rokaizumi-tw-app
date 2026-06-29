@@ -41,6 +41,22 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
             <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-xl">
               220 種精選輔具，從日本大阪直送台灣家門口。免關稅、7 天到貨、3 年保固，全中文客服協助選品。
             </p>
+        {/* 手機版姊妹站入口（桌機改用右側圓形 logo） */}
+        <a
+          href="https://nihon-mama-savebuy.onrender.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="lg:hidden mt-5 flex items-center gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#E6C9A0] shadow-md px-4 py-3 active:scale-[0.98] transition-transform"
+        >
+          <span className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-[#FBF1E4] ring-1 ring-[#E6C9A0] shrink-0 leading-none">
+            <span className="text-[8px] font-bold text-[#B8895A]">日本媽媽</span>
+            <span className="text-[13px] font-extrabold text-[#C49A5E]">省省購</span>
+          </span>
+          <span className="flex-1 text-left leading-tight">
+            <span className="block text-sm font-bold text-gray-800">日本媽媽省省購・即時拼團</span>
+            <span className="block text-xs text-gray-500">代購 0 元，看到好物就開團 →</span>
+          </span>
+        </a>
             <div className="flex flex-wrap gap-3 mb-7">
               <Link href="/products">
                 <a className="inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:-translate-y-0.5 transition-all">
