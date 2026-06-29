@@ -16,6 +16,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from "./pages/Orders";
 import Daiko from "./pages/Daiko";
 import Selection from "./pages/Selection";
+import AdminManage from "./pages/AdminManage";
 import Profile from "./pages/Profile";
 import AIChat from "./components/AIChat";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
@@ -53,6 +54,7 @@ function Router() {
           <Route path={"/orders"} component={Orders} />
           <Route path={"/daiko"} component={Daiko} />
           <Route path={"/selection"} component={Selection} />
+          <Route path={"/manage"} component={AdminManage} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/about"} component={About} />
       <Route path={"/b2b"} component={B2B} />
