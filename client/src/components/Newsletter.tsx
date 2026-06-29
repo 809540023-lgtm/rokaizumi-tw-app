@@ -50,7 +50,7 @@ export function Newsletter() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="輸入您的 Email"
-              className="flex-1 px-5 py-3.5 rounded-xl border-0 text-gray-900 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#0ABAB5]"
+              className="flex-1 px-5 py-3.5 rounded-xl border-0 bg-white text-gray-900 placeholder-gray-400 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#0ABAB5]"
             />
             <button
               type="submit"
