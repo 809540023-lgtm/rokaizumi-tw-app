@@ -41,7 +41,7 @@ export async function createProduct(data: InsertProduct) {
   const result = await db.insert(products).values({
     ...data,
     status: data.status || 'available',
-    stock: data.stock ?? 1,
+    stock: data.stock ?? 50,
     lowStockThreshold: data.lowStockThreshold ?? 5,
     costJPY: data.costJPY || '0',
     priceUSD: data.priceUSD || '0',
