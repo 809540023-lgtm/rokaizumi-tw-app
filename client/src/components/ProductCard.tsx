@@ -118,18 +118,20 @@ export function ProductCard({
           </div>
         )}
 
+        {/* 售價 */}
+        <div className="text-base font-extrabold text-[#E26D5C] mb-3">{formatPrice(product.price, language)}</div>
         {/* 按鈕 */}
         <div className="flex gap-2 mt-auto">
           <Link href={`/product/${product.id}`}>
-            <a className="flex-1 flex items-center justify-center gap-1.5 bg-white border-[1.5px] border-gray-200 text-gray-600 hover:border-[#0ABAB5] hover:text-[#0ABAB5] px-3 py-2.5 rounded-xl text-sm font-bold transition-colors">
-              <Eye className="w-4 h-4" /> 詳情
+            <a className="flex-1 flex items-center justify-center gap-1.5 bg-white border-[1.5px] border-gray-200 text-gray-600 hover:border-[#0ABAB5] hover:text-[#0ABAB5] px-2 py-2 rounded-lg text-xs font-bold transition-colors">
+              <Eye className="w-3.5 h-3.5" /> 詳情
             </a>
           </Link>
           <button
             onClick={onAddToCart}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-3 py-2.5 rounded-xl text-sm font-bold transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-2 py-2 rounded-lg text-xs font-bold transition-colors"
           >
-            <ShoppingCart className="w-4 h-4" /> 加入購物車
+            <ShoppingCart className="w-3.5 h-3.5" /> 加入購物車
           </button>
         </div>
       </div>
