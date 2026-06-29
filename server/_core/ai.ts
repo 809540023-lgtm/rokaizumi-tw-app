@@ -4,9 +4,10 @@ import type { Express, Request, Response } from "express";
  * AI 選品助理：上傳商品照片/截圖，透過 Google Gemini 看圖辨識，
  * 產生「原創」的繁體中文商品草稿（品名、特色、說明、建議分類）。
  *
- * 所有文案皆由模型用自己的話重新撰寫，不照抄任何網站既有文案。
- * 金鑰請放在 Render 環境變數 GEMINI_API_KEY（程式不存明碼）。
- * 可用 AI_MODEL 指定模型，預設 gemini-2.0-flash。
+ * 文案皆由模型用自己的話重新撰寫，不照抄任何網站既有文案。
+ * 金鑰放 Render 環境變數 GEMINI_API_KEY。
+ * 預設會自動輪流嘗試多個模型，哪個有額度就用哪個；
+ * 也可用 AI_MODEL 指定單一模型。
  */
 
 async function readJsonBody(req: Request): Promise<any> {
@@ -56,10 +57,10 @@ export function registerAiRoutes(app: Express) {
       const body = await readJsonBody(req);
       let imageBase64: string = String(body.imageBase64 || "");
       let mediaType: string = String(body.mediaType || "image/jpeg");
-      const m = imageBase64.match(/^data:([^;]+);base64,(.*)$/s);
-      if (m) {
-        mediaType = m[1];
-        imageBase64 = m[2];
+      const dm = imageBase64.match(/^data:([^;]+);base64,(.*)$/s);
+      if (dm) {
+        mediaType = dm[1];
+        imageBase64 = dm[2];
       }
       if (!imageBase64) {
         res.status(400).json({ ok: false, error: "缺少圖片資料。" });
@@ -73,61 +74,82 @@ export function registerAiRoutes(app: Express) {
         '{"name":"商品名稱","features":["賣點1","賣點2","賣點3"],' +
         '"description":"一段約 80–150 字的商品說明","suggestedCategory":"建議分類","estimatedJPY":數字或null}';
 
-      const model = process.env.AI_MODEL || "gemini-2.0-flash-lite";
+      const models = process.env.AI_MODEL
+        ? [process.env.AI_MODEL]
+        : [
+            "gemini-2.0-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-8b",
+            "gemini-2.0-flash",
+            "gemini-2.5-flash",
+          ];
 
-      let apiResp: any;
-      try {
-        apiResp = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
+      const reqBody = JSON.stringify({
+        contents: [
           {
-            method: "POST",
-            headers: { "x-goog-api-key": key, "content-type": "application/json" },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    { inline_data: { mime_type: mediaType, data: imageBase64 } },
-                    { text: instruction },
-                  ],
-                },
-              ],
-              generationConfig: { maxOutputTokens: 1024, temperature: 0.4 },
-            }),
+            parts: [
+              { inline_data: { mime_type: mediaType, data: imageBase64 } },
+              { text: instruction },
+            ],
+          },
+        ],
+        generationConfig: { maxOutputTokens: 1024, temperature: 0.4 },
+      });
+
+      let lastErr = "";
+      let quotaHit = false;
+
+      for (const model of models) {
+        let apiResp: any;
+        try {
+          apiResp = await fetch(
+            "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
+            {
+              method: "POST",
+              headers: { "x-goog-api-key": key, "content-type": "application/json" },
+              body: reqBody,
+            }
+          );
+        } catch (e) {
+          lastErr = "連線失敗";
+          continue;
+        }
+
+        const data: any = await apiResp.json().catch(() => null);
+
+        if (apiResp.ok) {
+          const parts = data?.candidates?.[0]?.content?.parts;
+          const text = Array.isArray(parts) ? parts.map((p: any) => p.text || "").join("\n") : "";
+          const draft = extractJson(text);
+          if (!draft) {
+            lastErr = "回傳格式無法解析";
+            continue;
           }
-        );
-      } catch (e) {
-        res.json({ ok: false, error: "無法連線到 AI 服務，請稍後再試。" });
-        return;
-      }
+          res.json({
+            ok: true,
+            model,
+            draft: {
+              name: draft.name || "",
+              features: Array.isArray(draft.features) ? draft.features : [],
+              description: draft.description || "",
+              suggestedCategory: draft.suggestedCategory || "",
+              estimatedJPY: typeof draft.estimatedJPY === "number" ? draft.estimatedJPY : null,
+            },
+          });
+          return;
+        }
 
-      const data: any = await apiResp.json().catch(() => null);
-      if (!apiResp.ok) {
-        const msg = (data && (data.error?.message || data.message)) || "AI 服務回應錯誤";
-        res.json({ ok: false, error: "AI 服務錯誤：" + String(msg).slice(0, 200) });
-        return;
-      }
-
-      const parts = data?.candidates?.[0]?.content?.parts;
-      const text = Array.isArray(parts) ? parts.map((p: any) => p.text || "").join("\n") : "";
-      const draft = extractJson(text);
-      if (!draft) {
-        res.json({
-          ok: false,
-          error: "AI 回傳格式無法解析，請重試或改為手動填寫。",
-          raw: text.slice(0, 300),
-        });
-        return;
+        const msg = String((data && (data.error?.message || data.message)) || "錯誤");
+        lastErr = msg;
+        if (/quota|exceeded|RESOURCE_EXHAUSTED|rate/i.test(msg)) quotaHit = true;
+        // 換下一個模型再試
       }
 
       res.json({
-        ok: true,
-        draft: {
-          name: draft.name || "",
-          features: Array.isArray(draft.features) ? draft.features : [],
-          description: draft.description || "",
-          suggestedCategory: draft.suggestedCategory || "",
-          estimatedJPY: typeof draft.estimatedJPY === "number" ? draft.estimatedJPY : null,
-        },
+        ok: false,
+        error: quotaHit
+          ? "所有模型的免費額度都用完了。請到該 Google 專案開啟計費（Billing）後再試。"
+          : "AI 服務錯誤：" + lastErr.slice(0, 160),
       });
     } catch (error) {
       console.error("[ai] product-draft error", error);
