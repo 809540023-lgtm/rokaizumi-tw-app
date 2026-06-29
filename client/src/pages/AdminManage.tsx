@@ -1,12 +1,41 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { trpc } from "../lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { SiteHeader } from "@/components/SiteHeader";
 import { toast } from "sonner";
-import { Package, ClipboardList, Users, BarChart3, Pencil, Trash2, Search, Plus, X, ShieldCheck } from "lucide-react";
+import { Package, ClipboardList, Users, BarChart3, Pencil, Trash2, Search, Plus, X, ShieldCheck, Upload } from "lucide-react";
 
 const A = trpc as any;
+
+const MAX_IMAGES = 5;
+
+// 將圖片縮到最長邊 900px 的 JPEG data URL，避免資料量過大
+function resizeImage(file: File, maxSide = 900): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSide || height > maxSide) {
+          if (width >= height) { height = Math.round((height * maxSide) / width); width = maxSide; }
+          else { width = Math.round((width * maxSide) / height); height = maxSide; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("canvas"));
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = reject;
+      img.src = String(reader.result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 const PRODUCT_STATUS = [
   { v: "available", label: "上架（販售中）" },
@@ -94,10 +123,11 @@ function ProductsTab() {
 
   async function saveEdit(form: any) {
     try {
+      const imgs = Array.isArray(form.images) ? form.images : (editing.images || []);
       await updateMut.mutateAsync({
         id: editing.id, name: form.name, description: editing.description || "",
         price: Number(form.price), categoryId: Number(form.categoryId),
-        imageUrl: editing.imageUrl || "", images: editing.images || [],
+        imageUrl: imgs[0] || editing.imageUrl || "", images: imgs,
         status: form.status, specifications: editing.specifications || "",
       } as any);
       if (Number(form.stock) !== (editing.stock ?? 0)) {
@@ -170,11 +200,54 @@ function EditModal({ product, categories, onClose, onSave, saving }: any) {
     name: product.name || "", price: String(product.price ?? ""), stock: String(product.stock ?? 0),
     categoryId: String(product.categoryId || ""), status: product.status || "available",
   });
+  const initImages: string[] = Array.isArray(product.images) && product.images.length
+    ? product.images
+    : (product.imageUrl ? [product.imageUrl] : []);
+  const [images, setImages] = useState<string[]>(initImages.slice(0, MAX_IMAGES));
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  async function handleFiles(files: FileList | null) {
+    if (!files) return;
+    const room = MAX_IMAGES - images.length;
+    if (room <= 0) { toast.error("最多只能 " + MAX_IMAGES + " 張相片"); return; }
+    setUploading(true);
+    const arr: string[] = [];
+    for (const f of Array.from(files).slice(0, room)) {
+      try { arr.push(await resizeImage(f)); } catch { /* skip */ }
+    }
+    setImages((prev) => [...prev, ...arr].slice(0, MAX_IMAGES));
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
   return (
     <Modal title="編輯商品" onClose={onClose}>
       <div className="space-y-3">
         <Field label="名稱"><input value={form.name} onChange={(e) => set("name", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></Field>
+        <Field label={"相片（最多 " + MAX_IMAGES + " 張，第一張為主圖）"}>
+          <div className="flex flex-wrap gap-2">
+            {images.map((src, i) => (
+              <div key={i} className="relative w-16 h-16">
+                <img src={src} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                <button type="button" onClick={() => setImages((p) => p.filter((_, idx) => idx !== i))}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gray-700 text-white flex items-center justify-center">
+                  <X className="w-3 h-3" />
+                </button>
+                {i === 0 && <span className="absolute bottom-0 left-0 text-[9px] bg-[#0ABAB5] text-white px-1 rounded-tr">主圖</span>}
+              </div>
+            ))}
+            {images.length < MAX_IMAGES && (
+              <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading}
+                className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-[#0ABAB5] disabled:opacity-50">
+                <Upload className="w-4 h-4" />
+                <span className="text-[9px] mt-0.5">{uploading ? "處理中" : "上傳"}</span>
+              </button>
+            )}
+            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
+          </div>
+        </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="售價 NT$"><input value={form.price} onChange={(e) => set("price", e.target.value.replace(/[^0-9]/g, ""))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></Field>
           <Field label="庫存"><input value={form.stock} onChange={(e) => set("stock", e.target.value.replace(/[^0-9]/g, ""))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></Field>
@@ -192,7 +265,7 @@ function EditModal({ product, categories, onClose, onSave, saving }: any) {
       </div>
       <div className="flex gap-2 mt-5">
         <button onClick={onClose} className="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-bold">取消</button>
-        <button onClick={() => onSave(form)} disabled={saving} className="flex-1 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold disabled:opacity-60">{saving ? "儲存中..." : "儲存"}</button>
+        <button onClick={() => onSave({ ...form, images })} disabled={saving || uploading} className="flex-1 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold disabled:opacity-60">{saving ? "儲存中..." : "儲存"}</button>
       </div>
     </Modal>
   );
