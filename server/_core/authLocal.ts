@@ -56,10 +56,16 @@ async function setSession(req: Request, res: Response, openId: string, name: str
 export function registerLocalAuthRoutes(app: Express) {
   app.post("/api/auth/bootstrap-admin", async (_req: Request, res: Response) => {
     try {
-      const owner = await db.getUserByEmail("cia8885@gmail.com");
-      if (!owner) { res.json({ ok: false, error: "owner account not found" }); return; }
-      await db.updateUserRole(owner.id, "admin" as any);
-      res.json({ ok: true, email: owner.email });
+      const ADMIN_EMAILS = ["cia8885@gmail.com", "swannylo@gmail.com"];
+      const promoted: string[] = [];
+      const missing: string[] = [];
+      for (const em of ADMIN_EMAILS) {
+        const u = await db.getUserByEmail(em);
+        if (!u) { missing.push(em); continue; }
+        await db.updateUserRole(u.id, "admin" as any);
+        promoted.push(em);
+      }
+      res.json({ ok: true, promoted, missing });
     } catch (e) {
       console.error("[auth] bootstrap-admin error", e);
       res.status(500).json({ ok: false, error: String((e as any)?.message || e) });
