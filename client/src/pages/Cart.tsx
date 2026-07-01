@@ -25,7 +25,7 @@ export default function Cart() {
     enabled: isAuthenticated,
   });
 
-  const updateMutation = trpc.cart.update.useMutation({
+  const updateMutation = trpc.cart.updateQuantity.useMutation({
     onSuccess: () => refetch(),
     onError: (e: any) => toast.error(e.message || '更新失敗'),
   });
