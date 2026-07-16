@@ -9,6 +9,9 @@ interface Props {
 
 const heroProducts: any[] = [];
 
+// 百元批發站網址（部署後換成正式網址）
+const HYAKUEN_URL = 'https://hyakuen-wholesale.onrender.com/';
+
 export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Props) {
   return (
     <section className="relative bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] overflow-hidden">
@@ -24,6 +27,19 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
         <span className="text-2xl font-extrabold text-[#C49A5E] leading-tight mt-0.5">省省購</span>
         <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">即時拼團・代購 0 元</span>
         <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#D8B98A] px-2 py-0.5 rounded-full group-hover:bg-[#caa874]">前往逛逛 →</span>
+      </a>
+      {/* 姊妹站入口：百元批發（KOKUBO 商品目錄，供台灣批發商） */}
+      <a
+        href={HYAKUEN_URL}
+        target="_blank"
+        rel="noreferrer"
+        title="百元批發入口 — 日本 KOKUBO 全商品目錄"
+        className="group hidden lg:flex absolute z-30 left-[6%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#F3B4B2] hover:scale-105 transition-transform duration-200"
+      >
+        <span className="text-[11px] font-bold text-[#C0392B] leading-none">日本直採</span>
+        <span className="text-2xl font-extrabold text-[#DC2626] leading-tight mt-0.5">百元批發</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">KOKUBO 1,463 品</span>
+        <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#DC2626] px-2 py-0.5 rounded-full group-hover:bg-[#B91C1C]">前往目錄 →</span>
       </a>
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-12 lg:py-20">
@@ -55,6 +71,22 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
           <span className="flex-1 text-left leading-tight">
             <span className="block text-sm font-bold text-gray-800">日本媽媽省省購・即時拼團</span>
             <span className="block text-xs text-gray-500">代購 0 元，看到好物就開團 →</span>
+          </span>
+        </a>
+        {/* 手機版百元批發入口 */}
+        <a
+          href={HYAKUEN_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="lg:hidden mt-3 flex items-center gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#F3B4B2] shadow-md px-4 py-3 active:scale-[0.98] transition-transform"
+        >
+          <span className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-[#FDECEA] ring-1 ring-[#F3B4B2] shrink-0 leading-none">
+            <span className="text-[8px] font-bold text-[#C0392B]">日本直採</span>
+            <span className="text-[13px] font-extrabold text-[#DC2626]">百元批發</span>
+          </span>
+          <span className="flex-1 text-left leading-tight">
+            <span className="block text-sm font-bold text-gray-800">百元批發入口・KOKUBO 全目錄</span>
+            <span className="block text-xs text-gray-500">1,463 品項，整箱直採報價 →</span>
           </span>
         </a>
             <div className="flex flex-wrap gap-3 mb-7">
