@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>離線中 - ろかいずみ合同会社</title>
+  <meta name="theme-color" content="#40E0D0">
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(to bottom, #fef9f3, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .icon-container {
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .icon-circle {
+      width: 128px;
+      height: 128px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .wifi-icon {
+      width: 64px;
+      height: 64px;
+      color: #9ca3af;
+    }
+
+    .ping-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 160px;
+      height: 160px;
+      border: 4px solid #e5e7eb;
+      border-radius: 50%;
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+      opacity: 0.2;
+    }
+
+    @keyframes ping {
+      75%, 100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .description {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #40E0D0;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(64, 224, 208, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .retry-btn:hover {
+      background: #3BC9BB;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(64, 224, 208, 0.5);
+    }
+
+    .retry-btn:active {
+      transform: translateY(0);
+    }
+
+    .retry-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .features-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 32px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .features-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .feature-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      background: #f9fafb;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .feature-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      color: #40E0D0;
+    }
+
+    .feature-text {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .tips-card {
+      background: rgba(64, 224, 208, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .tips-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #40E0D0;
+      margin-bottom: 12px;
+    }
+
+    .tips-list {
+      list-style: none;
+    }
+
+    .tips-list li {
+      font-size: 14px;
+      color: #4b5563;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .tips-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .tip-bullet {
+      color: #40E0D0;
+      margin-top: 2px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 32px;
+      color: #9ca3af;
+    }
+
+    .logo-circle {
+      width: 32px;
+      height: 32px;
+      background: #40E0D0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .logo-text {
+      font-size: 14px;
+    }
+
+    /* Language switcher */
+    .lang-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      padding: 6px 12px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover, .lang-btn.active {
+      background: #40E0D0;
+      color: white;
+      border-color: #40E0D0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Language Switcher -->
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLanguage('zh-TW')">中文</button>
+    <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
+  </div>
+
+  <div class="container">
+    <!-- Icon -->
+    <div class="icon-container">
+      <div class="ping-ring"></div>
+      <div class="icon-circle">
+        <svg class="wifi-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 id="title">您目前處於離線狀態</h1>
+    <p class="subtitle" id="subtitle">無法連接到網路</p>
+    <p class="description" id="description">請檢查您的網路連線，或稍後再試。</p>
+
+    <!-- Retry Button -->
+    <button class="retry-btn" onclick="retryConnection()">
+      <svg class="retry-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      <span id="retryText">重新連線</span>
+    </button>
+
+    <!-- Features Card -->
+    <div class="features-card">
+      <h2 class="features-title">
+        <svg width="20" height="20" fill="none" stroke="#40E0D0" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span id="featuresTitle">離線可用功能</span>
+      </h2>
+      <div class="features-grid">
+        <a href="/cart" class="feature-btn">
+          <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span class="feature-text" id="viewCart">查看購物車</span>
+        </a>
+        <a href="/" class="feature-btn">
+          <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="feature-text" id="goHome">返回首頁</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-card">
+      <h3 class="tips-title" id="tipsTitle">小提示</h3>
+      <ul class="tips-list">
+        <li>
+          <span class="tip-bullet">•</span>
+          <span id="tip1">已瀏覽過的頁面可能仍可查看</span>
+        </li>
+        <li>
+          <span class="tip-bullet">•</span>
+          <span id="tip2">購物車內容已保存在本地</span>
+        </li>
+        <li>
+          <span class="tip-bullet">•</span>
+          <span id="tip3">網路恢復後將自動同步</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-circle">ろ</div>
+      <span class="logo-text">ろかいずみ合同会社</span>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      'zh-TW': {
+        title: '您目前處於離線狀態',
+        subtitle: '無法連接到網路',
+        description: '請檢查您的網路連線，或稍後再試。',
+        retryText: '重新連線',
+        featuresTitle: '離線可用功能',
+        viewCart: '查看購物車',
+        goHome: '返回首頁',
+        tipsTitle: '小提示',
+        tip1: '已瀏覽過的頁面可能仍可查看',
+        tip2: '購物車內容已保存在本地',
+        tip3: '網路恢復後將自動同步',
+      },
+      'en': {
+        title: 'You are offline',
+        subtitle: 'Unable to connect to the network',
+        description: 'Please check your internet connection and try again.',
+        retryText: 'Retry Connection',
+        featuresTitle: 'Available Offline',
+        viewCart: 'View Cart',
+        goHome: 'Go Home',
+        tipsTitle: 'Tips',
+        tip1: 'Previously viewed pages may still be accessible',
+        tip2: 'Cart items are saved locally',
+        tip3: 'Data will sync when connection is restored',
+      },
+      'ja': {
+        title: 'オフラインです',
+        subtitle: 'ネットワークに接続できません',
+        description: 'インターネット接続を確認して、もう一度お試しください。',
+        retryText: '再接続',
+        featuresTitle: 'オフラインで利用可能',
+        viewCart: 'カートを見る',
+        goHome: 'ホームへ',
+        tipsTitle: 'ヒント',
+        tip1: '以前閲覧したページは引き続き表示できる場合があります',
+        tip2: 'カートの内容はローカルに保存されています',
+        tip3: '接続が回復すると自動的に同期されます',
+      },
+    };
+
+    function setLanguage(lang) {
+      const t = translations[lang];
+      document.getElementById('title').textContent = t.title;
+      document.getElementById('subtitle').textContent = t.subtitle;
+      document.getElementById('description').textContent = t.description;
+      document.getElementById('retryText').textContent = t.retryText;
+      document.getElementById('featuresTitle').textContent = t.featuresTitle;
+      document.getElementById('viewCart').textContent = t.viewCart;
+      document.getElementById('goHome').textContent = t.goHome;
+      document.getElementById('tipsTitle').textContent = t.tipsTitle;
+      document.getElementById('tip1').textContent = t.tip1;
+      document.getElementById('tip2').textContent = t.tip2;
+      document.getElementById('tip3').textContent = t.tip3;
+
+      // Update active button
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Save preference
+      localStorage.setItem('preferred-language', lang);
+    }
+
+    function retryConnection() {
+      window.location.reload();
+    }
+
+    // Check for saved language preference
+    const savedLang = localStorage.getItem('preferred-language');
+    if (savedLang && translations[savedLang]) {
+      setLanguage(savedLang);
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes(savedLang === 'zh-TW' ? '中文' : savedLang === 'en' ? 'EN' : '日本語')) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    // Auto-retry when online
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>

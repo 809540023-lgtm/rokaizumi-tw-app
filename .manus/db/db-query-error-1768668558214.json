@@ -1,0 +1,11 @@
+{
+  "query": "SELECT id, name FROM categories WHERE name IN ('銀髮生活品質加乘輔具', '日本精美小商品'); SELECT id, name, category_id, image_url, images FROM products ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name FROM categories WHERE name IN ('銀髮生活品質加乘輔具', '日本精美小商品'); SELECT id, name, category_id, image_url, images FROM products ORDER BY id DESC LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "id\tname",
+    "90001\t銀髮生活品質加乘輔具",
+    "90002\t日本精美小商品",
+    "ERROR 1054 (42S22) at line 1: Unknown column 'category_id' in 'field list'"
+  ]
+}

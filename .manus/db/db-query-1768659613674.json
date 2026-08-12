@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, name, email, role FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, email, role FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "林tw",
+      "email": "cia8885@gmail.com",
+      "role": "admin"
+    },
+    {
+      "id": "30001",
+      "name": "Admin User",
+      "email": "swannylo@gmail.com",
+      "role": "admin"
+    },
+    {
+      "id": "30002",
+      "name": "swanny lo",
+      "email": "swannylo@gmail.com",
+      "role": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\t林tw\tcia8885@gmail.com\tadmin\n30001\tAdmin User\tswannylo@gmail.com\tadmin\n30002\tswanny lo\tswannylo@gmail.com\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 1544
+}

@@ -1,0 +1,138 @@
+{
+  "query": "DESCRIBE users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute DESCRIBE users;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "openId",
+      "Type": "varchar(64)",
+      "Null": "NO",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "loginMethod",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "role",
+      "Type": "enum('user','admin')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "user",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "lastSignedIn",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "phone",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "address",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "city",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "postalCode",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "country",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "avatarUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "bio",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nopenId\tvarchar(64)\tNO\tUNI\tNULL\t\nname\ttext\tYES\t\tNULL\t\nemail\tvarchar(320)\tYES\t\tNULL\t\nloginMethod\tvarchar(64)\tYES\t\tNULL\t\nrole\tenum('user','admin')\tNO\t\tuser\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nlastSignedIn\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nphone\tvarchar(50)\tYES\t\tNULL\t\naddress\ttext\tYES\t\tNULL\t\ncity\tvarchar(100)\tYES\t\tNULL\t\npostalCode\tvarchar(20)\tYES\t\tNULL\t\ncountry\tvarchar(100)\tYES\t\tNULL\t\navatarUrl\ttext\tYES\t\tNULL\t\nbio\ttext\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

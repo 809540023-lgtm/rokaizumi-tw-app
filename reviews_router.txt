@@ -1,0 +1,48 @@
+  // Reviews API
+  reviews: router({
+    getByProductId: publicProcedure
+      .input(z.object({ productId: z.number() }))
+      .query(({ input }) => db.getReviewsByProductId(input.productId)),
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(({ input }) => db.getReviewById(input.id)),
+    getAverageRating: publicProcedure
+      .input(z.object({ productId: z.number() }))
+      .query(({ input }) => db.getAverageRating(input.productId)),
+    create: protectedProcedure
+      .input(z.object({
+        productId: z.number(),
+        rating: z.number().min(1).max(5),
+        title: z.string(),
+        comment: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.createReview({
+          productId: input.productId,
+          userId: ctx.user.id,
+          rating: input.rating,
+          title: input.title,
+          comment: input.comment || null,
+        });
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        rating: z.number().min(1).max(5).optional(),
+        title: z.string().optional(),
+        comment: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const review = await db.getReviewById(input.id);
+        if (!review || review.userId !== ctx.user.id) throw new Error('Unauthorized');
+        const { id, ...data } = input;
+        return db.updateReview(id, data);
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const review = await db.getReviewById(input.id);
+        if (!review || review.userId !== ctx.user.id) throw new Error('Unauthorized');
+        return db.deleteReview(input.id);
+      }),
+  }),

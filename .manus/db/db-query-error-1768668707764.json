@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, category_id FROM products WHERE name LIKE '%杜仲茶%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, category_id FROM products WHERE name LIKE '%杜仲茶%';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'category_id' in 'field list'"
+  ]
+}

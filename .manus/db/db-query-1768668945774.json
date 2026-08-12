@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name FROM categories WHERE name IN ('銀髮生活品質加乘輔具', '日本精美小商品');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name FROM categories WHERE name IN ('銀髮生活品質加乘輔具', '日本精美小商品');",
+  "rows": [
+    {
+      "id": "90001",
+      "name": "銀髮生活品質加乘輔具"
+    },
+    {
+      "id": "90002",
+      "name": "日本精美小商品"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n90001\t銀髮生活品質加乘輔具\n90002\t日本精美小商品\n",
+  "stderr": "",
+  "execution_time_ms": 1573
+}

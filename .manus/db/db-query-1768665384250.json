@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, name, categoryId FROM products ORDER BY id DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, categoryId FROM products ORDER BY id DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "150003",
+      "name": "test",
+      "categoryId": "2"
+    },
+    {
+      "id": "150001",
+      "name": "第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）",
+      "categoryId": "2"
+    },
+    {
+      "id": "60034",
+      "name": "可摺疊多功能健腹健身椅",
+      "categoryId": "30013"
+    },
+    {
+      "id": "60033",
+      "name": "muva遠紅外線專業支撐護膝L",
+      "categoryId": "30013"
+    },
+    {
+      "id": "60032",
+      "name": "腳踏訓練機",
+      "categoryId": "30013"
+    },
+    {
+      "id": "60031",
+      "name": "握力訓練器",
+      "categoryId": "30013"
+    },
+    {
+      "id": "60030",
+      "name": "NOVA 可調有背洗澡椅 9020CA",
+      "categoryId": "30015"
+    },
+    {
+      "id": "60029",
+      "name": "CPE-N 無背洗澡椅",
+      "categoryId": "30015"
+    },
+    {
+      "id": "60028",
+      "name": "安壽 床邊扶手",
+      "categoryId": "30015"
+    },
+    {
+      "id": "60027",
+      "name": "Platz New Point 3吋護理床褥",
+      "categoryId": "30012"
+    },
+    {
+      "id": "60026",
+      "name": "Geltron 薄款凝膠防褥瘡護理床墊",
+      "categoryId": "30012"
+    },
+    {
+      "id": "60025",
+      "name": "Lifree 褲型 薄型輕快褲 S尺寸",
+      "categoryId": "30012"
+    },
+    {
+      "id": "60024",
+      "name": "Attent 褲型 夜間1枚安心褲 M尺寸",
+      "categoryId": "30012"
+    },
+    {
+      "id": "60023",
+      "name": "Acti 尿取墊 晝用（2回吸收）",
+      "categoryId": "30012"
+    },
+    {
+      "id": "60022",
+      "name": "Terumo Medisafe Fit 血糖測定器",
+      "categoryId": "30011"
+    },
+    {
+      "id": "60021",
+      "name": "LifeScan OneTouch Verio Reflect 血糖測定器",
+      "categoryId": "30011"
+    },
+    {
+      "id": "60020",
+      "name": "AND 上臂式血壓計 UA-654Plus",
+      "categoryId": "30011"
+    },
+    {
+      "id": "60019",
+      "name": "OMRON 手腕式血壓計 HEM-6232T",
+      "categoryId": "30011"
+    },
+    {
+      "id": "60018",
+      "name": "OMRON 上臂式血壓計 HEM-1000",
+      "categoryId": "30011"
+    },
+    {
+      "id": "30034",
+      "name": "迷你沐浴椅 - 無背靠淡藍色",
+      "categoryId": "30010"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcategoryId\n150003\ttest\t2\n150001\t第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）\t2\n60034\t可摺疊多功能健腹健身椅\t30013\n60033\tmuva遠紅外線專業支撐護膝L\t30013\n60032\t腳踏訓練機\t30013\n60031\t握力訓練器\t30013\n60030\tNOVA 可調有背洗澡椅 9020CA\t30015\n60029\tCPE-N 無背洗澡椅\t30015\n60028\t安壽 床邊扶手\t30015\n60027\tPlatz New Point 3吋護理床褥\t30012\n60026\tGeltron 薄款凝膠防褥瘡護理床墊\t30012\n60025\tLifree 褲型 薄型輕快褲 S尺寸\t30012\n60024\tAttent 褲型 夜間1枚安心褲 M尺寸\t30012\n60023\tActi 尿取墊 晝用（2回吸收）\t30012\n60022\tTerumo Medisafe Fit 血糖測定器\t30011\n60021\tLifeScan OneTouch Verio Reflect 血糖測定器\t30011\n60020\tAND 上臂式血壓計 UA-654Plus\t30011\n60019\tOMRON 手腕式血壓計 HEM-6232T\t30011\n60018\tOMRON 上臂式血壓計 HEM-1000\t30011\n30034\t迷你沐浴椅 - 無背靠淡藍色\t30010\n",
+  "stderr": "",
+  "execution_time_ms": 1514
+}

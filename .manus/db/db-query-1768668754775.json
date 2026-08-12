@@ -1,0 +1,17 @@
+{
+  "query": "SELECT * FROM products WHERE name LIKE '%杜仲茶%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT * FROM products WHERE name LIKE '%杜仲茶%';",
+  "rows": [],
+  "messages": [
+    "150004\t杜仲茶3g*30袋\t小林製藥",
+    "每天都能持续使用的清爽饮用",
+    "内容量:3g×30袋",
+    "商品尺寸(长×宽×高):125mm×50mm×180mm",
+    "针对饮食、运动带来的健康减肥人士的脂肪分0、卡路里0的健康茶",
+    "不含咖啡因",
+    "将具有独特口感的杜仲茶充分香气,口感丰富\t299\t90001\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768666470282-0inawc.jpg\tavailable\t3gX30\t2026-01-17 16:15:06\t2026-01-17 16:15:57\t10\t5\t0.00\t0.00\t0.00\t0.007500\t30.00\t2026-01-17 16:15:06\t2.00\t0.00\t[]"
+  ],
+  "stdout": "id\tname\tdescription\tprice\tcategoryId\timageUrl\tstatus\tspecifications\tcreatedAt\tupdatedAt\tstock\tlowStockThreshold\tcostJPY\tpriceUSD\tprofitTWD\texchangeRateJPYtoUSD\texchangeRateUSDtoTWD\tlastRateUpdateAt\tprofitMargin\tinternationalShippingCost\timages\n150004\t杜仲茶3g*30袋\t小林製藥\n每天都能持续使用的清爽饮用\n内容量:3g×30袋\n商品尺寸(长×宽×高):125mm×50mm×180mm\n针对饮食、运动带来的健康减肥人士的脂肪分0、卡路里0的健康茶\n不含咖啡因\n将具有独特口感的杜仲茶充分香气,口感丰富\t299\t90001\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768666470282-0inawc.jpg\tavailable\t3gX30\t2026-01-17 16:15:06\t2026-01-17 16:15:57\t10\t5\t0.00\t0.00\t0.00\t0.007500\t30.00\t2026-01-17 16:15:06\t2.00\t0.00\t[]\n",
+  "stderr": "",
+  "execution_time_ms": 1536
+}

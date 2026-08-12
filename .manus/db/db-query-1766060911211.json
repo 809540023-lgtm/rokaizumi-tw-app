@@ -1,0 +1,74 @@
+{
+  "query": "SELECT id, name FROM categories;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name FROM categories;",
+  "rows": [
+    {
+      "id": "30011",
+      "name": "健康監測"
+    },
+    {
+      "id": "30016",
+      "name": "安全監控"
+    },
+    {
+      "id": "30015",
+      "name": "床邊照護"
+    },
+    {
+      "id": "30002",
+      "name": "廚房用品"
+    },
+    {
+      "id": "30013",
+      "name": "復健器材"
+    },
+    {
+      "id": "30005",
+      "name": "收納用品"
+    },
+    {
+      "id": "30003",
+      "name": "文具用品"
+    },
+    {
+      "id": "30001",
+      "name": "日用百貨"
+    },
+    {
+      "id": "30004",
+      "name": "清潔用品"
+    },
+    {
+      "id": "30008",
+      "name": "玩具雜貨"
+    },
+    {
+      "id": "30014",
+      "name": "生活輔具"
+    },
+    {
+      "id": "30006",
+      "name": "美妝保養"
+    },
+    {
+      "id": "30009",
+      "name": "行動輔助"
+    },
+    {
+      "id": "30010",
+      "name": "衛浴安全"
+    },
+    {
+      "id": "30012",
+      "name": "護理用品"
+    },
+    {
+      "id": "30007",
+      "name": "食品零食"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n30011\t健康監測\n30016\t安全監控\n30015\t床邊照護\n30002\t廚房用品\n30013\t復健器材\n30005\t收納用品\n30003\t文具用品\n30001\t日用百貨\n30004\t清潔用品\n30008\t玩具雜貨\n30014\t生活輔具\n30006\t美妝保養\n30009\t行動輔助\n30010\t衛浴安全\n30012\t護理用品\n30007\t食品零食\n",
+  "stderr": "",
+  "execution_time_ms": 1564
+}

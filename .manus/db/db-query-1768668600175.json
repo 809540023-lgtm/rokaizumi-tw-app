@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, name, categoryId, imageUrl, images FROM products ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, categoryId, imageUrl, images FROM products ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "150004",
+      "name": "杜仲茶3g*30袋",
+      "categoryId": "90001",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768666470282-0inawc.jpg",
+      "images": "[]"
+    },
+    {
+      "id": "150003",
+      "name": "test",
+      "categoryId": "2",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662629772-gc86kc-S__7274500.jpg",
+      "images": "[\"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662629948-dy4jid-S__614580.jpg\", \"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662630098-lcbssc-S__3997701.jpg\", \"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662645342-qvfz7e-綜合牛腱＿一公斤220元.jpg\"]"
+    },
+    {
+      "id": "150001",
+      "name": "第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）",
+      "categoryId": "2",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768659079597-t33xio.jpg",
+      "images": "[]"
+    },
+    {
+      "id": "60034",
+      "name": "可摺疊多功能健腹健身椅",
+      "categoryId": "30013",
+      "imageUrl": "NULL",
+      "images": "NULL"
+    },
+    {
+      "id": "60033",
+      "name": "muva遠紅外線專業支撐護膝L",
+      "categoryId": "30013",
+      "imageUrl": "NULL",
+      "images": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcategoryId\timageUrl\timages\n150004\t杜仲茶3g*30袋\t90001\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768666470282-0inawc.jpg\t[]\n150003\ttest\t2\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662629772-gc86kc-S__7274500.jpg\t[\"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662629948-dy4jid-S__614580.jpg\", \"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662630098-lcbssc-S__3997701.jpg\", \"https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768662645342-qvfz7e-綜合牛腱＿一公斤220元.jpg\"]\n150001\t第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）\t2\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768659079597-t33xio.jpg\t[]\n60034\t可摺疊多功能健腹健身椅\t30013\tNULL\tNULL\n60033\tmuva遠紅外線專業支撐護膝L\t30013\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

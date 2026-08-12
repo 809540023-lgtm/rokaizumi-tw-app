@@ -1,0 +1,58 @@
+{
+  "query": "SELECT CONCAT(id, ': ', name) as category_info FROM categories;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT CONCAT(id, ': ', name) as category_info FROM categories;",
+  "rows": [
+    {
+      "category_info": "30011: 健康監測"
+    },
+    {
+      "category_info": "30016: 安全監控"
+    },
+    {
+      "category_info": "30015: 床邊照護"
+    },
+    {
+      "category_info": "30002: 廚房用品"
+    },
+    {
+      "category_info": "30013: 復健器材"
+    },
+    {
+      "category_info": "30005: 收納用品"
+    },
+    {
+      "category_info": "30003: 文具用品"
+    },
+    {
+      "category_info": "30001: 日用百貨"
+    },
+    {
+      "category_info": "30004: 清潔用品"
+    },
+    {
+      "category_info": "30008: 玩具雜貨"
+    },
+    {
+      "category_info": "30014: 生活輔具"
+    },
+    {
+      "category_info": "30006: 美妝保養"
+    },
+    {
+      "category_info": "30009: 行動輔助"
+    },
+    {
+      "category_info": "30010: 衛浴安全"
+    },
+    {
+      "category_info": "30012: 護理用品"
+    },
+    {
+      "category_info": "30007: 食品零食"
+    }
+  ],
+  "messages": [],
+  "stdout": "category_info\n30011: 健康監測\n30016: 安全監控\n30015: 床邊照護\n30002: 廚房用品\n30013: 復健器材\n30005: 收納用品\n30003: 文具用品\n30001: 日用百貨\n30004: 清潔用品\n30008: 玩具雜貨\n30014: 生活輔具\n30006: 美妝保養\n30009: 行動輔助\n30010: 衛浴安全\n30012: 護理用品\n30007: 食品零食\n",
+  "stderr": "",
+  "execution_time_ms": 1534
+}

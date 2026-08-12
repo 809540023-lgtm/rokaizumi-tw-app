@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO categories (id, name, description) VALUES (1, '日本百元商品', '日本百元店商品'), (2, '老人看護器材', '老人護理和看護設備')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute INSERT INTO categories (id, name, description) VALUES (1, '日本百元商品', '日本百元店商品'), (2, '老人看護器材', '老人護理和看護設備')",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1621
+}

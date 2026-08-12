@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, name, description, price, \"categoryId\", status, \"createdAt\" FROM products WHERE id = 90008 OR name = '烏烏' ORDER BY \"createdAt\" DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, description, price, \"categoryId\", status, \"createdAt\" FROM products WHERE id = 90008 OR name = '烏烏' ORDER BY \"createdAt\" DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "90008",
+      "name": "鳥鳥",
+      "description": "庫藏股",
+      "price": "20000",
+      "categoryId": "categoryId",
+      "status": "available",
+      "createdAt": "createdAt"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdescription\tprice\tcategoryId\tstatus\tcreatedAt\n90008\t鳥鳥\t庫藏股\t20000\tcategoryId\tavailable\tcreatedAt\n",
+  "stderr": "",
+  "execution_time_ms": 1577
+}

@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET role = 'admin' WHERE role != 'admin';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute UPDATE users SET role = 'admin' WHERE role != 'admin';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1538
+}

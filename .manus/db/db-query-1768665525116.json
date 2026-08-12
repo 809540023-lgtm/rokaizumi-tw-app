@@ -1,0 +1,90 @@
+{
+  "query": "SELECT id, name FROM categories ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name FROM categories ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "日本百元商品"
+    },
+    {
+      "id": "2",
+      "name": "老人看護器材"
+    },
+    {
+      "id": "30001",
+      "name": "日用百貨"
+    },
+    {
+      "id": "30002",
+      "name": "廚房用品"
+    },
+    {
+      "id": "30003",
+      "name": "文具用品"
+    },
+    {
+      "id": "30004",
+      "name": "清潔用品"
+    },
+    {
+      "id": "30005",
+      "name": "收納用品"
+    },
+    {
+      "id": "30006",
+      "name": "美妝保養"
+    },
+    {
+      "id": "30007",
+      "name": "食品零食"
+    },
+    {
+      "id": "30008",
+      "name": "玩具雜貨"
+    },
+    {
+      "id": "30009",
+      "name": "行動輔助"
+    },
+    {
+      "id": "30010",
+      "name": "衛浴安全"
+    },
+    {
+      "id": "30011",
+      "name": "健康監測"
+    },
+    {
+      "id": "30012",
+      "name": "護理用品"
+    },
+    {
+      "id": "30013",
+      "name": "復健器材"
+    },
+    {
+      "id": "30014",
+      "name": "生活輔具"
+    },
+    {
+      "id": "30015",
+      "name": "床邊照護"
+    },
+    {
+      "id": "30016",
+      "name": "安全監控"
+    },
+    {
+      "id": "90001",
+      "name": "銀髮生活品質加乘輔具"
+    },
+    {
+      "id": "90002",
+      "name": "日本精美小商品"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\t日本百元商品\n2\t老人看護器材\n30001\t日用百貨\n30002\t廚房用品\n30003\t文具用品\n30004\t清潔用品\n30005\t收納用品\n30006\t美妝保養\n30007\t食品零食\n30008\t玩具雜貨\n30009\t行動輔助\n30010\t衛浴安全\n30011\t健康監測\n30012\t護理用品\n30013\t復健器材\n30014\t生活輔具\n30015\t床邊照護\n30016\t安全監控\n90001\t銀髮生活品質加乘輔具\n90002\t日本精美小商品\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}

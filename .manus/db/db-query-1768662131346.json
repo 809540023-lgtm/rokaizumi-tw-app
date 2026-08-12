@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, imageUrl, images FROM products ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, imageUrl, images FROM products ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "150002",
+      "name": "test",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768661780237-8ii8iu-多功能保溫台.jpg",
+      "images": "NULL"
+    },
+    {
+      "id": "150001",
+      "name": "第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768659079597-t33xio.jpg",
+      "images": "NULL"
+    },
+    {
+      "id": "90006",
+      "name": "測試商品3",
+      "imageUrl": "NULL",
+      "images": "NULL"
+    },
+    {
+      "id": "60020",
+      "name": "AND 上臂式血壓計 UA-654Plus",
+      "imageUrl": "NULL",
+      "images": "NULL"
+    },
+    {
+      "id": "60018",
+      "name": "OMRON 上臂式血壓計 HEM-1000",
+      "imageUrl": "NULL",
+      "images": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\timageUrl\timages\n150002\ttest\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/1768661780237-8ii8iu-多功能保溫台.jpg\tNULL\n150001\t第一三共（Daiichi Sankyo）Clean Dental Premium 藥用牙膏（酷涼型）\thttps://d2xsxph8kpxj0f.cloudfront.net/93648565/bMn2Gb7rjKtySEiV2r5RyX/products/product-1768659079597-t33xio.jpg\tNULL\n90006\t測試商品3\tNULL\tNULL\n60020\tAND 上臂式血壓計 UA-654Plus\tNULL\tNULL\n60018\tOMRON 上臂式血壓計 HEM-1000\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}

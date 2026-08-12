@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO products (name, description, price, categoryId, imageUrl, status, specifications, stock, lowStockThreshold, costJPY, priceUSD, profitTWD, exchangeRateJPYtoUSD, exchangeRateUSDtoTWD, profitMargin, internationalShippingCost) VALUES ('測試商品', '測試描述', 100, 2, NULL, 'available', '測試規格', 1, 5, '0.00', '0.00', '0.00', '0.0075', '30.00', '2.00', '0.00')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute INSERT INTO products (name, description, price, categoryId, imageUrl, status, specifications, stock, lowStockThreshold, costJPY, priceUSD, profitTWD, exchangeRateJPYtoUSD, exchangeRateUSDtoTWD, profitMargin, internationalShippingCost) VALUES ('測試商品', '測試描述', 100, 2, NULL, 'available', '測試規格', 1, 5, '0.00', '0.00', '0.00', '0.0075', '30.00', '2.00', '0.00')",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1452 (23000) at line 1: Cannot add or update a child row: a foreign key constraint fails (`bmn2gb7rjktyseiv2r5ryx`.`products`, CONSTRAINT `products_categoryId_categories_id_fk` FOREIGN KEY (`categoryId`) REFERENCES `categories` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION)"
+  ]
+}

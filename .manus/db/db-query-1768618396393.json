@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, imageUrl FROM products LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, imageUrl FROM products LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "日本製收納盒套裝",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=收納盒套裝"
+    },
+    {
+      "id": "2",
+      "name": "日式便當盒",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=便當盒"
+    },
+    {
+      "id": "3",
+      "name": "無印風文具套裝",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=文具套裝"
+    },
+    {
+      "id": "4",
+      "name": "廚房清潔海綿組",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=清潔海綿"
+    },
+    {
+      "id": "5",
+      "name": "抽屜分隔板組",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=分隔板"
+    },
+    {
+      "id": "6",
+      "name": "日本面膜套裝",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=面膜套裝"
+    },
+    {
+      "id": "7",
+      "name": "日本零食禮盒",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=零食禮盒"
+    },
+    {
+      "id": "8",
+      "name": "卡通造型玩具",
+      "imageUrl": "https://via.placeholder.com/400x400/FFE5CC/FF6B35?text=玩具"
+    },
+    {
+      "id": "9",
+      "name": "鋁合金四腳拐杖",
+      "imageUrl": "https://via.placeholder.com/400x400/E3F2FD/1976D2?text=四腳拐杖"
+    },
+    {
+      "id": "10",
+      "name": "折疊式助行器",
+      "imageUrl": "https://via.placeholder.com/400x400/E3F2FD/1976D2?text=助行器"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\timageUrl\n1\t日本製收納盒套裝\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=收納盒套裝\n2\t日式便當盒\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=便當盒\n3\t無印風文具套裝\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=文具套裝\n4\t廚房清潔海綿組\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=清潔海綿\n5\t抽屜分隔板組\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=分隔板\n6\t日本面膜套裝\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=面膜套裝\n7\t日本零食禮盒\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=零食禮盒\n8\t卡通造型玩具\thttps://via.placeholder.com/400x400/FFE5CC/FF6B35?text=玩具\n9\t鋁合金四腳拐杖\thttps://via.placeholder.com/400x400/E3F2FD/1976D2?text=四腳拐杖\n10\t折疊式助行器\thttps://via.placeholder.com/400x400/E3F2FD/1976D2?text=助行器\n",
+  "stderr": "",
+  "execution_time_ms": 1607
+}

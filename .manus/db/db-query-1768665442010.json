@@ -1,0 +1,9 @@
+{
+  "query": "INSERT IGNORE INTO categories (name, description) VALUES ('銀髮生活品質加乘輔具', '專業銀髮生活輔具，提升生活品質'), ('日本精美小商品', '精選日本優質小商品');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute INSERT IGNORE INTO categories (name, description) VALUES ('銀髮生活品質加乘輔具', '專業銀髮生活輔具，提升生活品質'), ('日本精美小商品', '精選日本優質小商品');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1577
+}

@@ -1,0 +1,178 @@
+{
+  "query": "DESCRIBE products;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute DESCRIBE products;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "name",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "description",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "price",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "categoryId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "imageUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('available','sold','reserved')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "available",
+      "Extra": ""
+    },
+    {
+      "Field": "specifications",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "stock",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "lowStockThreshold",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "5",
+      "Extra": ""
+    },
+    {
+      "Field": "costJPY",
+      "Type": "decimal(12,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "priceUSD",
+      "Type": "decimal(12,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "profitTWD",
+      "Type": "decimal(12,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "exchangeRateJPYtoUSD",
+      "Type": "decimal(10,6)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0.0075",
+      "Extra": ""
+    },
+    {
+      "Field": "exchangeRateUSDtoTWD",
+      "Type": "decimal(10,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "30",
+      "Extra": ""
+    },
+    {
+      "Field": "lastRateUpdateAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "profitMargin",
+      "Type": "decimal(5,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "2.0",
+      "Extra": ""
+    },
+    {
+      "Field": "internationalShippingCost",
+      "Type": "decimal(10,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "images",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nname\tvarchar(255)\tNO\t\tNULL\t\ndescription\ttext\tYES\t\tNULL\t\nprice\tint(11)\tNO\t\tNULL\t\ncategoryId\tint(11)\tNO\tMUL\tNULL\t\nimageUrl\ttext\tYES\t\tNULL\t\nstatus\tenum('available','sold','reserved')\tNO\t\tavailable\t\nspecifications\ttext\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nstock\tint(11)\tNO\t\t0\t\nlowStockThreshold\tint(11)\tNO\t\t5\t\ncostJPY\tdecimal(12,2)\tNO\t\t0\t\npriceUSD\tdecimal(12,2)\tNO\t\t0\t\nprofitTWD\tdecimal(12,2)\tNO\t\t0\t\nexchangeRateJPYtoUSD\tdecimal(10,6)\tNO\t\t0.0075\t\nexchangeRateUSDtoTWD\tdecimal(10,2)\tNO\t\t30\t\nlastRateUpdateAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nprofitMargin\tdecimal(5,2)\tNO\t\t2.0\t\ninternationalShippingCost\tdecimal(10,2)\tNO\t\t0\t\nimages\tjson\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

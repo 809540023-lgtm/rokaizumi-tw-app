@@ -1,0 +1,97 @@
+{
+  "name": "ろかいずみ合同会社",
+  "short_name": "ろかいずみ",
+  "description": "日本直送出口，服務台灣與澳洲市場。提供銀髮生活品質加乘輔具和日本精美小商品。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fef9f3",
+  "theme_color": "#40E0D0",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-TW",
+  "categories": ["shopping", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "首頁 - 桌面版"
+    },
+    {
+      "src": "/screenshots/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "首頁 - 手機版"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "瀏覽產品",
+      "short_name": "產品",
+      "description": "瀏覽所有產品",
+      "url": "/products",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "購物車",
+      "short_name": "購物車",
+      "description": "查看購物車",
+      "url": "/cart",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

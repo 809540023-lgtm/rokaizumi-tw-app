@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, email, role, openId FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "林tw",
+      "email": "cia8885@gmail.com",
+      "role": "user",
+      "openId": "c84EwzvWDL2acXyeEAkPHJ"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n1\t林tw\tcia8885@gmail.com\tuser\tc84EwzvWDL2acXyeEAkPHJ\n",
+  "stderr": "",
+  "execution_time_ms": 2039
+}

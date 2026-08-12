@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, name, categoryId, price, createdAt FROM products ORDER BY id DESC LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, categoryId, price, createdAt FROM products ORDER BY id DESC LIMIT 10",
+  "rows": [
+    {
+      "id": "90008",
+      "name": "鳥鳥",
+      "categoryId": "2",
+      "price": "20000",
+      "createdAt": "2025-12-26 14:58:45"
+    },
+    {
+      "id": "90007",
+      "name": "測試商品4",
+      "categoryId": "2",
+      "price": "100",
+      "createdAt": "2025-12-26 14:55:11"
+    },
+    {
+      "id": "90006",
+      "name": "測試商品3",
+      "categoryId": "2",
+      "price": "100",
+      "createdAt": "2025-12-26 14:55:07"
+    },
+    {
+      "id": "60034",
+      "name": "可摺疊多功能健腹健身椅",
+      "categoryId": "30013",
+      "price": "12000",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60033",
+      "name": "muva遠紅外線專業支撐護膝L",
+      "categoryId": "30013",
+      "price": "4000",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60032",
+      "name": "腳踏訓練機",
+      "categoryId": "30013",
+      "price": "7500",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60031",
+      "name": "握力訓練器",
+      "categoryId": "30013",
+      "price": "3500",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60030",
+      "name": "NOVA 可調有背洗澡椅 9020CA",
+      "categoryId": "30015",
+      "price": "12500",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60029",
+      "name": "CPE-N 無背洗澡椅",
+      "categoryId": "30015",
+      "price": "10000",
+      "createdAt": "2025-12-18 12:29:46"
+    },
+    {
+      "id": "60028",
+      "name": "安壽 床邊扶手",
+      "categoryId": "30015",
+      "price": "11500",
+      "createdAt": "2025-12-18 12:29:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcategoryId\tprice\tcreatedAt\n90008\t鳥鳥\t2\t20000\t2025-12-26 14:58:45\n90007\t測試商品4\t2\t100\t2025-12-26 14:55:11\n90006\t測試商品3\t2\t100\t2025-12-26 14:55:07\n60034\t可摺疊多功能健腹健身椅\t30013\t12000\t2025-12-18 12:29:46\n60033\tmuva遠紅外線專業支撐護膝L\t30013\t4000\t2025-12-18 12:29:46\n60032\t腳踏訓練機\t30013\t7500\t2025-12-18 12:29:46\n60031\t握力訓練器\t30013\t3500\t2025-12-18 12:29:46\n60030\tNOVA 可調有背洗澡椅 9020CA\t30015\t12500\t2025-12-18 12:29:46\n60029\tCPE-N 無背洗澡椅\t30015\t10000\t2025-12-18 12:29:46\n60028\t安壽 床邊扶手\t30015\t11500\t2025-12-18 12:29:46\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

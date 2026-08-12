@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, name FROM categories WHERE name LIKE '%健康%' OR name LIKE '%護理%' OR name LIKE '%床邊%' OR name LIKE '%復健%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name FROM categories WHERE name LIKE '%健康%' OR name LIKE '%護理%' OR name LIKE '%床邊%' OR name LIKE '%復健%';",
+  "rows": [
+    {
+      "id": "30011",
+      "name": "健康監測"
+    },
+    {
+      "id": "30015",
+      "name": "床邊照護"
+    },
+    {
+      "id": "30013",
+      "name": "復健器材"
+    },
+    {
+      "id": "30012",
+      "name": "護理用品"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n30011\t健康監測\n30015\t床邊照護\n30013\t復健器材\n30012\t護理用品\n",
+  "stderr": "",
+  "execution_time_ms": 1570
+}

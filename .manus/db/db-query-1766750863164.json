@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT id, name, email, role, openId FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "林tw",
+      "email": "cia8885@gmail.com",
+      "role": "admin",
+      "openId": "c84EwzvWDL2acXyeEAkPHJ"
+    },
+    {
+      "id": "30001",
+      "name": "Admin User",
+      "email": "swannylo@gmail.com",
+      "role": "admin",
+      "openId": "swannylo-admin-123456"
+    },
+    {
+      "id": "30002",
+      "name": "swanny lo",
+      "email": "swannylo@gmail.com",
+      "role": "user",
+      "openId": "fpCyyd2jzaRqh7ci3crLZh"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n1\t林tw\tcia8885@gmail.com\tadmin\tc84EwzvWDL2acXyeEAkPHJ\n30001\tAdmin User\tswannylo@gmail.com\tadmin\tswannylo-admin-123456\n30002\tswanny lo\tswannylo@gmail.com\tuser\tfpCyyd2jzaRqh7ci3crLZh\n",
+  "stderr": "",
+  "execution_time_ms": 1487
+}

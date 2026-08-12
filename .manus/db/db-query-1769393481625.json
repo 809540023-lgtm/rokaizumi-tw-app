@@ -1,0 +1,22 @@
+{
+  "query": "SELECT * FROM announcements;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3FVGt3RqCkiFaDE.0fde5e63513d --database bMn2Gb7rjKtySEiV2r5RyX --execute SELECT * FROM announcements;",
+  "rows": [
+    {
+      "id": "1",
+      "contentZh": "🇯🇵 日本連線中！專業團隊正陸續上架百元優質好物與高品質介護用品，敬請期待。",
+      "contentEn": "🇯🇵 Live from Japan! Our team is uploading quality products and premium care items. Stay tuned!",
+      "contentJa": "🇯🇵 日本から生中継！専門チームが百円商品と高品質介護用品を続々アップロード中。お楽しみに！",
+      "isActive": "1",
+      "priority": "1",
+      "startDate": "NULL",
+      "endDate": "NULL",
+      "createdAt": "2026-01-26 01:59:38",
+      "updatedAt": "2026-01-26 01:59:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcontentZh\tcontentEn\tcontentJa\tisActive\tpriority\tstartDate\tendDate\tcreatedAt\tupdatedAt\n1\t🇯🇵 日本連線中！專業團隊正陸續上架百元優質好物與高品質介護用品，敬請期待。\t🇯🇵 Live from Japan! Our team is uploading quality products and premium care items. Stay tuned!\t🇯🇵 日本から生中継！専門チームが百円商品と高品質介護用品を続々アップロード中。お楽しみに！\t1\t1\tNULL\tNULL\t2026-01-26 01:59:38\t2026-01-26 01:59:38\n",
+  "stderr": "",
+  "execution_time_ms": 1568
+}
