@@ -34,7 +34,7 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
         target="_blank"
         rel="noreferrer"
         title="百元批發入口 — 日本 KOKUBO 全商品目錄"
-        className="group hidden lg:flex absolute z-30 left-[45%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#F3B4B2] hover:scale-105 transition-transform duration-200"
+        className="group hidden lg:flex absolute z-30 left-[60%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#F3B4B2] hover:scale-105 transition-transform duration-200"
       >
         <span className="text-[11px] font-bold text-[#C0392B] leading-none">日本直採</span>
         <span className="text-2xl font-extrabold text-[#DC2626] leading-tight mt-0.5">百元批發</span>
