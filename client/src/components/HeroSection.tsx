@@ -34,12 +34,25 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
         target="_blank"
         rel="noreferrer"
         title="百元批發入口 — 日本 KOKUBO 全商品目錄"
-        className="group hidden lg:flex absolute z-30 left-[52%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#F3B4B2] hover:scale-105 transition-transform duration-200"
+        className="group hidden lg:flex absolute z-30 left-[40%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#F3B4B2] hover:scale-105 transition-transform duration-200"
       >
         <span className="text-[11px] font-bold text-[#C0392B] leading-none">日本直採</span>
         <span className="text-2xl font-extrabold text-[#DC2626] leading-tight mt-0.5">百元批發</span>
-        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">91,463品</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">91,132品</span>
         <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#DC2626] px-2 py-0.5 rounded-full group-hover:bg-[#B91C1C]">前往目錄 →</span>
+      </a>
+      {/* 山田化學(Yamada Kagaku)廠商入口 */}
+      <a
+        href={HYAKUEN_URL}
+        target="_blank"
+        rel="noreferrer"
+        title="山田化學 — 日本廚房・生活用品全系列"
+        className="group hidden lg:flex absolute z-30 right-[35%] top-1/2 -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#A78BFA] hover:scale-105 transition-transform duration-200"
+      >
+        <span className="text-[11px] font-bold text-[#7C3AED] leading-none">日本品質</span>
+        <span className="text-2xl font-extrabold text-[#A78BFA] leading-tight mt-0.5">山田化學</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">3277品</span>
+        <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#A78BFA] px-2 py-0.5 rounded-full group-hover:bg-[#9370DB]">逛廚房用品 →</span>
       </a>
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-12 lg:py-20">
