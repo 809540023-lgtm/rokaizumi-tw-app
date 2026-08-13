@@ -38,7 +38,7 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
       >
         <span className="text-[11px] font-bold text-[#C0392B] leading-none">日本直採</span>
         <span className="text-2xl font-extrabold text-[#DC2626] leading-tight mt-0.5">百元批發</span>
-        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">KOKUBO 1,463 品</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">91,463品</span>
         <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#DC2626] px-2 py-0.5 rounded-full group-hover:bg-[#B91C1C]">前往目錄 →</span>
       </a>
       <div className="container mx-auto px-4">
