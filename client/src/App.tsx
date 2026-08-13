@@ -5,7 +5,7 @@ import { Route, Switch } from "wouter";
 import ProductDetail from "./pages/ProductDetail";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
 import Products from "./pages/Products";
 import CategoryProducts from "./pages/CategoryProducts";
 import TripVideos from "./pages/TripVideos";
@@ -36,7 +36,7 @@ function Router() {
       <Route path={"/admin-panel"} component={AdminPanel} />
       <Route path={"/admin/financial"} component={FinancialDashboard} />
       <Route path={"/admin"} component={AdminDashboard} />
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={HomePage} />
       <Route path={"/koku"} component={Koku} />
       <Route path={"/products/:categoryId"} component={CategoryProducts} />
       <Route path={"/products"} component={Products} />
