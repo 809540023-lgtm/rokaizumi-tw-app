@@ -3,15 +3,40 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog } from '../drizzle/schema';
 import { ENV } from './_core/env';
+import { initializeFallbackDB, isFallbackActive, getFallbackProducts, getFallbackCategories } from './fallback-db';
 
 // Create database connection
-const pool = mysql.createPool(ENV.databaseUrl);
-export const db = drizzle(pool);
+let pool: any;
+let db: any;
+let isDbConnected = false;
+
+try {
+  if (ENV.databaseUrl) {
+    pool = mysql.createPool(ENV.databaseUrl);
+    db = drizzle(pool);
+    isDbConnected = true;
+    console.log('✅ 使用實際資料庫');
+  } else {
+    throw new Error('DATABASE_URL 未設置');
+  }
+} catch (error) {
+  console.warn('⚠️  資料庫連接失敗，使用回退模式');
+  console.warn((error as Error).message);
+
+  // 初始化回退資料庫
+  initializeFallbackDB();
+  isDbConnected = false;
+}
+
+export { db, isDbConnected };
 
 
 
 // ========== Categories ==========
 export async function getAllCategories() {
+  if (!isDbConnected && isFallbackActive) {
+    return await getFallbackCategories();
+  }
   return await db.select().from(categories).orderBy(categories.name);
 }
 
@@ -27,6 +52,9 @@ export async function createCategory(data: InsertCategory) {
 
 // ========== Products ==========
 export async function getAllProducts() {
+  if (!isDbConnected && isFallbackActive) {
+    return await getFallbackProducts();
+  }
   return await db.select().from(products).orderBy(desc(products.createdAt));
 }
 
@@ -80,6 +108,10 @@ export async function getLowStockProducts(threshold?: number) {
  * Search products by name or description
  */
 export async function searchProducts(query: string) {
+  if (!isDbConnected && isFallbackActive) {
+    const { searchFallbackProducts } = await import('./fallback-db');
+    return await searchFallbackProducts(query);
+  }
   const searchTerm = `%${query}%`;
   return await db.select().from(products).where(
     or(
