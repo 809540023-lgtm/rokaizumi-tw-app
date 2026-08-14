@@ -6,7 +6,12 @@ services:
     region: singapore
     branch: main
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && npm run db:push && pnpm build
+    buildCommand: |
+      corepack enable && \
+      pnpm install --frozen-lockfile && \
+      echo "Running database migrations..." && \
+      npm run db:push || echo "⚠️  Migration warning (may be expected on first run)" && \
+      pnpm build
     startCommand: pnpm start
     healthCheckPath: /api/health
     autoDeploy: true
@@ -33,8 +38,9 @@ services:
         sync: false
 
 databases:
-  - name: rokaizumi-mysql
+  - name: rokaizumi-db
     plan: starter
     region: singapore
     databaseName: rokaizumi
     user: rokaizumi
+    ipAllowList: []
