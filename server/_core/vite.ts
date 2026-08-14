@@ -48,14 +48,25 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // 在 production 和 development 中都使用 dist/public
-  // dist/index.js 會被執行，所以相對於 dist 目錄即可
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // 嘗試使用 dist/public，如果不存在則嘗試 client/public
+  let distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {
-    console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
+    console.log(`dist/public not found at: ${distPath}`);
+    // Fallback to client/public for development or partial builds
+    distPath = path.resolve(import.meta.dirname, "../..", "client", "public");
+    console.log(`Fallback to client/public at: ${distPath}`);
+  }
+
+  if (!fs.existsSync(distPath)) {
+    console.error(`Could not find static directory: ${distPath}`);
+  } else {
+    console.log(`✅ Serving static files from: ${distPath}`);
+    const productsPath = path.resolve(distPath, "products.json");
+    if (fs.existsSync(productsPath)) {
+      const count = fs.readFileSync(productsPath, "utf-8").match(/"id":/g)?.length || 0;
+      console.log(`📦 Available products: ${count}`);
+    }
   }
 
   app.use(express.static(distPath));
