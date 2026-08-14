@@ -48,24 +48,36 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // 嘗試使用 dist/public，如果不存在則嘗試 client/public
+  // 優先級: dist/public > server/public > client/public
   let distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {
     console.log(`dist/public not found at: ${distPath}`);
-    // Fallback to client/public for development or partial builds
-    distPath = path.resolve(import.meta.dirname, "../..", "client", "public");
-    console.log(`Fallback to client/public at: ${distPath}`);
+    // Fallback 1: server/public (用於 Render 部署)
+    const serverPublicPath = path.resolve(import.meta.dirname, "..", "public");
+    if (fs.existsSync(serverPublicPath)) {
+      distPath = serverPublicPath;
+      console.log(`Using server/public at: ${distPath}`);
+    } else {
+      console.log(`server/public not found at: ${serverPublicPath}`);
+      // Fallback 2: client/public (用於開發或回退)
+      distPath = path.resolve(import.meta.dirname, "../..", "client", "public");
+      console.log(`Fallback to client/public at: ${distPath}`);
+    }
+  } else {
+    console.log(`Using dist/public at: ${distPath}`);
   }
 
   if (!fs.existsSync(distPath)) {
-    console.error(`Could not find static directory: ${distPath}`);
+    console.error(`❌ Could not find static directory: ${distPath}`);
   } else {
     console.log(`✅ Serving static files from: ${distPath}`);
     const productsPath = path.resolve(distPath, "products.json");
     if (fs.existsSync(productsPath)) {
       const count = fs.readFileSync(productsPath, "utf-8").match(/"id":/g)?.length || 0;
       console.log(`📦 Available products: ${count}`);
+    } else {
+      console.warn(`⚠️ products.json not found at: ${productsPath}`);
     }
   }
 
