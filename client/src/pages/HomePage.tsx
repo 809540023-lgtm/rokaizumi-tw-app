@@ -10,13 +10,23 @@ import { toast } from 'sonner';
 import { useLocation as useWouterLocation } from 'wouter';
 import { MobileMenu } from '@/components/MobileMenu';
 import { HeroSection } from '@/components/HeroSection';
+import { useProductsFallback } from '../hooks/useProductsFallback';
 
 export default function HomePage() {
   const [location, setLocation] = useWouterLocation();
   const { user, isAuthenticated } = useAuth();
   const { data: latestVideos } = trpc.tripVideos.getLatest.useQuery({ limit: 5 });
-  const { data: categories = [] } = trpc.categories.list.useQuery();
-  const { data: products = [] } = trpc.products.list.useQuery();
+
+  // 使用回退機制加載產品和分類
+  const { products: fallbackProducts, categories: fallbackCategories, isFallback } = useProductsFallback();
+
+  // 嘗試從 API 加載，否則使用回退數據
+  const { data: apiCategories = [] } = trpc.categories.list.useQuery();
+  const { data: apiProducts = [] } = trpc.products.list.useQuery();
+
+  const categories = apiCategories.length > 0 ? apiCategories : fallbackCategories;
+  const products = apiProducts.length > 0 ? apiProducts : fallbackProducts;
+
   const { language, setLanguage, t } = useLanguage();
 
   const [quantities, setQuantities] = useState<Record<number, number>>({});
