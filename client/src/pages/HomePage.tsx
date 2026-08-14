@@ -107,14 +107,25 @@ export default function HomePage() {
     ['健康モニタリング', '安全監視', 'ベッドサイドケア', 'リハビリ機器', '移動補助', '浴室安全', '介護用品', '生活補助具'].includes(cat.name)
   );
 
-  // 篩選產品
+  // 篩選產品 - 支援API和fallback products兩種結構
   const filteredProducts = useMemo(() => {
     if (!selectedCategory) return [];
 
     const relevantCategories = selectedCategory === 'hundred' ? japaneseCategories : elderlyCareCategories;
-    const categoryIds = relevantCategories.map(cat => cat.id);
 
-    return products.filter(product => categoryIds.includes(product.categoryId));
+    // 支援兩種產品結構：API products (categoryId) 和 fallback products (category)
+    return products.filter(product => {
+      if (product.categoryId !== undefined) {
+        // API products - 使用 categoryId
+        const categoryIds = relevantCategories.map(cat => cat.id);
+        return categoryIds.includes(product.categoryId);
+      } else if (product.category) {
+        // Fallback products - 使用 category 名稱
+        const categoryNames = relevantCategories.map(cat => cat.name);
+        return categoryNames.includes(product.category);
+      }
+      return false;
+    });
   }, [selectedCategory, products, japaneseCategories, elderlyCareCategories]);
 
   return (
