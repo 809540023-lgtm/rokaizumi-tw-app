@@ -49,7 +49,9 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   // 在 production 和 development 中都使用 dist/public
-  const distPath = path.resolve(import.meta.dirname, "../..", "dist", "public");
+  // dist/index.js 會被執行，所以相對於 dist 目錄即可
+  const distPath = path.resolve(import.meta.dirname, "public");
+
   if (!fs.existsSync(distPath)) {
     console.error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
@@ -60,6 +62,11 @@ export function serveStatic(app: Express) {
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    const indexPath = path.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send("Not Found");
+    }
   });
 }
