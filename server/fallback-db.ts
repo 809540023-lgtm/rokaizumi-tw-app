@@ -32,8 +32,18 @@ let isFallbackActive = false;
  */
 export function initializeFallbackDB() {
   try {
-    const productsPath = path.resolve(process.cwd(), 'client/public/products.json');
-    
+    // 優先級: server/public > client/public
+    let productsPath = path.resolve(process.cwd(), 'server/public/products.json');
+
+    if (!fs.existsSync(productsPath)) {
+      productsPath = path.resolve(process.cwd(), 'client/public/products.json');
+    }
+
+    if (!fs.existsSync(productsPath)) {
+      // Fallback: 嘗試 dist/public（生產環境）
+      productsPath = path.resolve(__dirname, '../public/products.json');
+    }
+
     if (fs.existsSync(productsPath)) {
       const data = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
       fallbackProducts = data;
