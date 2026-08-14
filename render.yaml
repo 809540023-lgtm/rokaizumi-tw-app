@@ -6,7 +6,7 @@ services:
     region: singapore
     branch: main
     rootDir: .
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && npm run db:push && pnpm build
     startCommand: pnpm start
     healthCheckPath: /api/health
     autoDeploy: true
@@ -16,7 +16,7 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        sync: false
+        sync: true
       - key: JWT_SECRET
         generateValue: true
       - key: STRIPE_SECRET_KEY
