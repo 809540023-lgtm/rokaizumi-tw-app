@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import FinancialDashboard from "./pages/FinancialDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import Koku from "./pages/Koku";
+import Yamada from "./pages/Yamada";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -38,6 +39,7 @@ function Router() {
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/"} component={HomePage} />
       <Route path={"/koku"} component={Koku} />
+      <Route path={"/yama"} component={Yamada} />
       <Route path={"/products/:categoryId"} component={CategoryProducts} />
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:productId"} component={ProductDetail} />
