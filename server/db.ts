@@ -24,12 +24,40 @@ let isDbConnected = false;
 // 先把回退資料準備好，任何查詢在執行期失敗都能立刻接手。
 initializeFallbackDB();
 
+/**
+ * 建立連線池設定。
+ *
+ * TiDB Cloud（以及多數雲端 MySQL）強制要求 TLS，而 mysql2 預設「不」啟用 TLS，
+ * 連線字串裡若沒有 ssl 參數就會被伺服器拒絕。本機開發通常沒有憑證，
+ * 因此只在非 localhost 時啟用。
+ */
+function buildPoolConfig(url: string) {
+  const host = (() => {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return '';
+    }
+  })();
+  const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
+
+  if (isLocal) return url;
+  return { uri: url, ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true } };
+}
+
 try {
   if (ENV.databaseUrl) {
-    pool = mysql.createPool(ENV.databaseUrl);
+    pool = mysql.createPool(buildPoolConfig(ENV.databaseUrl) as any);
     db = drizzle(pool);
     isDbConnected = true;
     console.log('✅ 資料庫連線池已建立');
+
+    // createPool 不會真的連線，這裡主動探測一次，把失敗盡早記錄下來，
+    // 免得每個請求都要靠 withFallback 才發現資料庫其實不通。
+    pool
+      .query('SELECT 1')
+      .then(() => console.log('✅ 資料庫連線測試通過'))
+      .catch((e: Error) => console.error('❌ 資料庫連線測試失敗:', e.message));
   } else {
     throw new Error('DATABASE_URL 未設置');
   }
