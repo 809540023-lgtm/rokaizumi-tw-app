@@ -55,7 +55,7 @@ export default function Products() {
   // 分組分類
   const japaneseCategories = categories.filter(cat => 
     ['日用百貨', '廚房用品', '收納用品', '文具用品', '清潔用品', '玩具雜貨', '美妝保養', '食品零食'].includes(cat.name) ||
-    ['廚房用品', '洗衣用品', '衛浴用品', '清潔用品', '文具用品', '收納用品'].includes(cat.name) ||
+    ['廚房用品', '洗衣用品', '衛浴用品', '清潔用品', '文具用品', '收納用品', '居家生活', '美妝保養', '禮品包裝', '銀髮親子'].includes(cat.name) ||
     ['Daily Necessities', 'Kitchen Items', 'Storage', 'Stationery', 'Cleaning Supplies', 'Toys', 'Beauty Products', 'Food/Snacks'].includes(cat.name) ||
     ['日用雑貨', 'キッチン用品', '収納用品', '文房具', '清掃用品', 'おもちゃ雑貨', '美容・スキンケア', '食品・お菓子'].includes(cat.name)
   );
@@ -239,29 +239,29 @@ export default function Products() {
         {/* 產品網格 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map(product => (
-            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
               {/* 產品圖片 */}
               <Link href={`/product/${product.id}`} className="block">
-                  <div className="w-full h-48 overflow-hidden">
+                  <div className="w-full aspect-square bg-white overflow-hidden p-3">
                     <ProductImage
                       src={product.imageUrl}
                       alt={product.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      className="w-full h-full object-contain hover:scale-105 transition-transform"
                     />
                   </div>
                 </Link>
               
               {/* 產品信息 */}
-              <div className="p-4">
+              <div className="p-4 flex flex-col flex-1">
                 {/* 產品名稱 - 可點擊連結到詳情頁 */}
                 <Link href={`/product/${product.id}`} className="block">
-                    <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 hover:text-[#0ABAB5] transition-colors cursor-pointer">
+                    <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 min-h-[2.75rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
                       {product.name}
                     </h3>
                   </Link>
                 
                 {/* 價格 - 根據語言顯示不同幣別 */}
-                <div className="mb-4">
+                <div className="mb-4 mt-auto">
                   <span className="text-2xl font-bold text-[#0ABAB5]">
                     {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
                      language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 

@@ -178,7 +178,7 @@ export default function CategoryProducts() {
                       <img
                         src={product.imageUrl || 'https://placehold.co/400x300?text=Product'}
                         alt={product.name}
-                        className="w-full h-48 object-cover hover:scale-105 transition-transform"
+                        className="w-full aspect-square bg-white object-contain p-3 hover:scale-105 transition-transform"
                       />
                     </div>
                   </Link>

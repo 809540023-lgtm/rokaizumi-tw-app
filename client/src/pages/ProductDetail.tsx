@@ -234,7 +234,7 @@ export default function ProductDetail() {
                   <img
                     src={currentImage}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-4"
                   />
                 ) : (
                   <div className="text-6xl text-gray-400">📦</div>
@@ -261,7 +261,7 @@ export default function ProductDetail() {
                       <img
                         src={img}
                         alt={`${product.name} - ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain p-4"
                       />
                     </button>
                   ))}

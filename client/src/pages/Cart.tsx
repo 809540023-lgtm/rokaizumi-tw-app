@@ -118,7 +118,7 @@ export default function Cart() {
                   <div className="flex gap-6">
                     {/* Product Image */}
                     <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                      {<ProductImage src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />}
+                      {<ProductImage src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-1" />}
                     </div>
 
                     {/* Product Info */}

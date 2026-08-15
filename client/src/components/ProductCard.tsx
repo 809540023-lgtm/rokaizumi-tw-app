@@ -47,7 +47,7 @@ export function ProductCard({
               src={product.imageUrl}
               alt={product.name}
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-300"
+              className="w-full h-full object-contain p-3 group-hover:scale-[1.06] transition-transform duration-300"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-7xl bg-gradient-to-br from-gray-100 to-[#E0F7F6]">
