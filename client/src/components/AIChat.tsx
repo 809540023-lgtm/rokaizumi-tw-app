@@ -92,7 +92,7 @@ export default function AIChat() {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-[#0ABAB5] hover:bg-[#089B96] shadow-lg z-50"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#0ABAB5] hover:bg-[#089B96] shadow-lg z-50 mb-[env(safe-area-inset-bottom)]"
       >
         <MessageCircle className="w-8 h-8 text-white" />
       </Button>
@@ -100,7 +100,7 @@ export default function AIChat() {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-96 h-[600px] flex flex-col shadow-2xl z-50 overflow-hidden">
+    <Card className="fixed inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-96 h-[70vh] sm:h-[600px] flex flex-col shadow-2xl z-50 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-[#0ABAB5] to-[#089B96] p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">

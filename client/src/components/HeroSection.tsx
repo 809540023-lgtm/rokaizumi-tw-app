@@ -45,16 +45,16 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-8 sm:py-12 lg:py-20">
           {/* 左側內容 */}
           <div>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0ABAB5]/12 text-[#089B96] text-xs font-bold mb-5">
+            <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-[#0ABAB5]/12 text-[#089B96] text-[11px] sm:text-xs font-bold mb-4 sm:mb-5">
               🇯🇵 日本大阪直送・服務台灣家庭已 8 年
             </span>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.2] sm:leading-[1.15] tracking-tight mb-4 sm:mb-5 text-gray-900">
+            <h1 className="text-2xl min-[400px]:text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.25] sm:leading-[1.15] tracking-tight mb-4 sm:mb-5 text-gray-900">
               日本職人嚴選介護用品，
               <br className="hidden sm:block" />
               讓長輩生活
               <span className="text-[#0ABAB5]">更自在</span>。
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-xl">
+            <p className="text-sm sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-xl">
               1,600 種以上日本嚴選商品，從大阪直送台灣家門口。免關稅、7 天到貨、3 年保固，全中文客服協助選品。
             </p>
         {/* 手機版姊妹站入口（桌機改用右側圓形 logo） */}
@@ -62,15 +62,15 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
           href="https://nihon-mama-savebuy.onrender.com/"
           target="_blank"
           rel="noreferrer"
-          className="lg:hidden mt-5 flex items-center gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#E6C9A0] shadow-md px-4 py-3 active:scale-[0.98] transition-transform"
+          className="lg:hidden mt-5 flex items-center gap-2.5 sm:gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#E6C9A0] shadow-md px-3 sm:px-4 py-2.5 sm:py-3 active:scale-[0.98] transition-transform"
         >
-          <span className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-[#FBF1E4] ring-1 ring-[#E6C9A0] shrink-0 leading-none">
+          <span className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FBF1E4] ring-1 ring-[#E6C9A0] shrink-0 leading-none">
             <span className="text-[8px] font-bold text-[#B8895A]">日本媽媽</span>
             <span className="text-[13px] font-extrabold text-[#C49A5E]">省省購</span>
           </span>
-          <span className="flex-1 text-left leading-tight">
-            <span className="block text-sm font-bold text-gray-800">日本媽媽省省購・即時拼團</span>
-            <span className="block text-xs text-gray-500">代購 0 元，看到好物就開團 →</span>
+          <span className="flex-1 min-w-0 text-left leading-tight">
+            <span className="block text-[13px] sm:text-sm font-bold text-gray-800">日本媽媽省省購・即時拼團</span>
+            <span className="block text-[11px] sm:text-xs text-gray-500">代購 0 元，看到好物就開團 →</span>
           </span>
         </a>
         {/* 手機版百元批發入口 */}
@@ -78,15 +78,15 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
           href={HYAKUEN_URL}
           target="_blank"
           rel="noreferrer"
-          className="lg:hidden mt-3 flex items-center gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#F3B4B2] shadow-md px-4 py-3 active:scale-[0.98] transition-transform"
+          className="lg:hidden mt-3 flex items-center gap-2.5 sm:gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#F3B4B2] shadow-md px-3 sm:px-4 py-2.5 sm:py-3 active:scale-[0.98] transition-transform"
         >
-          <span className="flex flex-col items-center justify-center w-12 h-12 rounded-full bg-[#FDECEA] ring-1 ring-[#F3B4B2] shrink-0 leading-none">
+          <span className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FDECEA] ring-1 ring-[#F3B4B2] shrink-0 leading-none">
             <span className="text-[8px] font-bold text-[#C0392B]">日本直採</span>
             <span className="text-[13px] font-extrabold text-[#DC2626]">百元批發</span>
           </span>
-          <span className="flex-1 text-left leading-tight">
-            <span className="block text-sm font-bold text-gray-800">百元批發入口・KOKUBO 全目錄</span>
-            <span className="block text-xs text-gray-500">1,399 品項，整箱直採報價 →</span>
+          <span className="flex-1 min-w-0 text-left leading-tight">
+            <span className="block text-[13px] sm:text-sm font-bold text-gray-800">百元批發入口・KOKUBO 全目錄</span>
+            <span className="block text-[11px] sm:text-xs text-gray-500">1,399 品項，整箱直採報價 →</span>
           </span>
         </a>
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-7">
@@ -99,25 +99,25 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
             </div>
 
             {/* Hero 搜尋 */}
-            <div className="bg-white p-2 rounded-full shadow-[0_8px_24px_rgba(10,186,181,0.14)] flex items-center gap-2 max-w-lg">
+            <div className="bg-white p-1.5 sm:p-2 rounded-full shadow-[0_8px_24px_rgba(10,186,181,0.14)] flex items-center gap-1.5 sm:gap-2 max-w-lg">
               <input
                 type="text"
-                placeholder="輸入商品關鍵字，例如「電動介護床」、「輕量輪椅」..."
+                placeholder="搜尋商品，例如「輪椅」"
                 value={searchQuery}
                 onChange={e => onSearchChange(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && onSearchSubmit()}
-                className="flex-1 border-0 px-4 py-2 text-sm focus:outline-none bg-transparent"
+                className="flex-1 min-w-0 border-0 px-3 sm:px-4 py-2 text-sm focus:outline-none bg-transparent"
               />
               <button
                 onClick={onSearchSubmit}
-                className="bg-[#0ABAB5] hover:bg-[#089B96] text-white px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5"
+                className="shrink-0 whitespace-nowrap bg-[#0ABAB5] hover:bg-[#089B96] text-white px-4 sm:px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5"
               >
                 <Search className="w-4 h-4" />
                 搜尋
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-5 mt-5 text-sm text-gray-600">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 sm:mt-5 text-[13px] sm:text-sm text-gray-600">
               {['正品保証', '免關稅', '3 年保固', '中日客服'].map(item => (
                 <span key={item}>
                   <span className="text-[#16A34A] font-bold">✓</span> {item}
