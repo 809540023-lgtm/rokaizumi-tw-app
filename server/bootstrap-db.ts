@@ -98,9 +98,11 @@ async function seedProducts(pool: any) {
   const products = JSON.parse(fs.readFileSync(file, 'utf-8'));
   console.log(`📦 匯入 ${products.length} 筆商品…`);
 
+  // categories.name 有唯一鍵，而上一次執行可能已經寫入部分分類
+  // （商品匯入失敗但分類已成功），這裡用 INSERT IGNORE 讓重複執行安全。
   const names = [...new Set(products.map((p: any) => p.category).filter(Boolean))];
   for (const name of names) {
-    await pool.query('INSERT INTO categories (name, description) VALUES (?, ?)', [
+    await pool.query('INSERT IGNORE INTO categories (name, description) VALUES (?, ?)', [
       name,
       `分類: ${name}`,
     ]);
