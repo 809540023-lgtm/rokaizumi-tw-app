@@ -27,21 +27,28 @@ initializeFallbackDB();
 /**
  * 建立連線池設定。
  *
- * TiDB Cloud（以及多數雲端 MySQL）強制要求 TLS，而 mysql2 預設「不」啟用 TLS，
- * 連線字串裡若沒有 ssl 參數就會被伺服器拒絕。本機開發通常沒有憑證，
- * 因此只在非 localhost 時啟用。
+ * 公網託管的資料庫（TiDB Cloud、PlanetScale 等）強制要求 TLS，而 mysql2 預設
+ * 不啟用；但本機與雲端內網（Render / VPC 私有位址）通常沒有憑證，強加 TLS
+ * 反而會連不上。因此只對「公開網域」啟用，可用 DATABASE_SSL 覆寫。
  */
-function buildPoolConfig(url: string) {
-  const host = (() => {
-    try {
-      return new URL(url).hostname;
-    } catch {
-      return '';
-    }
-  })();
-  const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
+function isInternalHost(host: string): boolean {
+  if (!host || host === 'localhost' || host === '127.0.0.1') return true;
+  // RFC1918 私有網段：10.x / 172.16-31.x / 192.168.x
+  return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host);
+}
 
-  if (isLocal) return url;
+function buildPoolConfig(url: string) {
+  let host = '';
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    /* 解析不了就當內網處理，不強制 TLS */
+  }
+
+  const override = process.env.DATABASE_SSL;
+  const useSsl = override ? override !== 'false' : !isInternalHost(host);
+
+  if (!useSsl) return url;
   return { uri: url, ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true } };
 }
 
