@@ -640,6 +640,38 @@ export async function updateUserRole(userId: number, role: 'admin' | 'user') {
   return result;
 }
 
+/** 目前的管理員人數。用於判斷初次設定是否已完成。 */
+export async function countAdmins(): Promise<number> {
+  const rows = await db.select({ id: users.id }).from(users).where(eq(users.role, 'admin'));
+  return rows.length;
+}
+
+// ========== 本站帳密登入 ==========
+// authLocal.ts 需要下列函式，但先前並未實作，
+// 導致 /api/auth/register 與 /api/auth/login 無法運作。
+
+export async function getUserByEmail(email: string) {
+  const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return rows[0] || null;
+}
+
+export async function createLocalUser(data: {
+  openId: string;
+  email: string;
+  name: string | null;
+  passwordHash: string;
+}) {
+  await db.insert(users).values({
+    openId: data.openId,
+    email: data.email,
+    name: data.name,
+    passwordHash: data.passwordHash,
+    loginMethod: 'local',
+  });
+  const rows = await db.select().from(users).where(eq(users.openId, data.openId)).limit(1);
+  return rows[0];
+}
+
 
 // ========== Announcements ==========
 export async function getActiveAnnouncements() {

@@ -17,6 +17,8 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  /** 本站帳密登入用。走 OAuth 註冊的使用者為 null。 */
+  passwordHash: varchar("passwordHash", { length: 255 }),
   // Personal profile fields
   phone: varchar("phone", { length: 50 }),
   address: text("address"),

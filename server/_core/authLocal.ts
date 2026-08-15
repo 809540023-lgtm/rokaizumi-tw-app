@@ -54,8 +54,25 @@ async function setSession(req: Request, res: Response, openId: string, name: str
 }
 
 export function registerLocalAuthRoutes(app: Express) {
+  /**
+   * 首次建立管理員。
+   *
+   * 這條路由原本沒有任何保護：註冊不需要驗證信箱，任何人都能用清單上的
+   * email 註冊，再呼叫這裡把自己升級成管理員。改為只在「系統還沒有任何
+   * 管理員」時才可用——正常情況下只會在初次啟用時執行一次，
+   * 之後要新增管理員應該由既有管理員在後台操作。
+   */
   app.post("/api/auth/bootstrap-admin", async (_req: Request, res: Response) => {
     try {
+      const admins = await db.countAdmins();
+      if (admins > 0) {
+        res.status(403).json({
+          ok: false,
+          error: "系統已有管理員，此功能僅供初次設定使用",
+        });
+        return;
+      }
+
       const ADMIN_EMAILS = ["cia8885@gmail.com", "swannylo@gmail.com"];
       const promoted: string[] = [];
       const missing: string[] = [];
