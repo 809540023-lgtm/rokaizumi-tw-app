@@ -49,6 +49,14 @@ export type InsertCategory = typeof categories.$inferInsert;
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
+  // 商品識別與多語品名。原本資料表沒有這些欄位，改由資料庫供應商品後
+  // JAN 條碼、品番與日英文品名會整批遺失。
+  jan: varchar("jan", { length: 20 }),
+  code: varchar("code", { length: 50 }),
+  nameJa: varchar("nameJa", { length: 255 }),
+  nameEn: varchar("nameEn", { length: 255 }),
+  origin: varchar("origin", { length: 60 }),
+  priceJpy: int("priceJpy"),
   description: text("description"),
   price: int("price").notNull(),
   categoryId: int("categoryId").notNull().references(() => categories.id),

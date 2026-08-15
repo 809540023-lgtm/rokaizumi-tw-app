@@ -78,29 +78,65 @@ async function applyMigrations(pool: any) {
   console.log('✅ 資料表建立完成');
 }
 
+function loadProductsJson() {
+  const file = ['dist/public/products.json', 'server/public/products.json', 'client/public/products.json']
+    .map(p => path.resolve(process.cwd(), p))
+    .find(p => fs.existsSync(p));
+  return file ? JSON.parse(fs.readFileSync(file, 'utf-8')) : null;
+}
+
+/**
+ * 回填 jan / code / nameJa / nameEn / origin / priceJpy。
+ *
+ * 這些欄位是後來才加進資料表的，先前匯入的商品全部是空的；
+ * 其中 JAN 條碼有 1374 筆，缺了會影響商品辨識與後續對帳。
+ */
+async function backfillProductFields(pool: any) {
+  const [[{ n }]]: any = await pool.query(
+    "SELECT COUNT(*) AS n FROM products WHERE jan IS NULL AND code IS NULL"
+  );
+  if (Number(n) === 0) return;
+
+  const products = loadProductsJson();
+  if (!products) return;
+
+  console.log(`🔧 回填商品識別欄位（${n} 筆待處理）…`);
+  let done = 0;
+  for (const p of products) {
+    if (!p.jan && !p.code && !p.nameJa) continue;
+    try {
+      const [r]: any = await pool.query(
+        'UPDATE products SET jan = ?, code = ?, nameJa = ?, nameEn = ?, origin = ?, priceJpy = ? WHERE name = ?',
+        [p.jan ?? null, p.code ?? null, p.nameJa ?? null, p.nameEn ?? null, p.origin ?? null, p.priceJpy ?? null, p.name]
+      );
+      if (r.affectedRows) done++;
+    } catch {
+      /* 單筆失敗不中斷 */
+    }
+  }
+  console.log(`✅ 已回填 ${done} 筆`);
+}
+
 /** 商品表是空的就把 products.json 匯進去 */
 async function seedProducts(pool: any) {
   const [[{ n }]]: any = await pool.query('SELECT COUNT(*) AS n FROM products');
   if (Number(n) > 0) {
     console.log(`ℹ️  資料庫已有 ${n} 筆商品，略過匯入`);
+    await backfillProductFields(pool);
     return;
   }
 
-  const file = ['dist/public/products.json', 'server/public/products.json', 'client/public/products.json']
-    .map(p => path.resolve(process.cwd(), p))
-    .find(p => fs.existsSync(p));
-
-  if (!file) {
+  const products = loadProductsJson();
+  if (!products) {
     console.warn('⚠️  找不到 products.json，略過匯入');
     return;
   }
 
-  const products = JSON.parse(fs.readFileSync(file, 'utf-8'));
   console.log(`📦 匯入 ${products.length} 筆商品…`);
 
   // categories.name 有唯一鍵，而上一次執行可能已經寫入部分分類
   // （商品匯入失敗但分類已成功），這裡用 INSERT IGNORE 讓重複執行安全。
-  const names = [...new Set(products.map((p: any) => p.category).filter(Boolean))];
+  const names = Array.from(new Set(products.map((p: any) => p.category).filter(Boolean)));
   for (const name of names) {
     await pool.query('INSERT IGNORE INTO categories (name, description) VALUES (?, ?)', [
       name,
@@ -116,9 +152,16 @@ async function seedProducts(pool: any) {
     if (!cid) continue;
     try {
       await pool.query(
-        'INSERT INTO products (name, description, price, categoryId, imageUrl, images, status, specifications, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO products (name, jan, code, nameJa, nameEn, origin, priceJpy, description, price, categoryId, imageUrl, images, status, specifications, stock) ' +
+          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           p.name,
+          p.jan ?? null,
+          p.code ?? null,
+          p.nameJa ?? null,
+          p.nameEn ?? null,
+          p.origin ?? null,
+          p.priceJpy ?? null,
           p.description ?? '',
           p.price ?? 0,
           cid,
