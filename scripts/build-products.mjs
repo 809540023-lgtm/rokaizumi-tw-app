@@ -16,6 +16,7 @@ const root = path.resolve(__dirname, '..');
 
 const CARE_SRC = '/Volumes/ag/已完成專案/日本公司/Kimi_Agent_Deployment_v11/data/products.json';
 const KOKUBO_SRC = '/Volumes/ag/百元批發/data/products.json';
+const YAMADA_SRC = '/Users/agmini/Documents/yamada-kagaku-db/data/yamada-products-v2.json';
 
 // 日文分類 -> 站上使用的中文分類名
 const CARE_CAT = {
@@ -34,16 +35,37 @@ const CARE_CAT = {
 
 const KOKUBO_CAT = {
   kitchen: '廚房用品',
-  cleaning: '清潔用品',
-  storage: '收納用品',
-  stationery: '文具用品',
-  bath: '衛浴用品',
   laundry: '洗衣用品',
-  beauty: '美妝保養',
-  interior: '居家生活',
-  outdoor: '戶外用品',
-  sanitary: '衛生用品',
+  living: '居家生活',
+  healthcare: '美妝保養',
+  storage: '收納用品',
+  bath: '衛浴用品',
+  life_stage: '銀髮親子',
+  cleaning: '清潔用品',
+  gift: '禮品包裝',
+  stationery: '文具用品',
 };
+
+/**
+ * 山田化學的商品已被併進百元批發資料，但 images 是空陣列、jan 是空字串。
+ * 山田自己的資料集有圖片，且圖片檔名就是 JAN 條碼
+ * （4965534356817.jpg），兩邊用品名可以 100% 對上。
+ */
+function buildYamadaIndex() {
+  const list = JSON.parse(fs.readFileSync(YAMADA_SRC, 'utf-8'));
+  const index = new Map();
+  for (const p of list) {
+    const jan = /\/(\d{8,14})\.(?:jpg|jpeg|png|webp)/i.exec(p.imageUrl ?? '')?.[1] ?? '';
+    index.set(p.name.trim(), { imageUrl: p.imageUrl, jan });
+  }
+  return index;
+}
+const yamada = buildYamadaIndex();
+
+/** 排除中國製（含「日本/中国」這類混合標示）；其餘產地一律保留 */
+function isChinaMade(origin) {
+  return typeof origin === 'string' && /中国|中國|china/i.test(origin);
+}
 
 const out = [];
 let id = 1;
@@ -70,16 +92,26 @@ for (const p of care) {
 }
 const careCount = out.length;
 
-// ---- 日本小商品：每個分類取前 N 筆，保持頁面份量合理 ----
-const PER_CAT = 12;
+// ---- 日本小商品：全部上架，排除中國製 ----
 const kokubo = JSON.parse(fs.readFileSync(KOKUBO_SRC, 'utf-8'));
+let skippedChina = 0;
+let skippedNoImage = 0;
+let filledFromYamada = 0;
 const bucket = new Map();
 for (const p of kokubo) {
-  const slug = p.category?.slug;
-  const label = KOKUBO_CAT[slug];
-  if (!label || !p.images?.length) continue;
+  if (isChinaMade(p.origin)) { skippedChina++; continue; }
+
+  // 山田商品在這份資料裡沒有圖與條碼，從山田資料集補上
+  if (!p.images?.length) {
+    const y = yamada.get(p.nameJa?.trim());
+    if (!y?.imageUrl) { skippedNoImage++; continue; }
+    p.images = [y.imageUrl];
+    if (!p.jan && y.jan) p.jan = y.jan;
+    filledFromYamada++;
+  }
+  const label = KOKUBO_CAT[p.category?.slug] ?? p.category?.label;
+  if (!label) continue;
   const list = bucket.get(label) ?? [];
-  if (list.length >= PER_CAT) continue;
   list.push(p);
   bucket.set(label, list);
 }
@@ -98,6 +130,7 @@ for (const [label, list] of bucket) {
       priceJpy: p.priceJpy,
       description: p.desc || '',
       specifications: p.casePack ? `入數 ${p.casePack}` : '',
+      origin: p.origin ?? '',
       status: 'available',
       imageUrl: p.images[0],
       images: p.images.slice(0, 4),
@@ -106,13 +139,29 @@ for (const [label, list] of bucket) {
   }
 }
 
+// description 佔了整包 67%，但列表頁不顯示它。
+// 拆成主檔（列表用，體積小）與詳情檔（商品頁再抓），
+// 否則每個訪客一進站就要下載 4MB。
+const details = {};
+const list = out.map(({ description, spec, sourceUrl, images, ...rest }) => {
+  if (description || sourceUrl || (images && images.length > 1)) {
+    details[rest.id] = { description: description ?? '', sourceUrl, images };
+  }
+  return rest;
+});
+
 for (const dir of ['client/public', 'server/public', 'dist/public']) {
   const dest = path.join(root, dir);
   fs.mkdirSync(dest, { recursive: true });
-  fs.writeFileSync(path.join(dest, 'products.json'), JSON.stringify(out, null, 2));
+  fs.writeFileSync(path.join(dest, 'products.json'), JSON.stringify(list));
+  fs.writeFileSync(path.join(dest, 'product-details.json'), JSON.stringify(details));
 }
+const kb = (o) => Math.round(Buffer.byteLength(JSON.stringify(o)) / 1024);
+console.log(`   products.json ${kb(list)} KB / product-details.json ${kb(details)} KB`);
 
 const cats = [...new Set(out.map(p => p.category))];
+console.log(`   排除中國製 ${skippedChina} 筆、仍無圖 ${skippedNoImage} 筆`);
+console.log(`   從山田資料集補上圖片與 JAN: ${filledFromYamada} 筆`);
 console.log(`✅ 共 ${out.length} 筆（介護 ${careCount} / 小商品 ${out.length - careCount}）`);
 console.log(`   分類 ${cats.length} 個: ${cats.join('、')}`);
 console.log(`   全部有圖: ${out.every(p => p.imageUrl)}`);
