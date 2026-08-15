@@ -19,7 +19,7 @@ export default function OrderConfirmation() {
   });
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -149,17 +149,17 @@ export default function OrderConfirmation() {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            {language === 'zh' && '訂單確認'}
+            {(language === 'zh' || language === 'cn') && '訂單確認'}
             {language === 'en' && 'Order Confirmed'}
             {language === 'ja' && '注文確認'}
           </h1>
           <p className="text-xl text-gray-600 mb-2">
-            {language === 'zh' && '感謝您的購買！'}
+            {(language === 'zh' || language === 'cn') && '感謝您的購買！'}
             {language === 'en' && 'Thank you for your purchase!'}
             {language === 'ja' && 'ご購入ありがとうございます！'}
           </p>
           <p className="text-gray-500">
-            {language === 'zh' && '我們已收到您的訂單，將盡快為您處理。'}
+            {(language === 'zh' || language === 'cn') && '我們已收到您的訂單，將盡快為您處理。'}
             {language === 'en' && 'We have received your order and will process it as soon as possible.'}
             {language === 'ja' && 'ご注文を受け付けました。できるだけ早く処理させていただきます。'}
           </p>
@@ -171,14 +171,14 @@ export default function OrderConfirmation() {
             {/* Order Information */}
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">
-                {language === 'zh' && '訂單信息'}
+                {(language === 'zh' || language === 'cn') && '訂單信息'}
                 {language === 'en' && 'Order Information'}
                 {language === 'ja' && '注文情報'}
               </h2>
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
                   <div className="text-sm text-gray-600 mb-1">
-                    {language === 'zh' && '訂單編號'}
+                    {(language === 'zh' || language === 'cn') && '訂單編號'}
                     {language === 'en' && 'Order Number'}
                     {language === 'ja' && '注文番号'}
                   </div>
@@ -186,7 +186,7 @@ export default function OrderConfirmation() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-600 mb-1">
-                    {language === 'zh' && '訂單日期'}
+                    {(language === 'zh' || language === 'cn') && '訂單日期'}
                     {language === 'en' && 'Order Date'}
                     {language === 'ja' && '注文日'}
                   </div>
@@ -200,12 +200,12 @@ export default function OrderConfirmation() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">
-                      {language === 'zh' && '訂單狀態'}
+                      {(language === 'zh' || language === 'cn') && '訂單狀態'}
                       {language === 'en' && 'Order Status'}
                       {language === 'ja' && '注文ステータス'}
                     </div>
                     <div className="font-bold">
-                      {language === 'zh' && '已確認'}
+                      {(language === 'zh' || language === 'cn') && '已確認'}
                       {language === 'en' && 'Confirmed'}
                       {language === 'ja' && '確認済み'}
                     </div>
@@ -217,12 +217,12 @@ export default function OrderConfirmation() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">
-                      {language === 'zh' && '預計配送'}
+                      {(language === 'zh' || language === 'cn') && '預計配送'}
                       {language === 'en' && 'Expected Delivery'}
                       {language === 'ja' && '予定配送'}
                     </div>
                     <div className="font-bold">
-                      {language === 'zh' && '3-5 個工作天'}
+                      {(language === 'zh' || language === 'cn') && '3-5 個工作天'}
                       {language === 'en' && '3-5 business days'}
                       {language === 'ja' && '3～5営業日'}
                     </div>
@@ -234,7 +234,7 @@ export default function OrderConfirmation() {
             {/* Shipping Information */}
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">
-                {language === 'zh' && '配送信息'}
+                {(language === 'zh' || language === 'cn') && '配送信息'}
                 {language === 'en' && 'Shipping Information'}
                 {language === 'ja' && '配送情報'}
               </h2>
@@ -252,7 +252,7 @@ export default function OrderConfirmation() {
             {/* Order Items */}
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">
-                {language === 'zh' && '訂單商品'}
+                {(language === 'zh' || language === 'cn') && '訂單商品'}
                 {language === 'en' && 'Order Items'}
                 {language === 'ja' && '注文商品'}
               </h2>
@@ -262,7 +262,7 @@ export default function OrderConfirmation() {
                     <div className="flex-1">
                       <div className="font-semibold">{item.productName}</div>
                       <div className="text-sm text-gray-600">
-                        {language === 'zh' && '數量: '}{language === 'en' && 'Qty: '}{language === 'ja' && '数量: '}{item.quantity}
+                        {(language === 'zh' || language === 'cn') && '數量: '}{language === 'en' && 'Qty: '}{language === 'ja' && '数量: '}{item.quantity}
                       </div>
                     </div>
                     <div className="text-right">
@@ -279,14 +279,14 @@ export default function OrderConfirmation() {
           <div className="lg:col-span-1">
             <Card className="p-6 sticky top-24">
               <h2 className="text-2xl font-bold mb-6">
-                {language === 'zh' && '訂單摘要'}
+                {(language === 'zh' || language === 'cn') && '訂單摘要'}
                 {language === 'en' && 'Order Summary'}
                 {language === 'ja' && '注文概要'}
               </h2>
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">
-                    {language === 'zh' && '小計'}
+                    {(language === 'zh' || language === 'cn') && '小計'}
                     {language === 'en' && 'Subtotal'}
                     {language === 'ja' && '小計'}
                   </span>
@@ -294,12 +294,12 @@ export default function OrderConfirmation() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">
-                    {language === 'zh' && '運費'}
+                    {(language === 'zh' || language === 'cn') && '運費'}
                     {language === 'en' && 'Shipping'}
                     {language === 'ja' && '送料'}
                   </span>
                   <span className="font-bold">
-                    {language === 'zh' && '待定'}
+                    {(language === 'zh' || language === 'cn') && '待定'}
                     {language === 'en' && 'TBD'}
                     {language === 'ja' && '未定'}
                   </span>
@@ -308,7 +308,7 @@ export default function OrderConfirmation() {
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between items-center text-xl font-bold">
                   <span>
-                    {language === 'zh' && '總計'}
+                    {(language === 'zh' || language === 'cn') && '總計'}
                     {language === 'en' && 'Total'}
                     {language === 'ja' && '合計'}
                   </span>
@@ -321,13 +321,13 @@ export default function OrderConfirmation() {
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <span className="font-bold text-green-700">
-                    {language === 'zh' && '支付已完成'}
+                    {(language === 'zh' || language === 'cn') && '支付已完成'}
                     {language === 'en' && 'Payment Completed'}
                     {language === 'ja' && '支払い完了'}
                   </span>
                 </div>
                 <p className="text-sm text-green-600">
-                  {language === 'zh' && '您的支付已成功處理'}
+                  {(language === 'zh' || language === 'cn') && '您的支付已成功處理'}
                   {language === 'en' && 'Your payment has been processed successfully'}
                   {language === 'ja' && 'お支払いは正常に処理されました'}
                 </p>
@@ -339,7 +339,7 @@ export default function OrderConfirmation() {
                   onClick={() => setLocation('/orders')}
                   className="w-full bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                 >
-                  {language === 'zh' && '查看所有訂單'}
+                  {(language === 'zh' || language === 'cn') && '查看所有訂單'}
                   {language === 'en' && 'View All Orders'}
                   {language === 'ja' && 'すべての注文を表示'}
                 </Button>
@@ -348,7 +348,7 @@ export default function OrderConfirmation() {
                   variant="outline"
                   className="w-full"
                 >
-                  {language === 'zh' && '繼續購物'}
+                  {(language === 'zh' || language === 'cn') && '繼續購物'}
                   {language === 'en' && 'Continue Shopping'}
                   {language === 'ja' && 'ショッピングを続ける'}
                 </Button>
@@ -358,7 +358,7 @@ export default function OrderConfirmation() {
                   className="w-full"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  {language === 'zh' && '返回首頁'}
+                  {(language === 'zh' || language === 'cn') && '返回首頁'}
                   {language === 'en' && 'Back to Home'}
                   {language === 'ja' && 'ホームに戻る'}
                 </Button>

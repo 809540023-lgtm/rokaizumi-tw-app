@@ -158,7 +158,7 @@ export default function Products() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
+                onClick={() => setLanguage((language === 'zh' || language === 'cn') ? 'en' : 'zh')}
                 className="p-2"
               >
                 <Globe className="w-4 h-4" />
@@ -261,7 +261,7 @@ export default function Products() {
                 {/* 價格 - 根據語言顯示不同幣別 */}
                 <div className="mb-4">
                   <span className="text-2xl font-bold text-[#0ABAB5]">
-                    {language === 'zh' ? `NT$${Math.round(product.price)}` : 
+                    {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
                      language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 
                      `$${(product.price * 0.031).toFixed(2)}`}
                   </span>

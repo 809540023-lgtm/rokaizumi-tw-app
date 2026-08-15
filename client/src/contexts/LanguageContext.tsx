@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type Language = 'zh' | 'en' | 'ja';
+type Language = 'zh' | 'cn' | 'en' | 'ja';
+
+const STORAGE_KEY = 'rokaizumi.lang';
 
 interface LanguageContextType {
   language: Language;
@@ -99,7 +101,10 @@ const translations = {
     'category.livingAids': '生活輔具',
     'category.bedside': '床邊照護',
     'category.safety': '安全監控',
-  },
+      'cart.addSuccess': '已加入購物車',
+    'nav.login': '登入',
+    'products.categories': '分類',
+},
   en: {
     // Header
     'nav.home': 'Home',
@@ -129,7 +134,65 @@ const translations = {
     'products.available': 'Available',
     'products.reserved': 'Reserved',
     'products.sold': 'Sold',
-  },
+      'cart.title': 'Shopping Cart',
+    'cart.empty': 'Your cart is empty',
+    'cart.startShopping': 'Start Shopping',
+    'cart.subtotal': 'Subtotal',
+    'cart.total': 'Total',
+    'cart.checkout': 'Checkout',
+    'cart.continueShopping': 'Continue Shopping',
+    'cart.remove': 'Remove',
+    'cart.quantity': 'Quantity',
+    'cart.addSuccess': 'Added to cart',
+    'category.dailyGoods': 'Daily Necessities',
+    'category.kitchen': 'Kitchen Items',
+    'category.storage': 'Storage',
+    'category.stationery': 'Stationery',
+    'category.cleaning': 'Cleaning Supplies',
+    'category.toys': 'Toys',
+    'category.beauty': 'Beauty Products',
+    'category.snacks': 'Food & Snacks',
+    'category.health': 'Health Monitoring',
+    'category.mobility': 'Mobility Aids',
+    'category.bathroom': 'Bathroom Safety',
+    'category.nursing': 'Nursing Supplies',
+    'category.livingAids': 'Daily Living Aids',
+    'category.rehabilitation': 'Rehabilitation',
+    'category.bedside': 'Bedside Care',
+    'category.safety': 'Safety Monitoring',
+    'home.whyChooseUs': 'Why Choose Us',
+    'home.directFromJapan': 'Direct from Japan',
+    'home.directFromJapanDesc': 'Shipped directly from Osaka, Japan',
+    'home.globalExport': 'Global Export',
+    'home.globalExportDesc': 'Professional export worldwide',
+    'home.professionalService': 'Professional Service',
+    'home.professionalServiceDesc': 'Full Chinese-language customer support',
+    'home.productCategories': 'Product Categories',
+    'home.hundredYenProducts': 'Japanese 100-Yen Products',
+    'home.hundredYenProductsDesc': 'Carefully selected Japanese daily goods, kitchenware and stationery',
+    'home.careEquipment': 'Elderly Care Equipment',
+    'home.careEquipmentDesc': 'Japanese care products, mobility aids and health monitoring',
+    'home.latestVideos': 'Latest Videos',
+    'home.viewAll': 'View All',
+    'products.addToCart': 'Add to Cart',
+    'products.categories': 'Categories',
+    'products.filter': 'Filter',
+    'products.reset': 'Reset',
+    'products.found': 'found',
+    'products.items': 'items',
+    'products.mainCategory': 'Main Category',
+    'products.subCategory': 'Subcategory',
+    'products.priceRange': 'Price Range',
+    'products.status': 'Status',
+    'products.tryAdjust': 'Try adjusting your filters',
+    'products.hundredYen': '100-Yen Products',
+    'products.hundredYenTitle': 'Japanese 100-Yen Products',
+    'products.hundredYenDesc': 'Carefully selected Japanese daily goods',
+    'products.care': 'Care Equipment',
+    'products.careTitle': 'Elderly Care Equipment',
+    'products.careDesc': 'Japanese care products and mobility aids',
+    'nav.login': 'Login',
+},
   ja: {
     // Header
     'nav.home': 'ホーム',
@@ -218,15 +281,131 @@ const translations = {
     'category.livingAids': '生活補助具',
     'category.bedside': 'ベッドサイドケア',
     'category.safety': '安全監視',
-  },
+      'cart.addSuccess': 'カートに追加しました',
+    'nav.login': 'ログイン',
+    'products.categories': 'カテゴリー',
+},
+  cn: {
+    // Header
+    'nav.home': '首页',
+    'nav.products': '产品',
+    'nav.videos': '视频',
+    'nav.cart': '购物车',
+    
+    // Home page
+    'home.company': 'ろかいずみ合同会社',
+    'home.title': '银发生活品质加乘辅具 · 日本精美小商品',
+    'home.subtitle': '日本直送出口，服务台湾与澳洲市场',
+    'home.browseProducts': '浏览产品',
+    'home.japanConnection': '日本商品即时连接',
+    'home.whyChooseUs': '为什么选择我们',
+    'home.directFromJapan': '日本直采',
+    'home.directFromJapanDesc': '直接从日本采购，确保产品品质和价格优势。',
+    'home.globalExport': '全球出口',
+    'home.globalExportDesc': '日本直送出口，服务台湾与澳洲市场。',
+    'home.professionalService': '专业服务',
+    'home.professionalServiceDesc': '提供日本精美小商品和银发生活品质加乘辅具的专业资询。',
+    'home.latestVideos': '最新采购视频',
+    'home.viewAll': '查看全部',
+    'home.productCategories': '主要产品类别',
+    'home.hundredYenProducts': '日本精美小商品',
+    'home.hundredYenProductsDesc': '精选日本优质小商品',
+    'home.careEquipment': '银发生活品质加乘辅具',
+    'home.careEquipmentDesc': '专业银发生活辅具，提升生活品质',
+    
+    // Products page
+    'products.filter': '筛选器',
+    'products.reset': '重置',
+    'products.mainCategory': '主要分类',
+    'products.allProducts': '全部商品',
+    'products.hundredYen': '🛍️ 日本精美小商品',
+    'products.care': '♿ 银发生活品质加乘辅具',
+    'products.subCategory': '细分类别',
+    'products.priceRange': '价格范围',
+    'products.status': '商品状态',
+    'products.available': '可售',
+    'products.reserved': '预订',
+    'products.sold': '已售',
+    'products.found': '找到',
+    'products.items': '件商品',
+    'products.viewDetails': '查看详情',
+    'products.addToCart': '加入购物车',
+    'products.noProducts': '没有找到符合条件的商品',
+    'products.back': '返回首页',
+    'products.tryAdjust': '请尝试调整筛选条件',
+    'products.hundredYenTitle': '🛍️ 日本精美小商品',
+    'products.hundredYenDesc': '精选日本优质小商品，物美价廉',
+    'products.careTitle': '♿ 银发生活品质加乘辅具',
+    'products.careDesc': '专业银发生活辅具，提升生活品质',
+    'products.allProductsDesc': '浏览我们所有的优质商品',
+    'products.filters': '筛选器',
+    'products.showing': '显示',
+    'products.products': '个产品',
+    'products.resetFilters': '重置筛选器',
+    'home.category1': '日本精美小商品',
+    'home.category2': '银发生活品质加乘辅具',
+    
+    // Cart
+    'cart.title': '购物车',
+    'cart.empty': '购物车是空的',
+    'cart.startShopping': '开始购物',
+    'cart.subtotal': '小计',
+    'cart.total': '总计',
+    'cart.checkout': '结帐',
+    'cart.continueShopping': '继续购物',
+    'cart.remove': '移除',
+    'cart.quantity': '数量',
+    
+    // Categories
+    'category.dailyGoods': '日用百货',
+    'category.kitchen': '厨房用品',
+    'category.stationery': '文具用品',
+    'category.cleaning': '清洁用品',
+    'category.storage': '收纳用品',
+    'category.beauty': '美妆保养',
+    'category.snacks': '食品零食',
+    'category.toys': '玩具杂货',
+    'category.mobility': '行动辅助',
+    'category.bathroom': '卫浴安全',
+    'category.health': '健康监测',
+    'category.nursing': '护理用品',
+    'category.rehabilitation': '复健器材',
+    'category.livingAids': '生活辅具',
+    'category.bedside': '床边照护',
+    'category.safety': '安全监控',
+      'cart.addSuccess': '已加入购物车',
+    'nav.login': '登录',
+    'products.categories': '分类',
+},
 };
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('ja');
+/** 讀取上次選擇的語言；沒有的話用繁中（本站主要客群在台灣） */
+function initialLanguage(): Language {
+  if (typeof window === 'undefined') return 'zh';
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  if (saved && saved in translations) return saved as Language;
+  return 'zh';
+}
 
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
+
+  // 語言選擇要跨頁面保留，否則每次換頁都會跳回預設值
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, lang);
+    } catch {
+      /* 隱私模式下忽略 */
+    }
+  };
+
+  // 遞補鏈：選定語言 → 繁中 → key 本身。
+  // 直接吐 key（例如畫面上出現 "cart.addSuccess"）對使用者毫無意義，
+  // 所以缺翻譯時寧可顯示繁中。
   const t = (key: string): string => {
-    const translation = translations[language as keyof typeof translations];
-    return (translation as any)[key] || key;
+    const table = translations[language] as Record<string, string> | undefined;
+    return table?.[key] ?? (translations.zh as Record<string, string>)[key] ?? key;
   };
 
   return (

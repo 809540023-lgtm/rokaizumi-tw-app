@@ -59,7 +59,7 @@ export default function AnnouncementManagement() {
       utils.admin.announcements.invalidate();
       setIsDialogOpen(false);
       setFormData(defaultFormData);
-      toast.success(language === 'zh' ? '公告已創建' : language === 'ja' ? 'お知らせを作成しました' : 'Announcement created');
+      toast.success((language === 'zh' || language === 'cn') ? '公告已創建' : language === 'ja' ? 'お知らせを作成しました' : 'Announcement created');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -72,7 +72,7 @@ export default function AnnouncementManagement() {
       setIsDialogOpen(false);
       setEditingId(null);
       setFormData(defaultFormData);
-      toast.success(language === 'zh' ? '公告已更新' : language === 'ja' ? 'お知らせを更新しました' : 'Announcement updated');
+      toast.success((language === 'zh' || language === 'cn') ? '公告已更新' : language === 'ja' ? 'お知らせを更新しました' : 'Announcement updated');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -82,7 +82,7 @@ export default function AnnouncementManagement() {
   const deleteMutation = trpc.admin.deleteAnnouncement.useMutation({
     onSuccess: () => {
       utils.admin.announcements.invalidate();
-      toast.success(language === 'zh' ? '公告已刪除' : language === 'ja' ? 'お知らせを削除しました' : 'Announcement deleted');
+      toast.success((language === 'zh' || language === 'cn') ? '公告已刪除' : language === 'ja' ? 'お知らせを削除しました' : 'Announcement deleted');
     },
     onError: (error) => {
       toast.error(error.message);
@@ -133,7 +133,7 @@ export default function AnnouncementManagement() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm(language === 'zh' ? '確定要刪除這個公告嗎？' : language === 'ja' ? 'このお知らせを削除しますか？' : 'Are you sure you want to delete this announcement?')) {
+    if (confirm((language === 'zh' || language === 'cn') ? '確定要刪除這個公告嗎？' : language === 'ja' ? 'このお知らせを削除しますか？' : 'Are you sure you want to delete this announcement?')) {
       deleteMutation.mutate({ id });
     }
   };
@@ -149,7 +149,7 @@ export default function AnnouncementManagement() {
   };
 
   const getText = (zh: string, en: string, ja: string) => {
-    return language === 'zh' ? zh : language === 'ja' ? ja : en;
+    return (language === 'zh' || language === 'cn') ? zh : language === 'ja' ? ja : en;
   };
 
   if (isLoading) {

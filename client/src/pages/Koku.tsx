@@ -47,14 +47,14 @@ export default function Koku() {
       setProducts(convertedProducts);
     } catch (error) {
       console.error('Failed to fetch Koku products:', error);
-      toast.error(language === 'zh' ? '無法載入百元批發產品' : 'Failed to load wholesale products');
+      toast.error((language === 'zh' || language === 'cn') ? '無法載入百元批發產品' : 'Failed to load wholesale products');
     } finally {
       setIsLoading(false);
     }
   };
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -108,7 +108,7 @@ export default function Koku() {
                 className="flex items-center gap-1"
               >
                 <ArrowLeft className="w-4 h-4" />
-                {language === 'zh' ? '返回' : language === 'ja' ? '戻る' : 'Back'}
+                {(language === 'zh' || language === 'cn') ? '返回' : language === 'ja' ? '戻る' : 'Back'}
               </Button>
             </div>
           </div>
@@ -120,10 +120,10 @@ export default function Koku() {
         {/* Title Section */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {language === 'zh' ? '百元批發商品' : language === 'ja' ? '百円卸売商品' : 'Wholesale Products'}
+            {(language === 'zh' || language === 'cn') ? '百元批發商品' : language === 'ja' ? '百円卸売商品' : 'Wholesale Products'}
           </h1>
           <p className="text-gray-600">
-            {language === 'zh' ? 'KOKUBO 1,463件の高品質商品' : language === 'ja' ? 'KOKUBO 1,463件の高品質商品' : 'High-quality products from KOKUBO'}
+            {(language === 'zh' || language === 'cn') ? 'KOKUBO 1,463件の高品質商品' : language === 'ja' ? 'KOKUBO 1,463件の高品質商品' : 'High-quality products from KOKUBO'}
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function Koku() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={language === 'zh' ? '搜尋商品...' : language === 'ja' ? '商品を検索...' : 'Search products...'}
+                placeholder={(language === 'zh' || language === 'cn') ? '搜尋商品...' : language === 'ja' ? '商品を検索...' : 'Search products...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-4 py-3 pr-12 border-2 border-[#0ABAB5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ABAB5] focus:border-transparent"
@@ -175,7 +175,7 @@ export default function Koku() {
                   {/* Price */}
                   <div className="mb-4">
                     <span className="text-xl font-bold text-[#0ABAB5]">
-                      {language === 'zh' ? `NT$${Math.round(product.価格)}` :
+                      {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.価格)}` :
                        language === 'ja' ? `¥${Math.round(product.価格)}` :
                        `$${(product.価格 * 0.031).toFixed(2)}`}
                     </span>
@@ -198,15 +198,15 @@ export default function Koku() {
                       disabled={!isAuthenticated}
                       onClick={() => {
                         if (!isAuthenticated) {
-                          toast.error(language === 'zh' ? '請先登入' : 'Please log in first');
+                          toast.error((language === 'zh' || language === 'cn') ? '請先登入' : 'Please log in first');
                           setLocation('/login');
                         } else {
-                          toast.success(language === 'zh' ? '已加入購物車' : 'Added to cart');
+                          toast.success((language === 'zh' || language === 'cn') ? '已加入購物車' : 'Added to cart');
                         }
                       }}
                     >
                       <ShoppingCart className="w-4 h-4 mr-1" />
-                      {language === 'zh' ? '加入購物車' : language === 'ja' ? 'カートに追加' : 'Add to Cart'}
+                      {(language === 'zh' || language === 'cn') ? '加入購物車' : language === 'ja' ? 'カートに追加' : 'Add to Cart'}
                     </Button>
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export default function Koku() {
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-600 text-lg">
-              {language === 'zh' ? '找不到符合條件的商品' : language === 'ja' ? '該当する商品が見つかりません' : 'No products found'}
+              {(language === 'zh' || language === 'cn') ? '找不到符合條件的商品' : language === 'ja' ? '該当する商品が見つかりません' : 'No products found'}
             </p>
           </div>
         )}

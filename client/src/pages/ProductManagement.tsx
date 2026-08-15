@@ -251,7 +251,7 @@ export default function ProductManagement() {
     if (!files || files.length === 0) return;
     
     if (uploadedImages.length + files.length > 5) {
-      alert(language === 'zh' ? '最多只能上傳 5 張圖片' : 
+      alert((language === 'zh' || language === 'cn') ? '最多只能上傳 5 張圖片' : 
             language === 'ja' ? '画像は最大5枚までです' : 
             'Maximum 5 images allowed');
       return;
@@ -281,7 +281,7 @@ export default function ProductManagement() {
       setUploadedImages([...uploadedImages, ...result.images.map(img => img.url)]);
     } catch (error) {
       console.error('Upload failed:', error);
-      alert(language === 'zh' ? '圖片上傳失敗' : 
+      alert((language === 'zh' || language === 'cn') ? '圖片上傳失敗' : 
             language === 'ja' ? '画像のアップロードに失敗しました' : 
             'Image upload failed');
     } finally {
@@ -298,7 +298,7 @@ export default function ProductManagement() {
     if (!files || files.length === 0) return;
     
     if (editUploadedImages.length + files.length > 5) {
-      alert(language === 'zh' ? '最多只能上傳 5 張圖片' : 
+      alert((language === 'zh' || language === 'cn') ? '最多只能上傳 5 張圖片' : 
             language === 'ja' ? '画像は最大5枚までです' : 
             'Maximum 5 images allowed');
       return;
@@ -328,7 +328,7 @@ export default function ProductManagement() {
       setEditUploadedImages([...editUploadedImages, ...result.images.map(img => img.url)]);
     } catch (error) {
       console.error('Upload failed:', error);
-      alert(language === 'zh' ? '圖片上傳失敗' : 
+      alert((language === 'zh' || language === 'cn') ? '圖片上傳失敗' : 
             language === 'ja' ? '画像のアップロードに失敗しました' : 
             'Image upload failed');
     } finally {
@@ -342,7 +342,7 @@ export default function ProductManagement() {
 
   const handleCreateProduct = async () => {
     if (!newProduct.name || !newProduct.categoryId) {
-      alert(language === 'zh' ? '請填寫產品名稱和選擇分類' : 
+      alert((language === 'zh' || language === 'cn') ? '請填寫產品名稱和選擇分類' : 
             language === 'ja' ? '商品名とカテゴリーを入力してください' : 
             'Please fill in product name and select category');
       return;
@@ -537,7 +537,7 @@ export default function ProductManagement() {
                   value={newProduct.name}
                   onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ABAB5]"
-                  placeholder={language === 'zh' ? '輸入產品名稱' : language === 'ja' ? '商品名を入力' : 'Enter product name'}
+                  placeholder={(language === 'zh' || language === 'cn') ? '輸入產品名稱' : language === 'ja' ? '商品名を入力' : 'Enter product name'}
                 />
               </div>
 
@@ -550,7 +550,7 @@ export default function ProductManagement() {
                   onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ABAB5]"
                   rows={3}
-                  placeholder={language === 'zh' ? '輸入產品描述' : language === 'ja' ? '商品説明を入力' : 'Enter description'}
+                  placeholder={(language === 'zh' || language === 'cn') ? '輸入產品描述' : language === 'ja' ? '商品説明を入力' : 'Enter description'}
                 />
               </div>
 
@@ -602,7 +602,7 @@ export default function ProductManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'zh' ? '產品圖片（最多 5 張）' : language === 'ja' ? '商品画像（最大5枚）' : 'Product Images (Max 5)'}
+                  {(language === 'zh' || language === 'cn') ? '產品圖片（最多 5 張）' : language === 'ja' ? '商品画像（最大5枚）' : 'Product Images (Max 5)'}
                 </label>
                 <div className="space-y-3">
                   {/* 已上傳的圖片預覽 */}
@@ -617,7 +617,7 @@ export default function ProductManagement() {
                           />
                           {index === 0 && (
                             <span className="absolute -top-2 -left-2 bg-[#0ABAB5] text-white text-xs px-1.5 py-0.5 rounded">
-                              {language === 'zh' ? '主圖' : language === 'ja' ? 'メイン' : 'Main'}
+                              {(language === 'zh' || language === 'cn') ? '主圖' : language === 'ja' ? 'メイン' : 'Main'}
                             </span>
                           )}
                           <button
@@ -646,14 +646,14 @@ export default function ProductManagement() {
                         <>
                           <Loader2 className="w-5 h-5 animate-spin text-[#0ABAB5]" />
                           <span className="text-sm text-gray-600">
-                            {language === 'zh' ? '上傳中...' : language === 'ja' ? 'アップロード中...' : 'Uploading...'}
+                            {(language === 'zh' || language === 'cn') ? '上傳中...' : language === 'ja' ? 'アップロード中...' : 'Uploading...'}
                           </span>
                         </>
                       ) : (
                         <>
                           <Upload className="w-5 h-5 text-gray-400" />
                           <span className="text-sm text-gray-600">
-                            {language === 'zh' ? `點擊上傳圖片（還可上傳 ${5 - uploadedImages.length} 張）` : 
+                            {(language === 'zh' || language === 'cn') ? `點擊上傳圖片（還可上傳 ${5 - uploadedImages.length} 張）` : 
                              language === 'ja' ? `クリックして画像をアップロード（残り ${5 - uploadedImages.length} 枚）` : 
                              `Click to upload images (${5 - uploadedImages.length} remaining)`}
                           </span>
@@ -662,7 +662,7 @@ export default function ProductManagement() {
                     </label>
                   )}
                   <p className="text-xs text-gray-500">
-                    {language === 'zh' ? '第一張圖片將作為主圖顯示' : 
+                    {(language === 'zh' || language === 'cn') ? '第一張圖片將作為主圖顯示' : 
                      language === 'ja' ? '最初の画像がメイン画像として表示されます' : 
                      'The first image will be displayed as the main image'}
                   </p>
@@ -711,7 +711,7 @@ export default function ProductManagement() {
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {language === 'zh' ? '編輯產品' : language === 'ja' ? '商品を編集' : 'Edit Product'}
+                {(language === 'zh' || language === 'cn') ? '編輯產品' : language === 'ja' ? '商品を編集' : 'Edit Product'}
               </h3>
               <button
                 onClick={() => setEditingProduct(null)}
@@ -777,7 +777,7 @@ export default function ProductManagement() {
               {/* Image Upload for Edit */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'zh' ? '產品圖片（最多 5 張）' : 
+                  {(language === 'zh' || language === 'cn') ? '產品圖片（最多 5 張）' : 
                    language === 'ja' ? '商品画像（最大5枚）' : 
                    'Product Images (max 5)'}
                 </label>
@@ -801,7 +801,7 @@ export default function ProductManagement() {
                         </button>
                         {index === 0 && (
                           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#0ABAB5] text-white text-xs px-1 rounded">
-                            {language === 'zh' ? '主圖' : language === 'ja' ? 'メイン' : 'Main'}
+                            {(language === 'zh' || language === 'cn') ? '主圖' : language === 'ja' ? 'メイン' : 'Main'}
                           </span>
                         )}
                       </div>
@@ -818,7 +818,7 @@ export default function ProductManagement() {
                         <>
                           <Upload className="w-6 h-6 text-gray-400" />
                           <p className="text-sm text-gray-500">
-                            {language === 'zh' ? `點擊上傳圖片（還可上傳 ${5 - editUploadedImages.length} 張）` : 
+                            {(language === 'zh' || language === 'cn') ? `點擊上傳圖片（還可上傳 ${5 - editUploadedImages.length} 張）` : 
                              language === 'ja' ? `クリックしてアップロード（残り ${5 - editUploadedImages.length} 枚）` : 
                              `Click to upload (${5 - editUploadedImages.length} remaining)`}
                           </p>
@@ -836,7 +836,7 @@ export default function ProductManagement() {
                   </label>
                 )}
                 <p className="text-xs text-gray-500 mt-1">
-                  {language === 'zh' ? '第一張圖片將作為主圖顯示' : 
+                  {(language === 'zh' || language === 'cn') ? '第一張圖片將作為主圖顯示' : 
                    language === 'ja' ? '最初の画像がメイン画像として表示されます' : 
                    'The first image will be displayed as the main image'}
                 </p>

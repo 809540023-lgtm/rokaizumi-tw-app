@@ -29,7 +29,7 @@ export default function AdminDashboard() {
 
   const createSupplierMutation = trpc.admin.createSupplier.useMutation({
     onSuccess: () => {
-      toast.success(language === 'zh' ? '廠商已添加' : 'Supplier added');
+      toast.success((language === 'zh' || language === 'cn') ? '廠商已添加' : 'Supplier added');
       setShowSupplierForm(false);
     },
     onError: (error) => {
@@ -39,7 +39,7 @@ export default function AdminDashboard() {
 
   const createPurchaseMutation = trpc.admin.createPurchase.useMutation({
     onSuccess: () => {
-      toast.success(language === 'zh' ? '進貨記錄已添加' : 'Purchase record added');
+      toast.success((language === 'zh' || language === 'cn') ? '進貨記錄已添加' : 'Purchase record added');
       setShowPurchaseForm(false);
     },
     onError: (error) => {
@@ -53,10 +53,10 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-[#fef9f3] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">
-            {language === 'zh' ? '無權限訪問' : 'Access Denied'}
+            {(language === 'zh' || language === 'cn') ? '無權限訪問' : 'Access Denied'}
           </h1>
           <Button onClick={() => setLocation('/')}>
-            {language === 'zh' ? '返回首頁' : 'Back to Home'}
+            {(language === 'zh' || language === 'cn') ? '返回首頁' : 'Back to Home'}
           </Button>
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-[#0ABAB5]">
-            {language === 'zh' ? '管理後台' : 'Admin Dashboard'}
+            {(language === 'zh' || language === 'cn') ? '管理後台' : 'Admin Dashboard'}
           </h1>
         </div>
       </header>
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
               href="/admin/financial"
               className="py-4 px-6 font-semibold text-[#0ABAB5] hover:bg-gray-100 transition-colors"
             >
-              {language === 'zh' ? '📊 財務儀表板' : language === 'ja' ? '📊 財務ダッシュボード' : '📊 Financial Dashboard'}
+              {(language === 'zh' || language === 'cn') ? '📊 財務儀表板' : language === 'ja' ? '📊 財務ダッシュボード' : '📊 Financial Dashboard'}
             </a>
             <div className="border-l border-gray-300 h-8"></div>
             <button
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
-              {language === 'zh' ? '訂單管理' : 'Orders'} ({orders.length})
+              {(language === 'zh' || language === 'cn') ? '訂單管理' : 'Orders'} ({orders.length})
             </button>
             <button
               onClick={() => setActiveTab('suppliers')}
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
-              {language === 'zh' ? '廠商管理' : 'Suppliers'} ({suppliers.length})
+              {(language === 'zh' || language === 'cn') ? '廠商管理' : 'Suppliers'} ({suppliers.length})
             </button>
             <button
               onClick={() => setActiveTab('purchases')}
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
-              {language === 'zh' ? '進貨記錄' : 'Purchases'} ({purchases.length})
+              {(language === 'zh' || language === 'cn') ? '進貨記錄' : 'Purchases'} ({purchases.length})
             </button>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
         {activeTab === 'orders' && (
           <div>
             <h2 className="text-xl font-bold mb-6">
-              {language === 'zh' ? '訂單管理' : 'Order Management'}
+              {(language === 'zh' || language === 'cn') ? '訂單管理' : 'Order Management'}
             </h2>
             {ordersLoading ? (
               <div className="flex justify-center py-12">
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                {language === 'zh' ? '暫無訂單' : 'No orders'}
+                {(language === 'zh' || language === 'cn') ? '暫無訂單' : 'No orders'}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -141,19 +141,19 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '訂單號' : 'Order ID'}
+                        {(language === 'zh' || language === 'cn') ? '訂單號' : 'Order ID'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '客戶' : 'Customer'}
+                        {(language === 'zh' || language === 'cn') ? '客戶' : 'Customer'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '金額' : 'Total'}
+                        {(language === 'zh' || language === 'cn') ? '金額' : 'Total'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '狀態' : 'Status'}
+                        {(language === 'zh' || language === 'cn') ? '狀態' : 'Status'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '日期' : 'Date'}
+                        {(language === 'zh' || language === 'cn') ? '日期' : 'Date'}
                       </th>
                     </tr>
                   </thead>
@@ -189,14 +189,14 @@ export default function AdminDashboard() {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">
-                {language === 'zh' ? '廠商管理' : 'Supplier Management'}
+                {(language === 'zh' || language === 'cn') ? '廠商管理' : 'Supplier Management'}
               </h2>
               <Button
                 onClick={() => setShowSupplierForm(!showSupplierForm)}
                 className="bg-[#0ABAB5] hover:bg-[#089B96] text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {language === 'zh' ? '新增廠商' : 'Add Supplier'}
+                {(language === 'zh' || language === 'cn') ? '新增廠商' : 'Add Supplier'}
               </Button>
             </div>
 
@@ -206,7 +206,7 @@ export default function AdminDashboard() {
               </div>
             ) : suppliers.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                {language === 'zh' ? '暫無廠商' : 'No suppliers'}
+                {(language === 'zh' || language === 'cn') ? '暫無廠商' : 'No suppliers'}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -214,16 +214,16 @@ export default function AdminDashboard() {
                   <Card key={supplier.id} className="p-6">
                     <h3 className="font-bold text-lg mb-2">{supplier.name}</h3>
                     <p className="text-sm text-gray-600 mb-1">
-                      {language === 'zh' ? '聯絡人：' : 'Contact: '}{supplier.contactPerson}
+                      {(language === 'zh' || language === 'cn') ? '聯絡人：' : 'Contact: '}{supplier.contactPerson}
                     </p>
                     <p className="text-sm text-gray-600 mb-1">
-                      {language === 'zh' ? '電郵：' : 'Email: '}{supplier.email}
+                      {(language === 'zh' || language === 'cn') ? '電郵：' : 'Email: '}{supplier.email}
                     </p>
                     <p className="text-sm text-gray-600 mb-1">
-                      {language === 'zh' ? '電話：' : 'Phone: '}{supplier.phone}
+                      {(language === 'zh' || language === 'cn') ? '電話：' : 'Phone: '}{supplier.phone}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {language === 'zh' ? '地址：' : 'Address: '}{supplier.address}
+                      {(language === 'zh' || language === 'cn') ? '地址：' : 'Address: '}{supplier.address}
                     </p>
                   </Card>
                 ))}
@@ -237,14 +237,14 @@ export default function AdminDashboard() {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">
-                {language === 'zh' ? '進貨記錄' : 'Purchase Records'}
+                {(language === 'zh' || language === 'cn') ? '進貨記錄' : 'Purchase Records'}
               </h2>
               <Button
                 onClick={() => setShowPurchaseForm(!showPurchaseForm)}
                 className="bg-[#0ABAB5] hover:bg-[#089B96] text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {language === 'zh' ? '新增進貨' : 'Add Purchase'}
+                {(language === 'zh' || language === 'cn') ? '新增進貨' : 'Add Purchase'}
               </Button>
             </div>
 
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
               </div>
             ) : purchases.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                {language === 'zh' ? '暫無進貨記錄' : 'No purchase records'}
+                {(language === 'zh' || language === 'cn') ? '暫無進貨記錄' : 'No purchase records'}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -262,22 +262,22 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '商品' : 'Product'}
+                        {(language === 'zh' || language === 'cn') ? '商品' : 'Product'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '廠商' : 'Supplier'}
+                        {(language === 'zh' || language === 'cn') ? '廠商' : 'Supplier'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '數量' : 'Quantity'}
+                        {(language === 'zh' || language === 'cn') ? '數量' : 'Quantity'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '進貨價' : 'Unit Price'}
+                        {(language === 'zh' || language === 'cn') ? '進貨價' : 'Unit Price'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '總成本' : 'Total Cost'}
+                        {(language === 'zh' || language === 'cn') ? '總成本' : 'Total Cost'}
                       </th>
                       <th className="border border-gray-300 px-4 py-2 text-left">
-                        {language === 'zh' ? '進貨日期' : 'Purchase Date'}
+                        {(language === 'zh' || language === 'cn') ? '進貨日期' : 'Purchase Date'}
                       </th>
                     </tr>
                   </thead>

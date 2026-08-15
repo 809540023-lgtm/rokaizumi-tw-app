@@ -19,10 +19,10 @@ export default function FinancialDashboard() {
       <div className="min-h-screen bg-[#fef9f3] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">
-            {language === 'zh' ? '無權限訪問' : language === 'ja' ? 'アクセス拒否' : 'Access Denied'}
+            {(language === 'zh' || language === 'cn') ? '無權限訪問' : language === 'ja' ? 'アクセス拒否' : 'Access Denied'}
           </h1>
           <Button onClick={() => setLocation('/')}>
-            {language === 'zh' ? '返回首頁' : language === 'ja' ? 'ホームに戻る' : 'Back to Home'}
+            {(language === 'zh' || language === 'cn') ? '返回首頁' : language === 'ja' ? 'ホームに戻る' : 'Back to Home'}
           </Button>
         </div>
       </div>
@@ -174,10 +174,10 @@ export default function FinancialDashboard() {
               <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-1" />
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-orange-900 mb-2">
-                  {language === 'zh' ? '低庫存警告' : language === 'ja' ? '在庫不足警告' : 'Low Stock Alert'}
+                  {(language === 'zh' || language === 'cn') ? '低庫存警告' : language === 'ja' ? '在庫不足警告' : 'Low Stock Alert'}
                 </h3>
                 <p className="text-sm text-orange-800 mb-3">
-                  {language === 'zh'
+                  {(language === 'zh' || language === 'cn')
                     ? '有商品庫存不足'
                     : language === 'ja'
                     ? '商品の在庫が不足しています'
@@ -365,7 +365,7 @@ export default function FinancialDashboard() {
                           </td>
                           <td className="border border-gray-300 px-4 py-2">
                             {new Date(order.createdAt).toLocaleDateString(
-                              language === 'zh' ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
+                              (language === 'zh' || language === 'cn') ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
                             )}
                           </td>
                         </tr>
@@ -375,7 +375,7 @@ export default function FinancialDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-12 text-gray-500">
-                  {language === 'zh' ? '暫無訂單' : language === 'ja' ? '注文がありません' : 'No orders'}
+                  {(language === 'zh' || language === 'cn') ? '暫無訂單' : language === 'ja' ? '注文がありません' : 'No orders'}
                 </div>
               )}
             </div>

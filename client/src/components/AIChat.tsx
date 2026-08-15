@@ -25,7 +25,7 @@ export default function AIChat() {
     onError: () => {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: language === 'zh' ? '抱歉，我現在無法回答。請稍後再試。' : 
+        content: (language === 'zh' || language === 'cn') ? '抱歉，我現在無法回答。請稍後再試。' : 
                  language === 'en' ? 'Sorry, I cannot answer right now. Please try again later.' :
                  '申し訳ございません。現在お答えできません。後でもう一度お試しください。'
       }]);
@@ -110,7 +110,7 @@ export default function AIChat() {
           <div>
             <h3 className="text-white font-bold">{getTitle()}</h3>
             <p className="text-white/80 text-sm">
-              {language === 'zh' ? '在線' : language === 'en' ? 'Online' : 'オンライン'}
+              {(language === 'zh' || language === 'cn') ? '在線' : language === 'en' ? 'Online' : 'オンライン'}
             </p>
           </div>
         </div>

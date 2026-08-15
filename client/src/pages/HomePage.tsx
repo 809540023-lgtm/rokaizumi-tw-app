@@ -68,7 +68,7 @@ export default function HomePage() {
   };
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -159,7 +159,7 @@ export default function HomePage() {
                 >
                   <Globe className="w-4 h-4" />
                   <span className="hidden md:inline">{getLanguageLabel()}</span>
-                  <span className="md:hidden text-xs">{language === 'zh' ? '中' : language === 'ja' ? '日' : 'EN'}</span>
+                  <span className="md:hidden text-xs">{(language === 'zh' || language === 'cn') ? '中' : language === 'ja' ? '日' : 'EN'}</span>
                 </Button>
                 {user?.role === 'admin' && (
                   <Button
@@ -169,7 +169,7 @@ export default function HomePage() {
                     className="flex items-center gap-1 md:gap-2 bg-[#0ABAB5] hover:bg-[#089B96] order-3"
                   >
                     <Settings className="w-4 h-4" />
-                    <span className="hidden md:inline">{language === 'zh' ? '管理後台' : language === 'ja' ? '管理画面' : 'Admin'}</span>
+                    <span className="hidden md:inline">{(language === 'zh' || language === 'cn') ? '管理後台' : language === 'ja' ? '管理画面' : 'Admin'}</span>
                   </Button>
                 )}
                 {!user && (
@@ -179,8 +179,8 @@ export default function HomePage() {
                     onClick={() => window.location.href = getLoginUrl()}
                     className="flex items-center gap-1 md:gap-2 bg-[#0ABAB5] hover:bg-[#089B96] order-3"
                   >
-                    <span className="hidden md:inline">{language === 'zh' ? '登入' : language === 'ja' ? 'ログイン' : 'Login'}</span>
-                    <span className="md:hidden text-xs">{language === 'zh' ? '登' : language === 'ja' ? 'ログ' : 'Log'}</span>
+                    <span className="hidden md:inline">{(language === 'zh' || language === 'cn') ? '登入' : language === 'ja' ? 'ログイン' : 'Login'}</span>
+                    <span className="md:hidden text-xs">{(language === 'zh' || language === 'cn') ? '登' : language === 'ja' ? 'ログ' : 'Log'}</span>
                   </Button>
                 )}
               </div>
@@ -194,7 +194,7 @@ export default function HomePage() {
         <div className="bg-gradient-to-r from-[#0ABAB5] to-[#089B96] text-white py-2 overflow-hidden relative">
           <div className="animate-marquee whitespace-nowrap pr-12">
             {announcements.map((announcement, index) => {
-              const content = language === 'zh'
+              const content = (language === 'zh' || language === 'cn')
                 ? announcement.contentZh
                 : language === 'ja'
                   ? (announcement.contentJa || announcement.contentZh)
@@ -206,7 +206,7 @@ export default function HomePage() {
               );
             })}
             {announcements.map((announcement, index) => {
-              const content = language === 'zh'
+              const content = (language === 'zh' || language === 'cn')
                 ? announcement.contentZh
                 : language === 'ja'
                   ? (announcement.contentJa || announcement.contentZh)
@@ -221,7 +221,7 @@ export default function HomePage() {
           <button
             onClick={() => setIsMarqueeVisible(false)}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded transition-colors"
-            title={language === 'zh' ? '關閉公告' : language === 'ja' ? 'お知らせを閉じる' : 'Close announcement'}
+            title={(language === 'zh' || language === 'cn') ? '關閉公告' : language === 'ja' ? 'お知らせを閉じる' : 'Close announcement'}
           >
             <X className="w-4 h-4" />
           </button>
@@ -239,13 +239,13 @@ export default function HomePage() {
             >
               <div className="text-4xl mb-4">🛍️</div>
               <h2 className="text-2xl font-bold text-gray-800 mb-3">
-                {language === 'zh' ? '日本精美小商品' : language === 'ja' ? '日本の美しい小商品' : 'Japanese Everyday Products'}
+                {(language === 'zh' || language === 'cn') ? '日本精美小商品' : language === 'ja' ? '日本の美しい小商品' : 'Japanese Everyday Products'}
               </h2>
               <p className="text-gray-600 mb-4">
-                {language === 'zh' ? '精選日本百貨、廚房、文具等生活用品' : language === 'ja' ? '日本の厳選された日用品、キッチン、文房具など' : 'Carefully selected Japanese daily necessities, kitchen, and stationery'}
+                {(language === 'zh' || language === 'cn') ? '精選日本百貨、廚房、文具等生活用品' : language === 'ja' ? '日本の厳選された日用品、キッチン、文房具など' : 'Carefully selected Japanese daily necessities, kitchen, and stationery'}
               </p>
               <span className="text-[#0ABAB5] font-semibold">
-                {language === 'zh' ? '瀏覽商品 →' : language === 'ja' ? '商品を見る →' : 'Browse Products →'}
+                {(language === 'zh' || language === 'cn') ? '瀏覽商品 →' : language === 'ja' ? '商品を見る →' : 'Browse Products →'}
               </span>
             </button>
 
@@ -256,13 +256,13 @@ export default function HomePage() {
             >
               <div className="text-4xl mb-4">🏥</div>
               <h2 className="text-2xl font-bold text-gray-800 mb-3">
-                {language === 'zh' ? '銀髮生活品質加乘輔具' : language === 'ja' ? 'シニアライフ支援用具' : 'Elderly Care Aids'}
+                {(language === 'zh' || language === 'cn') ? '銀髮生活品質加乘輔具' : language === 'ja' ? 'シニアライフ支援用具' : 'Elderly Care Aids'}
               </h2>
               <p className="text-gray-600 mb-4">
-                {language === 'zh' ? '日本精選介護用品、輔助器材、健康監測' : language === 'ja' ? '日本厳選の介護用品、補助器具、健康監視' : 'Premium Japanese nursing supplies and health monitoring'}
+                {(language === 'zh' || language === 'cn') ? '日本精選介護用品、輔助器材、健康監測' : language === 'ja' ? '日本厳選の介護用品、補助器具、健康監視' : 'Premium Japanese nursing supplies and health monitoring'}
               </p>
               <span className="text-[#0ABAB5] font-semibold">
-                {language === 'zh' ? '瀏覽商品 →' : language === 'ja' ? '商品を見る →' : 'Browse Products →'}
+                {(language === 'zh' || language === 'cn') ? '瀏覽商品 →' : language === 'ja' ? '商品を見る →' : 'Browse Products →'}
               </span>
             </button>
           </div>
@@ -271,7 +271,7 @@ export default function HomePage() {
         <main className="container mx-auto px-4 py-8">
           <div className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800">
-              {language === 'zh' ? `搜尋結果："${searchQuery}"` : language === 'ja' ? `検索結果："${searchQuery}"` : `Search Results: "${searchQuery}"`}
+              {(language === 'zh' || language === 'cn') ? `搜尋結果："${searchQuery}"` : language === 'ja' ? `検索結果："${searchQuery}"` : `Search Results: "${searchQuery}"`}
             </h1>
             <Button
               variant="outline"
@@ -282,14 +282,14 @@ export default function HomePage() {
               className="flex items-center gap-2"
             >
               <X className="w-4 h-4" />
-              {language === 'zh' ? '返回' : language === 'ja' ? '戻る' : 'Back'}
+              {(language === 'zh' || language === 'cn') ? '返回' : language === 'ja' ? '戻る' : 'Back'}
             </Button>
           </div>
 
           {isSearchFetching ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0ABAB5] mx-auto"></div>
-              <p className="text-gray-600 mt-4">{language === 'zh' ? '搜尋中...' : language === 'ja' ? '検索中...' : 'Searching...'}</p>
+              <p className="text-gray-600 mt-4">{(language === 'zh' || language === 'cn') ? '搜尋中...' : language === 'ja' ? '検索中...' : 'Searching...'}</p>
             </div>
           ) : searchResults.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -312,7 +312,7 @@ export default function HomePage() {
                       </Link>
                     <div className="mb-4">
                       <span className="text-2xl font-bold text-[#0ABAB5]">
-                        {language === 'zh' ? `NT$${Math.round(product.price)}` :
+                        {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` :
                          language === 'ja' ? `¥${Math.round(product.price * 4.5)}` :
                          `$${(product.price * 0.031).toFixed(2)}`}
                       </span>
@@ -343,7 +343,7 @@ export default function HomePage() {
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
-                {language === 'zh' ? `找不到符合 "${searchQuery}" 的產品` : language === 'ja' ? `"${searchQuery}" に一致する商品が見つかりません` : `No products found for "${searchQuery}"`}
+                {(language === 'zh' || language === 'cn') ? `找不到符合 "${searchQuery}" 的產品` : language === 'ja' ? `"${searchQuery}" に一致する商品が見つかりません` : `No products found for "${searchQuery}"`}
               </p>
             </div>
           )}
@@ -353,8 +353,8 @@ export default function HomePage() {
           <div className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800">
               {selectedCategory === 'hundred'
-                ? (language === 'zh' ? '日本精美小商品' : language === 'ja' ? '日本の美しい小商品' : 'Japanese Everyday Products')
-                : (language === 'zh' ? '銀髮生活品質加乘輔具' : language === 'ja' ? 'シニアライフ支援用具' : 'Elderly Care Aids')}
+                ? ((language === 'zh' || language === 'cn') ? '日本精美小商品' : language === 'ja' ? '日本の美しい小商品' : 'Japanese Everyday Products')
+                : ((language === 'zh' || language === 'cn') ? '銀髮生活品質加乘輔具' : language === 'ja' ? 'シニアライフ支援用具' : 'Elderly Care Aids')}
             </h1>
             <Button
               variant="outline"
@@ -362,7 +362,7 @@ export default function HomePage() {
               className="flex items-center gap-2"
             >
               <X className="w-4 h-4" />
-              {language === 'zh' ? '返回' : language === 'ja' ? '戻る' : 'Back'}
+              {(language === 'zh' || language === 'cn') ? '返回' : language === 'ja' ? '戻る' : 'Back'}
             </Button>
           </div>
 
@@ -387,7 +387,7 @@ export default function HomePage() {
                       </Link>
                     <div className="mb-4">
                       <span className="text-2xl font-bold text-[#0ABAB5]">
-                        {language === 'zh' ? `NT$${Math.round(product.price)}` :
+                        {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` :
                          language === 'ja' ? `¥${Math.round(product.price * 4.5)}` :
                          `$${(product.price * 0.031).toFixed(2)}`}
                       </span>
@@ -418,7 +418,7 @@ export default function HomePage() {
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
-                {language === 'zh' ? '此分類暫無商品' : language === 'ja' ? 'このカテゴリーに商品がありません' : 'No products in this category'}
+                {(language === 'zh' || language === 'cn') ? '此分類暫無商品' : language === 'ja' ? 'このカテゴリーに商品がありません' : 'No products in this category'}
               </p>
             </div>
           )}

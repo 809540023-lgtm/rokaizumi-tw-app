@@ -319,7 +319,7 @@ export default function OrderManagement() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
                       {new Date(order.createdAt).toLocaleDateString(
-                        language === 'zh' ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
+                        (language === 'zh' || language === 'cn') ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm">

@@ -116,10 +116,10 @@ export default function UserManagement() {
 
   const handleRoleChange = async (userId: number, newRole: 'admin' | 'user') => {
     const confirmMessage = newRole === 'admin' 
-      ? (language === 'zh' ? '確定要將此會員設為管理員嗎？' : 
+      ? ((language === 'zh' || language === 'cn') ? '確定要將此會員設為管理員嗎？' : 
          language === 'ja' ? 'この会員を管理者に設定しますか？' : 
          'Are you sure you want to set this user as admin?')
-      : (language === 'zh' ? '確定要將此會員設為一般會員嗎？' : 
+      : ((language === 'zh' || language === 'cn') ? '確定要將此會員設為一般會員嗎？' : 
          language === 'ja' ? 'この会員を一般会員に設定しますか？' : 
          'Are you sure you want to set this user as member?');
     
@@ -275,7 +275,7 @@ export default function UserManagement() {
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         {new Date(user.createdAt).toLocaleDateString(
-                          language === 'zh' ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
+                          (language === 'zh' || language === 'cn') ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US'
                         )}
                       </div>
                     </td>

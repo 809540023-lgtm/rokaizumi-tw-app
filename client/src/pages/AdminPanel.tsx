@@ -229,7 +229,7 @@ export default function AdminPanel() {
               <div className="flex flex-col">
                 <span className="font-bold text-gray-900">Rokaizumi</span>
                 <span className="text-xs text-gray-500">
-                  {language === 'zh' ? '管理後台' : language === 'ja' ? '管理画面' : 'Admin'}
+                  {(language === 'zh' || language === 'cn') ? '管理後台' : language === 'ja' ? '管理画面' : 'Admin'}
                 </span>
               </div>
             )}
@@ -284,7 +284,7 @@ export default function AdminPanel() {
           {sidebarOpen && (
             <div className="px-4 py-3 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-600">
-                {language === 'zh' ? '登入用戶' : language === 'ja' ? 'ログイン中' : 'Logged in as'}
+                {(language === 'zh' || language === 'cn') ? '登入用戶' : language === 'ja' ? 'ログイン中' : 'Logged in as'}
               </p>
               <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
             </div>
@@ -297,7 +297,7 @@ export default function AdminPanel() {
             <LogOut className="w-4 h-4" />
             {sidebarOpen && (
               <span>
-                {language === 'zh' ? '登出' : language === 'ja' ? 'ログアウト' : 'Logout'}
+                {(language === 'zh' || language === 'cn') ? '登出' : language === 'ja' ? 'ログアウト' : 'Logout'}
               </span>
             )}
           </Button>
@@ -310,7 +310,7 @@ export default function AdminPanel() {
         <div className="bg-white shadow-sm sticky top-0 z-10">
           <div className="px-8 py-4 flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">
-              {language === 'zh'
+              {(language === 'zh' || language === 'cn')
                 ? 'ろかいずみ合同会社 - 管理後台'
                 : language === 'ja'
                   ? 'ろかいずみ合同会社 - 管理画面'
@@ -318,7 +318,7 @@ export default function AdminPanel() {
             </h1>
             <div className="text-sm text-gray-600">
               {new Date().toLocaleDateString(
-                language === 'zh' ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US',
+                (language === 'zh' || language === 'cn') ? 'zh-TW' : language === 'ja' ? 'ja-JP' : 'en-US',
                 { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
               )}
             </div>
@@ -338,7 +338,7 @@ export default function AdminPanel() {
           {currentPage === 'dashboard' && (
             <div>
               <h2 className="text-xl font-bold mb-6 text-gray-900">
-                {language === 'zh' ? '歡迎回到管理後台' : language === 'ja' ? '管理画面へようこそ' : 'Welcome to Admin Panel'}
+                {(language === 'zh' || language === 'cn') ? '歡迎回到管理後台' : language === 'ja' ? '管理画面へようこそ' : 'Welcome to Admin Panel'}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Quick Stats */}
@@ -346,7 +346,7 @@ export default function AdminPanel() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">
-                        {language === 'zh' ? '今日訂單' : language === 'ja' ? '本日の注文' : 'Today Orders'}
+                        {(language === 'zh' || language === 'cn') ? '今日訂單' : language === 'ja' ? '本日の注文' : 'Today Orders'}
                       </p>
                       <p className="text-3xl font-bold text-gray-900">0</p>
                     </div>
@@ -358,7 +358,7 @@ export default function AdminPanel() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">
-                        {language === 'zh' ? '待處理訂單' : language === 'ja' ? '処理待ち' : 'Pending Orders'}
+                        {(language === 'zh' || language === 'cn') ? '待處理訂單' : language === 'ja' ? '処理待ち' : 'Pending Orders'}
                       </p>
                       <p className="text-3xl font-bold text-gray-900">0</p>
                     </div>
@@ -370,7 +370,7 @@ export default function AdminPanel() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">
-                        {language === 'zh' ? '低庫存商品' : language === 'ja' ? '在庫不足' : 'Low Stock'}
+                        {(language === 'zh' || language === 'cn') ? '低庫存商品' : language === 'ja' ? '在庫不足' : 'Low Stock'}
                       </p>
                       <p className="text-3xl font-bold text-gray-900">0</p>
                     </div>
@@ -382,7 +382,7 @@ export default function AdminPanel() {
               {/* Quick Links */}
               <div className="mt-8">
                 <h3 className="text-lg font-bold mb-4 text-gray-900">
-                  {language === 'zh' ? '快速導航' : language === 'ja' ? 'クイックリンク' : 'Quick Links'}
+                  {(language === 'zh' || language === 'cn') ? '快速導航' : language === 'ja' ? 'クイックリンク' : 'Quick Links'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {menuItems.slice(1).map((item) => (
@@ -415,14 +415,14 @@ export default function AdminPanel() {
           {currentPage === 'financial' && (
             <div className="bg-white rounded-lg p-8 text-center">
               <p className="text-gray-600 mb-4">
-                {language === 'zh'
+                {(language === 'zh' || language === 'cn')
                   ? '此功能正在開發中...'
                   : language === 'ja'
                     ? 'この機能は開発中です...'
                     : 'This feature is coming soon...'}
               </p>
               <Button onClick={() => setLocation('/admin-panel')}>
-                {language === 'zh' ? '返回儀表板' : language === 'ja' ? 'ダッシュボードに戻る' : 'Back to Dashboard'}
+                {(language === 'zh' || language === 'cn') ? '返回儀表板' : language === 'ja' ? 'ダッシュボードに戻る' : 'Back to Dashboard'}
               </Button>
             </div>
           )}
@@ -430,14 +430,14 @@ export default function AdminPanel() {
           {currentPage === 'settings' && (
             <div className="bg-white rounded-lg p-8 text-center">
               <p className="text-gray-600 mb-4">
-                {language === 'zh'
+                {(language === 'zh' || language === 'cn')
                   ? '此功能正在開發中...'
                   : language === 'ja'
                     ? 'この機能は開発中です...'
                     : 'This feature is coming soon...'}
               </p>
               <Button onClick={() => setLocation('/admin-panel')}>
-                {language === 'zh' ? '返回儀表板' : language === 'ja' ? 'ダッシュボードに戻る' : 'Back to Dashboard'}
+                {(language === 'zh' || language === 'cn') ? '返回儀表板' : language === 'ja' ? 'ダッシュボードに戻る' : 'Back to Dashboard'}
               </Button>
             </div>
           )}

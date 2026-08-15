@@ -48,7 +48,7 @@ export default function KokuManagement() {
       setProducts(convertedProducts);
     } catch (error) {
       console.error('Failed to fetch Koku products:', error);
-      toast.error(language === 'zh' ? '無法載入百元批發產品' : 'Failed to load products');
+      toast.error((language === 'zh' || language === 'cn') ? '無法載入百元批發產品' : 'Failed to load products');
     } finally {
       setIsLoading(false);
     }
@@ -64,26 +64,26 @@ export default function KokuManagement() {
       // 模擬更新（實際應該調用後端API）
       setProducts(products.map(p => p.id === id ? { ...p, ...editData } : p));
       setEditingId(null);
-      toast.success(language === 'zh' ? '已更新' : 'Updated successfully');
+      toast.success((language === 'zh' || language === 'cn') ? '已更新' : 'Updated successfully');
     } catch (error) {
-      toast.error(language === 'zh' ? '更新失敗' : 'Update failed');
+      toast.error((language === 'zh' || language === 'cn') ? '更新失敗' : 'Update failed');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm(language === 'zh' ? '確定要刪除嗎？' : 'Are you sure?')) {
+    if (confirm((language === 'zh' || language === 'cn') ? '確定要刪除嗎？' : 'Are you sure?')) {
       try {
         setProducts(products.filter(p => p.id !== id));
-        toast.success(language === 'zh' ? '已刪除' : 'Deleted successfully');
+        toast.success((language === 'zh' || language === 'cn') ? '已刪除' : 'Deleted successfully');
       } catch (error) {
-        toast.error(language === 'zh' ? '刪除失敗' : 'Delete failed');
+        toast.error((language === 'zh' || language === 'cn') ? '刪除失敗' : 'Delete failed');
       }
     }
   };
 
   const handleAddProduct = async () => {
     if (!newProduct.商品名 || !newProduct.価格) {
-      toast.error(language === 'zh' ? '請填寫必要欄位' : 'Please fill in required fields');
+      toast.error((language === 'zh' || language === 'cn') ? '請填寫必要欄位' : 'Please fill in required fields');
       return;
     }
 
@@ -99,9 +99,9 @@ export default function KokuManagement() {
       setProducts([...products, product]);
       setNewProduct({ 商品名: '', 価格: 0, 在庫: 0 });
       setIsAddingNew(false);
-      toast.success(language === 'zh' ? '已新增' : 'Added successfully');
+      toast.success((language === 'zh' || language === 'cn') ? '已新增' : 'Added successfully');
     } catch (error) {
-      toast.error(language === 'zh' ? '新增失敗' : 'Add failed');
+      toast.error((language === 'zh' || language === 'cn') ? '新增失敗' : 'Add failed');
     }
   };
 
@@ -115,10 +115,10 @@ export default function KokuManagement() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            {language === 'zh' ? '百元批發商品管理' : language === 'ja' ? '百円卸売商品管理' : 'Kokubo Wholesale Management'}
+            {(language === 'zh' || language === 'cn') ? '百元批發商品管理' : language === 'ja' ? '百円卸売商品管理' : 'Kokubo Wholesale Management'}
           </h2>
           <p className="text-gray-600">
-            {language === 'zh' ? '共 {0} 件商品' : language === 'ja' ? '全{0}件の商品' : '{0} products'}
+            {(language === 'zh' || language === 'cn') ? '共 {0} 件商品' : language === 'ja' ? '全{0}件の商品' : '{0} products'}
               .replace('{0}', products.length.toString())
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function KokuManagement() {
           className="bg-[#0ABAB5] hover:bg-[#089B96] text-white flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          {language === 'zh' ? '新增商品' : language === 'ja' ? '商品追加' : 'Add Product'}
+          {(language === 'zh' || language === 'cn') ? '新增商品' : language === 'ja' ? '商品追加' : 'Add Product'}
         </Button>
       </div>
 
@@ -137,7 +137,7 @@ export default function KokuManagement() {
           <Search className="w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder={language === 'zh' ? '搜尋商品名稱或品番...' : 'Search product name or SKU...'}
+            placeholder={(language === 'zh' || language === 'cn') ? '搜尋商品名稱或品番...' : 'Search product name or SKU...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ABAB5]"
@@ -151,7 +151,7 @@ export default function KokuManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {language === 'zh' ? '商品名稱' : 'Product Name'}
+                {(language === 'zh' || language === 'cn') ? '商品名稱' : 'Product Name'}
               </label>
               <input
                 type="text"
@@ -162,7 +162,7 @@ export default function KokuManagement() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {language === 'zh' ? '價格' : 'Price'}
+                {(language === 'zh' || language === 'cn') ? '價格' : 'Price'}
               </label>
               <input
                 type="number"
@@ -173,7 +173,7 @@ export default function KokuManagement() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {language === 'zh' ? '庫存' : 'Stock'}
+                {(language === 'zh' || language === 'cn') ? '庫存' : 'Stock'}
               </label>
               <input
                 type="number"
@@ -188,7 +188,7 @@ export default function KokuManagement() {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {language === 'zh' ? '保存' : 'Save'}
+                {(language === 'zh' || language === 'cn') ? '保存' : 'Save'}
               </Button>
               <Button
                 onClick={() => setIsAddingNew(false)}
@@ -214,19 +214,19 @@ export default function KokuManagement() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    {language === 'zh' ? '品番' : 'SKU'}
+                    {(language === 'zh' || language === 'cn') ? '品番' : 'SKU'}
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    {language === 'zh' ? '商品名稱' : 'Product Name'}
+                    {(language === 'zh' || language === 'cn') ? '商品名稱' : 'Product Name'}
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    {language === 'zh' ? '價格' : 'Price'}
+                    {(language === 'zh' || language === 'cn') ? '價格' : 'Price'}
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    {language === 'zh' ? '庫存' : 'Stock'}
+                    {(language === 'zh' || language === 'cn') ? '庫存' : 'Stock'}
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                    {language === 'zh' ? '操作' : 'Actions'}
+                    {(language === 'zh' || language === 'cn') ? '操作' : 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -332,7 +332,7 @@ export default function KokuManagement() {
       ) : (
         <Card className="p-12 text-center">
           <p className="text-gray-600">
-            {language === 'zh' ? '沒有找到商品' : 'No products found'}
+            {(language === 'zh' || language === 'cn') ? '沒有找到商品' : 'No products found'}
           </p>
         </Card>
       )}

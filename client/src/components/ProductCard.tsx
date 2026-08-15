@@ -23,7 +23,7 @@ interface Props {
 
 /** 幣別與顯示 */
 function formatPrice(price: number, language: 'zh' | 'en' | 'ja'): string {
-  if (language === 'zh') return `NT$ ${Math.round(price).toLocaleString()}`;
+  if ((language === 'zh' || language === 'cn')) return `NT$ ${Math.round(price).toLocaleString()}`;
   if (language === 'ja') return `¥ ${Math.round(price * 4.5).toLocaleString()}`;
   return `$ ${(price * 0.031).toFixed(2)}`;
 }

@@ -15,7 +15,7 @@ interface Props {
 
 export function MarqueeBar({ announcements, language, onClose }: Props) {
   const pickContent = (a: Announcement) => {
-    if (language === 'zh') return a.contentZh;
+    if ((language === 'zh' || language === 'cn')) return a.contentZh;
     if (language === 'ja') return a.contentJa || a.contentZh;
     return a.contentEn || a.contentZh;
   };

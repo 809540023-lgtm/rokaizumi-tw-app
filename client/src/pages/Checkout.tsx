@@ -49,7 +49,7 @@ export default function Checkout() {
   });
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');

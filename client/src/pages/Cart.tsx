@@ -18,7 +18,7 @@ export default function Cart() {
   const isLoading = false;
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -44,7 +44,7 @@ export default function Cart() {
   };
 
   const handleRemoveItem = (productId: number) => {
-    if (confirm(language === 'zh' ? '確定要移除此商品嗎？' : 'Are you sure you want to remove this item?')) {
+    if (confirm((language === 'zh' || language === 'cn') ? '確定要移除此商品嗎？' : 'Are you sure you want to remove this item?')) {
       remove(productId);
       toast.success('商品已移除');
     }
@@ -183,7 +183,7 @@ export default function Cart() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
                 <h2 className="text-xl font-bold mb-6 text-gray-900">
-                  {language === 'zh' ? '訂單摘要' : 'Order Summary'}
+                  {(language === 'zh' || language === 'cn') ? '訂單摘要' : 'Order Summary'}
                 </h2>
                 
                 <div className="space-y-3 mb-6">

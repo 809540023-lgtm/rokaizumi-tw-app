@@ -33,7 +33,7 @@ export default function ProductDetail() {
   });
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -62,7 +62,7 @@ export default function ProductDetail() {
   const handleShare = () => {
     if (!product) return;
     const productUrl = `${window.location.origin}/product/${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${product.name}` 
       : language === 'en'
       ? `Check out this product: ${product.name}`
@@ -77,7 +77,7 @@ export default function ProductDetail() {
         // Fallback if user cancels
       });
     } else {
-      toast.info(language === 'zh' ? '複製了產品連結' : 'Product link copied');
+      toast.info((language === 'zh' || language === 'cn') ? '複製了產品連結' : 'Product link copied');
       navigator.clipboard.writeText(productUrl);
     }
   };
@@ -92,7 +92,7 @@ export default function ProductDetail() {
   const handleShareToTwitter = () => {
     if (!product) return;
     const productUrl = `${window.location.origin}/product/${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${product.name}` 
       : language === 'en'
       ? `Check out this product: ${product.name}`
@@ -104,7 +104,7 @@ export default function ProductDetail() {
   const handleShareToLine = () => {
     if (!product) return;
     const productUrl = `${window.location.origin}/product/${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${product.name}` 
       : language === 'en'
       ? `Check out this product: ${product.name}`
@@ -115,16 +115,16 @@ export default function ProductDetail() {
 
   const addToWishlistMutation = trpc.wishlist.add.useMutation({
     onSuccess: () => {
-      toast.success(language === 'zh' ? '已加入願望清單' : 'Added to wishlist');
+      toast.success((language === 'zh' || language === 'cn') ? '已加入願望清單' : 'Added to wishlist');
     },
     onError: (error: any) => {
-      toast.error(error.message || (language === 'zh' ? '加入願望清單失敗' : 'Failed to add to wishlist'));
+      toast.error(error.message || ((language === 'zh' || language === 'cn') ? '加入願望清單失敗' : 'Failed to add to wishlist'));
     },
   });
 
   const handleAddToWishlist = () => {
     if (!isAuthenticated) {
-      toast.error(language === 'zh' ? '請先登入' : 'Please log in first');
+      toast.error((language === 'zh' || language === 'cn') ? '請先登入' : 'Please log in first');
       return;
     }
     addToWishlistMutation.mutate({ productId });
@@ -157,10 +157,10 @@ export default function ProductDetail() {
         </header>
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold mb-4">
-            {language === 'zh' ? '產品未找到' : 'Product Not Found'}
+            {(language === 'zh' || language === 'cn') ? '產品未找到' : 'Product Not Found'}
           </h2>
           <Link href="/products" className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
-              {language === 'zh' ? '返回產品列表' : 'Back to Products'}
+              {(language === 'zh' || language === 'cn') ? '返回產品列表' : 'Back to Products'}
             </Link>
         </div>
       </div>
@@ -276,7 +276,7 @@ export default function ProductDetail() {
             
             <div className="mb-6">
               <p className="text-4xl font-bold text-[#DC2626] mb-3">
-                {language === 'zh' ? `NT$${Math.round(product.price).toLocaleString()}` : 
+                {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price).toLocaleString()}` : 
                  language === 'ja' ? `¥${Math.round(product.price * 4.5).toLocaleString()}` : 
                  `$${(product.price * 0.031).toFixed(2)}`}
               </p>
@@ -292,13 +292,13 @@ export default function ProductDetail() {
                         : 'bg-red-100 text-red-800'
                     }`}>
                       {product.stock > 0 
-                        ? (language === 'zh' ? `庫存: ${product.stock}` : `Stock: ${product.stock}`)
-                        : (language === 'zh' ? '缺貨' : 'Out of Stock')
+                        ? ((language === 'zh' || language === 'cn') ? `庫存: ${product.stock}` : `Stock: ${product.stock}`)
+                        : ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
                       }
                     </span>
                     {product.stock <= product.lowStockThreshold && product.stock > 0 && (
                       <span className="text-xs text-orange-600 font-semibold">
-                        {language === 'zh' ? '⚠️ 庫存即將用盡' : '⚠️ Low Stock'}
+                        {(language === 'zh' || language === 'cn') ? '⚠️ 庫存即將用盡' : '⚠️ Low Stock'}
                       </span>
                     )}
                   </>
@@ -312,7 +312,7 @@ export default function ProductDetail() {
 
             {product.specifications && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">{language === 'zh' ? '規格' : 'Specifications'}</h3>
+                <h3 className="text-lg font-semibold mb-3">{(language === 'zh' || language === 'cn') ? '規格' : 'Specifications'}</h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-gray-700 whitespace-pre-wrap">{product.specifications}</p>
                 </div>
@@ -322,7 +322,7 @@ export default function ProductDetail() {
             {/* Quantity Selector */}
             <div className="mb-6">
               <label className="block text-sm font-medium mb-2">
-                {language === 'zh' ? '數量' : 'Quantity'}
+                {(language === 'zh' || language === 'cn') ? '數量' : 'Quantity'}
               </label>
               <div className="flex items-center gap-4">
                 <button
@@ -355,8 +355,8 @@ export default function ProductDetail() {
             >
               <ShoppingCart className="w-5 h-5" />
               {product.stock !== undefined && product.stock <= 0 
-                ? (language === 'zh' ? '缺貨' : 'Out of Stock')
-                : (language === 'zh' ? '加入購物車' : 'Add to Cart')
+                ? ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
+                : ((language === 'zh' || language === 'cn') ? '加入購物車' : 'Add to Cart')
               }
             </Button>
 
@@ -369,14 +369,14 @@ export default function ProductDetail() {
                 className="flex-1 flex items-center justify-center gap-2"
               >
                 <Heart className="w-4 h-4" />
-                {language === 'zh' ? '加入願望清單' : 'Add to Wishlist'}
+                {(language === 'zh' || language === 'cn') ? '加入願望清單' : 'Add to Wishlist'}
               </Button>
               <Button
                 variant="outline"
                 className="flex-1 relative group flex items-center justify-center gap-2"
               >
                 <Share2 className="w-4 h-4" />
-                {language === 'zh' ? '分享' : 'Share'}
+                {(language === 'zh' || language === 'cn') ? '分享' : 'Share'}
                 {/* Share dropdown menu */}
                 <div className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 w-48">
                   <button
@@ -405,14 +405,14 @@ export default function ProductDetail() {
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm">{language === 'zh' ? '更多' : 'More'}</span>
+                    <span className="text-sm">{(language === 'zh' || language === 'cn') ? '更多' : 'More'}</span>
                   </button>
                 </div>
               </Button>
             </div>
 
             <Link href="/products" className="block text-center text-[#0ABAB5] hover:text-[#089B96] font-semibold py-2">
-                {language === 'zh' ? '繼續購物' : 'Continue Shopping'}
+                {(language === 'zh' || language === 'cn') ? '繼續購物' : 'Continue Shopping'}
               </Link>
           </div>
         </div>
@@ -422,10 +422,10 @@ export default function ProductDetail() {
           <div className="mb-12 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-8">
             <div className="mb-8">
               <h2 className="text-3xl font-bold mb-2 text-gray-900">
-                {language === 'zh' ? '✨ 相關商品推薦' : '✨ Related Products'}
+                {(language === 'zh' || language === 'cn') ? '✨ 相關商品推薦' : '✨ Related Products'}
               </h2>
               <p className="text-gray-600">
-                {language === 'zh' ? '您可能也會喜歡這些商品' : 'You might also like these products'}
+                {(language === 'zh' || language === 'cn') ? '您可能也會喜歡這些商品' : 'You might also like these products'}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -445,7 +445,7 @@ export default function ProductDetail() {
                         {/* Quick View Overlay */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
                           <Button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-[#0ABAB5] hover:bg-gray-100">
-                            {language === 'zh' ? '快速查看' : 'Quick View'}
+                            {(language === 'zh' || language === 'cn') ? '快速查看' : 'Quick View'}
                           </Button>
                         </div>
                       </div>
@@ -458,13 +458,13 @@ export default function ProductDetail() {
                             ¥{relatedProduct.price?.toLocaleString()}
                           </p>
                           <span className="text-xs bg-[#0ABAB5] text-white px-2 py-1 rounded-full">
-                            {language === 'zh' ? '推薦' : 'Recommended'}
+                            {(language === 'zh' || language === 'cn') ? '推薦' : 'Recommended'}
                           </span>
                         </div>
                         {/* Category Badge */}
                         {relatedProduct.categoryId && (
                           <div className="text-xs text-gray-600 mb-3">
-                            {relatedProduct.categoryId === 1 ? (language === 'zh' ? '🛍️ 日本百元商品' : '🛍️ 100 Yen Products') : (language === 'zh' ? '♿ 老人看護器材' : '♿ Care Equipment')}
+                            {relatedProduct.categoryId === 1 ? ((language === 'zh' || language === 'cn') ? '🛍️ 日本百元商品' : '🛍️ 100 Yen Products') : ((language === 'zh' || language === 'cn') ? '♿ 老人看護器材' : '♿ Care Equipment')}
                           </div>
                         )}
                       </div>

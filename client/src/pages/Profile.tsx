@@ -36,13 +36,13 @@ export default function Profile() {
   const removeFromWishlistMutation = trpc.wishlist.remove.useMutation({
     onSuccess: () => {
       refetchWishlist();
-      toast.success(language === 'zh' ? '已從願望清單移除' : 'Removed from wishlist');
+      toast.success((language === 'zh' || language === 'cn') ? '已從願望清單移除' : 'Removed from wishlist');
     },
   });
 
   const addToCartMutation = trpc.cart.add.useMutation({
     onSuccess: () => {
-      toast.success(language === 'zh' ? '已添加到購物車' : 'Added to cart');
+      toast.success((language === 'zh' || language === 'cn') ? '已添加到購物車' : 'Added to cart');
     },
   });
 
@@ -62,7 +62,7 @@ export default function Profile() {
   }, [user]);
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -92,10 +92,10 @@ export default function Profile() {
     setIsSaving(true);
     try {
       // TODO: Implement save profile mutation
-      toast.success(language === 'zh' ? '個人資料已保存' : 'Profile saved successfully');
+      toast.success((language === 'zh' || language === 'cn') ? '個人資料已保存' : 'Profile saved successfully');
       setIsEditing(false);
     } catch (error) {
-      toast.error(language === 'zh' ? '保存失敗' : 'Failed to save profile');
+      toast.error((language === 'zh' || language === 'cn') ? '保存失敗' : 'Failed to save profile');
     } finally {
       setIsSaving(false);
     }
@@ -111,7 +111,7 @@ export default function Profile() {
 
   const handleShare = (productId: number, productName: string) => {
     const productUrl = `${window.location.origin}/products?id=${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
       ? `Check out this product: ${productName}`
@@ -128,7 +128,7 @@ export default function Profile() {
       });
     } else {
       // Fallback: show share options
-      toast.info(language === 'zh' ? '複製了產品連結' : 'Product link copied');
+      toast.info((language === 'zh' || language === 'cn') ? '複製了產品連結' : 'Product link copied');
       navigator.clipboard.writeText(productUrl);
     }
   };
@@ -141,7 +141,7 @@ export default function Profile() {
 
   const handleShareToTwitter = (productId: number, productName: string) => {
     const productUrl = `${window.location.origin}/products?id=${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
       ? `Check out this product: ${productName}`
@@ -152,7 +152,7 @@ export default function Profile() {
 
   const handleShareToLine = (productId: number, productName: string) => {
     const productUrl = `${window.location.origin}/products?id=${productId}`;
-    const shareText = language === 'zh' 
+    const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
       ? `Check out this product: ${productName}`
@@ -180,10 +180,10 @@ export default function Profile() {
         </header>
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold mb-4">
-            {language === 'zh' ? '請先登入' : 'Please log in first'}
+            {(language === 'zh' || language === 'cn') ? '請先登入' : 'Please log in first'}
           </h2>
           <Link href="/" className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
-              {language === 'zh' ? '返回首頁' : 'Back to Home'}
+              {(language === 'zh' || language === 'cn') ? '返回首頁' : 'Back to Home'}
             </Link>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function Profile() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {language === 'zh' ? '個人資料' : 'Profile'}
+              {(language === 'zh' || language === 'cn') ? '個人資料' : 'Profile'}
             </button>
             <button
               onClick={() => setActiveTab('wishlist')}
@@ -249,7 +249,7 @@ export default function Profile() {
               }`}
             >
               <Heart className="w-4 h-4" />
-              {language === 'zh' ? '願望清單' : 'Wishlist'}
+              {(language === 'zh' || language === 'cn') ? '願望清單' : 'Wishlist'}
             </button>
           </div>
 
@@ -258,7 +258,7 @@ export default function Profile() {
             <>
               <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">
-                  {language === 'zh' ? '個人資料' : 'Profile'}
+                  {(language === 'zh' || language === 'cn') ? '個人資料' : 'Profile'}
                 </h1>
                 <Button
                   onClick={() => isEditing ? handleSave() : setIsEditing(true)}
@@ -268,15 +268,15 @@ export default function Profile() {
                   {isSaving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {language === 'zh' ? '保存中...' : 'Saving...'}
+                      {(language === 'zh' || language === 'cn') ? '保存中...' : 'Saving...'}
                     </>
                   ) : isEditing ? (
                     <>
                       <Save className="w-4 h-4 mr-2" />
-                      {language === 'zh' ? '保存' : 'Save'}
+                      {(language === 'zh' || language === 'cn') ? '保存' : 'Save'}
                     </>
                   ) : (
-                    language === 'zh' ? '編輯' : 'Edit'
+                    (language === 'zh' || language === 'cn') ? '編輯' : 'Edit'
                   )}
                 </Button>
               </div>
@@ -286,7 +286,7 @@ export default function Profile() {
                   {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '名稱' : 'Name'}
+                      {(language === 'zh' || language === 'cn') ? '名稱' : 'Name'}
                     </label>
                     <input
                       type="text"
@@ -301,7 +301,7 @@ export default function Profile() {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '郵箱' : 'Email'}
+                      {(language === 'zh' || language === 'cn') ? '郵箱' : 'Email'}
                     </label>
                     <input
                       type="email"
@@ -316,7 +316,7 @@ export default function Profile() {
                   {/* Phone */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '電話' : 'Phone'}
+                      {(language === 'zh' || language === 'cn') ? '電話' : 'Phone'}
                     </label>
                     <input
                       type="tel"
@@ -331,7 +331,7 @@ export default function Profile() {
                   {/* City */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '城市' : 'City'}
+                      {(language === 'zh' || language === 'cn') ? '城市' : 'City'}
                     </label>
                     <input
                       type="text"
@@ -346,7 +346,7 @@ export default function Profile() {
                   {/* Postal Code */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '郵編' : 'Postal Code'}
+                      {(language === 'zh' || language === 'cn') ? '郵編' : 'Postal Code'}
                     </label>
                     <input
                       type="text"
@@ -361,7 +361,7 @@ export default function Profile() {
                   {/* Country */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '國家' : 'Country'}
+                      {(language === 'zh' || language === 'cn') ? '國家' : 'Country'}
                     </label>
                     <input
                       type="text"
@@ -376,7 +376,7 @@ export default function Profile() {
                   {/* Address - Full Width */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '地址' : 'Address'}
+                      {(language === 'zh' || language === 'cn') ? '地址' : 'Address'}
                     </label>
                     <textarea
                       name="address"
@@ -391,7 +391,7 @@ export default function Profile() {
                   {/* Bio - Full Width */}
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'zh' ? '個人簡介' : 'Bio'}
+                      {(language === 'zh' || language === 'cn') ? '個人簡介' : 'Bio'}
                     </label>
                     <textarea
                       name="bio"
@@ -411,7 +411,7 @@ export default function Profile() {
           {activeTab === 'wishlist' && (
             <>
               <h1 className="text-3xl font-bold mb-8">
-                {language === 'zh' ? '願望清單' : 'Wishlist'}
+                {(language === 'zh' || language === 'cn') ? '願望清單' : 'Wishlist'}
               </h1>
 
               {isLoadingWishlist ? (
@@ -422,10 +422,10 @@ export default function Profile() {
                 <Card className="p-12 text-center">
                   <Heart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-600">
-                    {language === 'zh' ? '您的願望清單是空的' : 'Your wishlist is empty'}
+                    {(language === 'zh' || language === 'cn') ? '您的願望清單是空的' : 'Your wishlist is empty'}
                   </p>
                   <Link href="/products" className="inline-block mt-4 bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
-                      {language === 'zh' ? '瀏覽產品' : 'Browse Products'}
+                      {(language === 'zh' || language === 'cn') ? '瀏覽產品' : 'Browse Products'}
                     </Link>
                 </Card>
               ) : (
@@ -449,7 +449,7 @@ export default function Profile() {
                             disabled={addToCartMutation.isPending}
                           >
                             <ShoppingCart className="w-4 h-4" />
-                            {language === 'zh' ? '加入購物車' : 'Add to Cart'}
+                            {(language === 'zh' || language === 'cn') ? '加入購物車' : 'Add to Cart'}
                           </Button>
                           <div className="flex gap-2">
                             <Button
@@ -492,7 +492,7 @@ export default function Profile() {
                                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
                                 >
                                   <Share2 className="w-4 h-4 text-gray-600" />
-                                  <span className="text-sm">{language === 'zh' ? '更多' : 'More'}</span>
+                                  <span className="text-sm">{(language === 'zh' || language === 'cn') ? '更多' : 'More'}</span>
                                 </button>
                               </div>
                             </Button>

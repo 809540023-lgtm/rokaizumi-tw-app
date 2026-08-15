@@ -35,7 +35,7 @@ export default function CategoryProducts() {
   });
 
   const toggleLanguage = () => {
-    if (language === 'zh') {
+    if ((language === 'zh' || language === 'cn')) {
       setLanguage('en');
     } else if (language === 'en') {
       setLanguage('ja');
@@ -190,7 +190,7 @@ export default function CategoryProducts() {
                     </Link>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-[#DC2626]">
-                      {language === 'zh' ? `NT$${Math.round(product.price).toLocaleString()}` : 
+                      {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price).toLocaleString()}` : 
                        language === 'ja' ? `¥${Math.round(product.price * 4.5).toLocaleString()}` : 
                        `$${(product.price * 0.031).toFixed(2)}`}
                     </span>
