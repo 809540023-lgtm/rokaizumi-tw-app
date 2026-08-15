@@ -19,6 +19,18 @@ async function tableExists(pool: any, name: string): Promise<boolean> {
   return Number(rows?.[0]?.n ?? 0) > 0;
 }
 
+/**
+ * 讓 SQL 相容 TiDB。
+ *
+ * drizzle 會為 json 欄位產生 `DEFAULT ('[]')`，TiDB 不允許 json/blob/text
+ * 使用預設值，整道 ALTER 會因語法錯誤失敗，導致 images 欄位建不出來，
+ * 後續所有查詢（SELECT 會列出該欄位）跟著失敗。
+ * 去掉預設值後結果一致——後面的 migration 本來就會 MODIFY 成無預設。
+ */
+function toTiDBCompatible(sql: string): string {
+  return sql.replace(/(`?\w+`?\s+json)\s+DEFAULT\s*\([^)]*\)/gi, '$1');
+}
+
 /** 依序套用 drizzle 產生的 migration SQL */
 async function applyMigrations(pool: any) {
   const dir = ['drizzle', '../drizzle', '../../drizzle']
@@ -38,7 +50,7 @@ async function applyMigrations(pool: any) {
   console.log(`🔧 開始建立資料表（${files.length} 個 migration）`);
 
   for (const file of files) {
-    const sql = fs.readFileSync(path.join(dir, file), 'utf-8');
+    const sql = toTiDBCompatible(fs.readFileSync(path.join(dir, file), 'utf-8'));
     // drizzle 用 --> statement-breakpoint 分隔每一道 SQL
     const statements = sql
       .split(/--> statement-breakpoint/)
@@ -130,12 +142,13 @@ async function seedProducts(pool: any) {
 export async function bootstrapDatabase(pool: any) {
   if (!pool) return;
   try {
-    if (await tableExists(pool, 'products')) {
-      console.log('✅ 資料表已存在');
-    } else {
-      console.log('🆕 偵測到全新資料庫，開始初始化');
-      await applyMigrations(pool);
-    }
+    // 每次都完整套用一次 migration。已存在的資料表與欄位會被忽略，
+    // 所以重複執行是安全的；而「表存在就整批跳過」的話，
+    // 一旦某道 ALTER 曾經失敗（例如 TiDB 不接受的語法），
+    // 缺掉的欄位就永遠補不回來。
+    const fresh = !(await tableExists(pool, 'products'));
+    console.log(fresh ? '🆕 偵測到全新資料庫，開始初始化' : '🔄 檢查資料表結構');
+    await applyMigrations(pool);
     await seedProducts(pool);
   } catch (e) {
     console.error('❌ 資料庫初始化失敗:', (e as Error).message);
