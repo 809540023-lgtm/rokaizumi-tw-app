@@ -90,6 +90,7 @@ export default function HomePage() {
   const japaneseCategories = categories.filter(cat =>
     cat.name === '日本精美小商品' ||
     ['日用百貨', '廚房用品', '收納用品', '文具用品', '清潔用品', '玩具雜貨', '美妝保養', '食品零食'].includes(cat.name) ||
+    ['廚房用品', '洗衣用品', '衛浴用品', '清潔用品', '文具用品', '收納用品'].includes(cat.name) ||
     ['Daily Necessities', 'Kitchen Items', 'Storage', 'Stationery', 'Cleaning Supplies', 'Toys', 'Beauty Products', 'Food/Snacks'].includes(cat.name) ||
     ['日用雑貨', 'キッチン用品', '収納用品', '文房具', '清掃用品', 'おもちゃ雑貨', '美容・スキンケア', '食品・お菓子'].includes(cat.name)
   );
@@ -97,6 +98,7 @@ export default function HomePage() {
   const elderlyCareCategories = categories.filter(cat =>
     cat.name === '銀髮生活品質加乘輔具' ||
     ['健康監測', '安全監控', '床邊照護', '復健器材', '行動輔助', '衛浴安全', '護理用品', '生活輔具'].includes(cat.name) ||
+    ['拐杖', '助行器', '介護鞋', '輪椅移位', '入浴用品', '如廁照護', '成人紙尿褲', '介護床寢具', '防褥瘡', '安全扶手', '餐具圍兜'].includes(cat.name) ||
     ['Health Monitoring', 'Safety Monitoring', 'Bedside Care', 'Rehabilitation', 'Mobility Aids', 'Bathroom Safety', 'Nursing Supplies', 'Daily Living Aids'].includes(cat.name) ||
     ['健康モニタリング', '安全監視', 'ベッドサイドケア', 'リハビリ機器', '移動補助', '浴室安全', '介護用品', '生活補助具'].includes(cat.name)
   );

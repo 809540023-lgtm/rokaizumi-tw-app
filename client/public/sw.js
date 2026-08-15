@@ -105,6 +105,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // 商品資料採 network-first：下面的通用邏輯是 cache-first，
+  // 套在 products.json 上會讓使用者在更新商品後仍看到舊目錄
+  // （新版本只會進快取，要下一次造訪才生效）。
+  // 資料要即時，離線時才退回快取。
+  if (url.pathname === '/products.json') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
+          return cached ?? new Response('[]', {
+            headers: { 'Content-Type': 'application/json' },
+          });
+        })
+    );
+    return;
+  }
+
   // 處理導航請求（HTML 頁面）
   if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
