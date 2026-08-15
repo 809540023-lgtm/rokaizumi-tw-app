@@ -78,8 +78,20 @@ async function applyMigrations(pool: any) {
   console.log('✅ 資料表建立完成');
 }
 
+/**
+ * 讀取商品資料。
+ *
+ * public 底下的 products.json 是給前端列表用的精簡版，為了體積把
+ * description 拆走了；匯入資料庫要讀 data/products-full.json，
+ * 否則 1409 筆商品說明會全部寫成空字串。
+ */
 function loadProductsJson() {
-  const file = ['dist/public/products.json', 'server/public/products.json', 'client/public/products.json']
+  const file = [
+    'data/products-full.json',
+    'dist/public/products.json',
+    'server/public/products.json',
+    'client/public/products.json',
+  ]
     .map(p => path.resolve(process.cwd(), p))
     .find(p => fs.existsSync(p));
   return file ? JSON.parse(fs.readFileSync(file, 'utf-8')) : null;
@@ -92,22 +104,35 @@ function loadProductsJson() {
  * 其中 JAN 條碼有 1374 筆，缺了會影響商品辨識與後續對帳。
  */
 async function backfillProductFields(pool: any) {
-  const [[{ n }]]: any = await pool.query(
-    "SELECT COUNT(*) AS n FROM products WHERE jan IS NULL AND code IS NULL"
+  const [[{ ids }]]: any = await pool.query(
+    "SELECT COUNT(*) AS ids FROM products WHERE jan IS NULL AND code IS NULL"
   );
-  if (Number(n) === 0) return;
+  const [[{ descs }]]: any = await pool.query(
+    "SELECT COUNT(*) AS descs FROM products WHERE description IS NULL OR description = ''"
+  );
+  if (Number(ids) === 0 && Number(descs) === 0) return;
 
   const products = loadProductsJson();
   if (!products) return;
 
-  console.log(`🔧 回填商品識別欄位（${n} 筆待處理）…`);
+  console.log(`🔧 回填商品資料（識別欄位 ${ids} 筆、商品說明 ${descs} 筆）…`);
   let done = 0;
   for (const p of products) {
-    if (!p.jan && !p.code && !p.nameJa) continue;
+    if (!p.jan && !p.code && !p.nameJa && !p.description) continue;
     try {
       const [r]: any = await pool.query(
-        'UPDATE products SET jan = ?, code = ?, nameJa = ?, nameEn = ?, origin = ?, priceJpy = ? WHERE name = ?',
-        [p.jan ?? null, p.code ?? null, p.nameJa ?? null, p.nameEn ?? null, p.origin ?? null, p.priceJpy ?? null, p.name]
+        'UPDATE products SET jan = ?, code = ?, nameJa = ?, nameEn = ?, origin = ?, priceJpy = ?, ' +
+          "description = COALESCE(NULLIF(?, ''), description) WHERE name = ?",
+        [
+          p.jan ?? null,
+          p.code ?? null,
+          p.nameJa ?? null,
+          p.nameEn ?? null,
+          p.origin ?? null,
+          p.priceJpy ?? null,
+          p.description ?? '',
+          p.name,
+        ]
       );
       if (r.affectedRows) done++;
     } catch {

@@ -150,12 +150,16 @@ const list = out.map(({ description, spec, sourceUrl, images, ...rest }) => {
   return rest;
 });
 
+// 完整版另外保留一份給資料庫匯入用。
+// 匯入若讀拆過的主檔，description 會整批寫成空字串。
 for (const dir of ['client/public', 'server/public', 'dist/public']) {
   const dest = path.join(root, dir);
   fs.mkdirSync(dest, { recursive: true });
   fs.writeFileSync(path.join(dest, 'products.json'), JSON.stringify(list));
   fs.writeFileSync(path.join(dest, 'product-details.json'), JSON.stringify(details));
 }
+fs.mkdirSync(path.join(root, 'data'), { recursive: true });
+fs.writeFileSync(path.join(root, 'data/products-full.json'), JSON.stringify(out));
 const kb = (o) => Math.round(Buffer.byteLength(JSON.stringify(o)) / 1024);
 console.log(`   products.json ${kb(list)} KB / product-details.json ${kb(details)} KB`);
 
