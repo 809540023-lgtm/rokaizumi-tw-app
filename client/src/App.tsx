@@ -22,6 +22,13 @@ import AdminPanel from "./pages/AdminPanel";
 import Koku from "./pages/Koku";
 import Yamada from "./pages/Yamada";
 import Guides from "./pages/Guides";
+import GuideDetail from "./pages/GuideDetail";
+import Login from "./pages/Login";
+import B2B from "./pages/B2B";
+import Daiko from "./pages/Daiko";
+import Selection from "./pages/Selection";
+import AdminManage from "./pages/AdminManage";
+import About from "./pages/About";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -41,8 +48,14 @@ function Router() {
       <Route path={"/"} component={HomePage} />
       <Route path={"/koku"} component={Koku} />
       <Route path={"/yama"} component={Yamada} />
-      <Route path={"/guides/:slug"} component={Guides} />
+      <Route path={"/guides/:slug"} component={GuideDetail} />
       <Route path={"/guides"} component={Guides} />
+      <Route path={"/login"} component={Login} />
+      <Route path={"/b2b"} component={B2B} />
+      <Route path={"/daiko"} component={Daiko} />
+      <Route path={"/selection"} component={Selection} />
+      <Route path={"/manage"} component={AdminManage} />
+      <Route path={"/about"} component={About} />
       <Route path={"/products/:categoryId"} component={CategoryProducts} />
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:productId"} component={ProductDetail} />

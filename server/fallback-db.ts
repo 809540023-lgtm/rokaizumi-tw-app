@@ -1,6 +1,9 @@
 /**
  * 資料庫回退機制
- * 當真實資料庫失敗時，使用靜態 JSON 數據
+ * 當真實資料庫查詢失敗時，使用靜態 JSON 數據
+ *
+ * 注意：本檔案會被 esbuild 打包成 ESM，__dirname 不可用，
+ * 一律以 process.cwd() 為基準搜尋候選路徑。
  */
 
 import fs from 'fs';
@@ -15,11 +18,15 @@ interface FallbackCategory {
 interface FallbackProduct {
   id: number;
   name: string;
+  nameJa?: string;
   category: string;
+  categoryId?: number;
   price: number;
+  priceJpy?: number;
   description?: string;
   specifications?: string;
   imageUrl?: string;
+  images?: string[];
   status: string;
 }
 
@@ -27,80 +34,89 @@ let fallbackProducts: FallbackProduct[] = [];
 let fallbackCategories: FallbackCategory[] = [];
 let isFallbackActive = false;
 
+/** 依序尋找 products.json，回傳第一個存在的路徑 */
+function resolveProductsPath(): string | null {
+  const candidates = [
+    path.resolve(process.cwd(), 'dist/public/products.json'),
+    path.resolve(process.cwd(), 'server/public/products.json'),
+    path.resolve(process.cwd(), 'client/public/products.json'),
+    path.resolve(process.cwd(), 'public/products.json'),
+  ];
+  return candidates.find(p => fs.existsSync(p)) ?? null;
+}
+
 /**
- * 初始化回退資料庫
+ * 初始化回退資料庫。
+ * 會在啟動時無條件呼叫一次——資料庫是否正常都先把靜態資料讀進記憶體，
+ * 這樣任何一個查詢在執行期失敗時都能立刻接手。
  */
 export function initializeFallbackDB() {
   try {
-    // 優先級: server/public > client/public
-    let productsPath = path.resolve(process.cwd(), 'server/public/products.json');
+    const productsPath = resolveProductsPath();
 
-    if (!fs.existsSync(productsPath)) {
-      productsPath = path.resolve(process.cwd(), 'client/public/products.json');
+    if (!productsPath) {
+      console.warn('⚠️  找不到 products.json，回退資料庫未啟用');
+      return false;
     }
 
-    if (!fs.existsSync(productsPath)) {
-      // Fallback: 嘗試 dist/public（生產環境）
-      productsPath = path.resolve(__dirname, '../public/products.json');
+    const data = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn('⚠️  products.json 內容為空，回退資料庫未啟用');
+      return false;
     }
 
-    if (fs.existsSync(productsPath)) {
-      const data = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
-      fallbackProducts = data;
-      
-      // 提取唯一分類
-      const categories = new Set(data.map((p: any) => p.category));
-      fallbackCategories = Array.from(categories).map((cat, idx) => ({
-        id: idx + 1,
-        name: cat as string,
-        description: `分類: ${cat}`
-      }));
-      
-      isFallbackActive = true;
-      console.log('✅ 回退資料庫已初始化');
-      console.log(`   產品: ${fallbackProducts.length}`);
-      console.log(`   分類: ${fallbackCategories.length}`);
-      return true;
-    }
+    // 分類先建好，再把 categoryId 回填到每個商品，
+    // 讓前端不論拿到 DB 資料還是回退資料都有一致的欄位。
+    const names = Array.from(new Set(data.map((p: any) => p.category).filter(Boolean)));
+    fallbackCategories = names.map((name, idx) => ({
+      id: idx + 1,
+      name: name as string,
+      description: `分類: ${name}`,
+    }));
+
+    const idByName = new Map(fallbackCategories.map(c => [c.name, c.id]));
+    fallbackProducts = data.map((p: any) => ({
+      ...p,
+      categoryId: idByName.get(p.category) ?? 0,
+    }));
+
+    isFallbackActive = true;
+    console.log(`✅ 回退資料庫已初始化 (${productsPath})`);
+    console.log(`   產品: ${fallbackProducts.length}  分類: ${fallbackCategories.length}`);
+    return true;
   } catch (error) {
     console.error('❌ 回退資料庫初始化失敗:', (error as Error).message);
+    return false;
   }
-  return false;
 }
 
-/**
- * 獲取所有分類（回退版本）
- */
 export async function getFallbackCategories() {
-  if (!isFallbackActive) return [];
   return fallbackCategories;
 }
 
-/**
- * 獲取所有產品（回退版本）
- */
 export async function getFallbackProducts() {
-  if (!isFallbackActive) return [];
   return fallbackProducts;
 }
 
-/**
- * 按分類獲取產品（回退版本）
- */
-export async function getFallbackProductsByCategory(categoryName: string) {
-  if (!isFallbackActive) return [];
-  return fallbackProducts.filter(p => p.category === categoryName);
+export async function getFallbackProductById(id: number) {
+  return fallbackProducts.find(p => p.id === id) ?? null;
 }
 
-/**
- * 搜尋產品（回退版本）
- */
+export async function getFallbackCategoryById(id: number) {
+  return fallbackCategories.find(c => c.id === id) ?? null;
+}
+
+export async function getFallbackProductsByCategory(categoryId: number) {
+  return fallbackProducts.filter(p => p.categoryId === categoryId);
+}
+
 export async function searchFallbackProducts(query: string) {
-  if (!isFallbackActive) return [];
-  const lowerQuery = query.toLowerCase();
-  return fallbackProducts.filter(p =>
-    p.name.toLowerCase().includes(lowerQuery) ||
-    (p.description?.toLowerCase().includes(lowerQuery) ?? false)
+  const q = query.toLowerCase();
+  return fallbackProducts.filter(
+    p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.nameJa?.toLowerCase().includes(q) ?? false) ||
+      (p.description?.toLowerCase().includes(q) ?? false)
   );
 }
 

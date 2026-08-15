@@ -14,12 +14,10 @@ export function MobileStickyCTA() {
         <MessageCircle className="w-4 h-4" />
         LINE 客服
       </a>
-      <Link href="/products">
-        <a className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-4 py-3 rounded-xl font-bold text-sm shadow-[0_4px_14px_rgba(220,38,38,0.3)]">
+      <Link href="/products" className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-4 py-3 rounded-xl font-bold text-sm shadow-[0_4px_14px_rgba(220,38,38,0.3)]">
           <ShoppingBag className="w-4 h-4" />
           立刻選購 →
-        </a>
-      </Link>
+        </Link>
     </div>
   );
 }

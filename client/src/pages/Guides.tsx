@@ -4,7 +4,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 
-const guides = [
+export const guides = [
   {
     slug: 'japanese-wheelchair-2026',
     cat: '輪椅',
@@ -93,8 +93,7 @@ export default function Guides() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {guides.map(g => (
-              <Link key={g.slug} href={`/guides/${g.slug}`}>
-                <a className="group bg-white rounded-2xl shadow-sm hover:shadow-[0_8px_24px_rgba(10,186,181,0.14)] hover:-translate-y-1 transition-all overflow-hidden">
+              <Link key={g.slug} href={`/guides/${g.slug}`} className="group bg-white rounded-2xl shadow-sm hover:shadow-[0_8px_24px_rgba(10,186,181,0.14)] hover:-translate-y-1 transition-all overflow-hidden">
                   <div className="aspect-[16/10] bg-gradient-to-br from-[#E0F7F6] to-white flex items-center justify-center text-7xl">
                     {g.cover}
                   </div>
@@ -111,8 +110,7 @@ export default function Guides() {
                       <span>{g.readTime}閱讀</span>
                     </div>
                   </div>
-                </a>
-              </Link>
+                </Link>
             ))}
           </div>
         </div>

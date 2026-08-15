@@ -114,27 +114,19 @@ export default function CategoryProducts() {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
                 <span className="text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
-              </a>
-            </Link>
+              </Link>
             <div className="flex items-center gap-6">
               <nav className="flex gap-6">
-                <Link href="/">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</a>
-                </Link>
+                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
               </nav>
               <Button
                 variant="outline"
@@ -181,8 +173,7 @@ export default function CategoryProducts() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product: any) => (
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <Link href={`/product/${product.id}`}>
-                  <a className="block">
+                <Link href={`/product/${product.id}`} className="block">
                     <div className="relative">
                       <img
                         src={product.imageUrl || 'https://placehold.co/400x300?text=Product'}
@@ -190,16 +181,13 @@ export default function CategoryProducts() {
                         className="w-full h-48 object-cover hover:scale-105 transition-transform"
                       />
                     </div>
-                  </a>
-                </Link>
+                  </Link>
                 <div className="p-4">
-                  <Link href={`/product/${product.id}`}>
-                    <a className="block">
+                  <Link href={`/product/${product.id}`} className="block">
                       <h3 className="text-lg font-bold text-gray-800 mb-3 hover:text-[#0ABAB5] transition-colors cursor-pointer line-clamp-2">
                         {product.name}
                       </h3>
-                    </a>
-                  </Link>
+                    </Link>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-[#DC2626]">
                       {language === 'zh' ? `NT$${Math.round(product.price).toLocaleString()}` : 

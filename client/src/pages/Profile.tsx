@@ -167,16 +167,14 @@ export default function Profile() {
         <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/">
-                <a className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                     ろ
                   </div>
                   <span className="text-2xl font-bold text-[#0ABAB5]">
                     {t('home.company')}
                   </span>
-                </a>
-              </Link>
+                </Link>
             </div>
           </div>
         </header>
@@ -184,11 +182,9 @@ export default function Profile() {
           <h2 className="text-2xl font-bold mb-4">
             {language === 'zh' ? '請先登入' : 'Please log in first'}
           </h2>
-          <Link href="/">
-            <a className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
+          <Link href="/" className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
               {language === 'zh' ? '返回首頁' : 'Back to Home'}
-            </a>
-          </Link>
+            </Link>
         </div>
       </div>
     );
@@ -200,30 +196,20 @@ export default function Profile() {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
                 <span className="text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
-              </a>
-            </Link>
+              </Link>
             <div className="flex items-center gap-6">
               <nav className="flex gap-6">
-                <Link href="/">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</a>
-                </Link>
-                <Link href="/products">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</a>
-                </Link>
+                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
+                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
               </nav>
               <Button
                 variant="outline"
@@ -438,11 +424,9 @@ export default function Profile() {
                   <p className="text-gray-600">
                     {language === 'zh' ? '您的願望清單是空的' : 'Your wishlist is empty'}
                   </p>
-                  <Link href="/products">
-                    <a className="inline-block mt-4 bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
+                  <Link href="/products" className="inline-block mt-4 bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
                       {language === 'zh' ? '瀏覽產品' : 'Browse Products'}
-                    </a>
-                  </Link>
+                    </Link>
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -41,8 +41,7 @@ export function ProductCard({
   return (
     <article className="group bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(10,186,181,0.14)] hover:-translate-y-1 transition-all flex flex-col">
       {/* 圖片區 */}
-      <Link href={`/product/${product.id}`}>
-        <a className="block relative aspect-square bg-gray-100 overflow-hidden">
+      <Link href={`/product/${product.id}`} className="block relative aspect-square bg-gray-100 overflow-hidden">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -80,18 +79,15 @@ export function ProductCard({
           >
             <Heart className="w-4 h-4" />
           </button>
-        </a>
-      </Link>
+        </Link>
 
       {/* 內容區 */}
       <div className="p-4 flex flex-col flex-1">
-        <Link href={`/product/${product.id}`}>
-          <a className="block">
+        <Link href={`/product/${product.id}`} className="block">
             <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 min-h-[2.6rem] mb-2 hover:text-[#0ABAB5] transition-colors">
               {product.name}
             </h3>
-          </a>
-        </Link>
+          </Link>
 
         {/* 評分 */}
         {product.rating != null && (
@@ -122,11 +118,9 @@ export function ProductCard({
         <div className="text-base font-extrabold text-[#E26D5C] mb-3">{formatPrice(product.price, language)}</div>
         {/* 按鈕 */}
         <div className="flex gap-2 mt-auto">
-          <Link href={`/product/${product.id}`}>
-            <a className="flex-1 flex items-center justify-center gap-1.5 bg-white border-[1.5px] border-gray-200 text-gray-600 hover:border-[#0ABAB5] hover:text-[#0ABAB5] px-2 py-2 rounded-lg text-xs font-bold transition-colors">
+          <Link href={`/product/${product.id}`} className="flex-1 flex items-center justify-center gap-1.5 bg-white border-[1.5px] border-gray-200 text-gray-600 hover:border-[#0ABAB5] hover:text-[#0ABAB5] px-2 py-2 rounded-lg text-xs font-bold transition-colors">
               <Eye className="w-3.5 h-3.5" /> 詳情
-            </a>
-          </Link>
+            </Link>
           <button
             onClick={onAddToCart}
             className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-2 py-2 rounded-lg text-xs font-bold transition-colors"

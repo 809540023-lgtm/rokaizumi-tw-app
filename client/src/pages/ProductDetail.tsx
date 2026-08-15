@@ -144,16 +144,14 @@ export default function ProductDetail() {
         <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <Link href="/">
-                <a className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                     ろ
                   </div>
                   <span className="text-2xl font-bold text-[#0ABAB5]">
                     {t('home.company')}
                   </span>
-                </a>
-              </Link>
+                </Link>
             </div>
           </div>
         </header>
@@ -161,11 +159,9 @@ export default function ProductDetail() {
           <h2 className="text-2xl font-bold mb-4">
             {language === 'zh' ? '產品未找到' : 'Product Not Found'}
           </h2>
-          <Link href="/products">
-            <a className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
+          <Link href="/products" className="inline-block bg-[#0ABAB5] text-white px-6 py-2 rounded-lg hover:bg-[#089B96]">
               {language === 'zh' ? '返回產品列表' : 'Back to Products'}
-            </a>
-          </Link>
+            </Link>
         </div>
       </div>
     );
@@ -181,30 +177,20 @@ export default function ProductDetail() {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
                 <span className="text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
-              </a>
-            </Link>
+              </Link>
             <div className="flex items-center gap-6">
               <nav className="flex gap-6">
-                <Link href="/">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</a>
-                </Link>
-                <Link href="/products">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</a>
-                </Link>
+                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
+                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
               </nav>
               <Button
                 variant="outline"
@@ -223,13 +209,9 @@ export default function ProductDetail() {
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Link href="/">
-            <a className="hover:text-[#0ABAB5]">{t('nav.home')}</a>
-          </Link>
+          <Link href="/" className="hover:text-[#0ABAB5]">{t('nav.home')}</Link>
           <span>/</span>
-          <Link href="/products">
-            <a className="hover:text-[#0ABAB5]">{t('nav.products')}</a>
-          </Link>
+          <Link href="/products" className="hover:text-[#0ABAB5]">{t('nav.products')}</Link>
           <span>/</span>
           <span className="text-gray-900">{product.name}</span>
         </div>
@@ -429,11 +411,9 @@ export default function ProductDetail() {
               </Button>
             </div>
 
-            <Link href="/products">
-              <a className="block text-center text-[#0ABAB5] hover:text-[#089B96] font-semibold py-2">
+            <Link href="/products" className="block text-center text-[#0ABAB5] hover:text-[#089B96] font-semibold py-2">
                 {language === 'zh' ? '繼續購物' : 'Continue Shopping'}
-              </a>
-            </Link>
+              </Link>
           </div>
         </div>
 
@@ -451,8 +431,7 @@ export default function ProductDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredRelated.map((relatedProduct) => (
                 <Card key={relatedProduct.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
-                  <Link href={`/product/${relatedProduct.id}`}>
-                    <a className="block">
+                  <Link href={`/product/${relatedProduct.id}`} className="block">
                       <div className="aspect-square bg-gray-200 overflow-hidden flex items-center justify-center relative">
                         {relatedProduct.imageUrl ? (
                           <img
@@ -489,8 +468,7 @@ export default function ProductDetail() {
                           </div>
                         )}
                       </div>
-                    </a>
-                  </Link>
+                    </Link>
                 </Card>
               ))}
             </div>

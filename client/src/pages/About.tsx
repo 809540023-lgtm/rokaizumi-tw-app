@@ -145,11 +145,9 @@ export default function About() {
           <p className="opacity-90 max-w-xl mx-auto mb-6">
             從 220 件嚴選日本介護用品中找到答案，或直接 LINE 我們由介護士為您推薦。
           </p>
-          <Link href="/products">
-            <a className="inline-block bg-white text-[#089B96] hover:bg-[#FEF9F3] px-10 py-4 rounded-xl font-bold transition-colors">
+          <Link href="/products" className="inline-block bg-white text-[#089B96] hover:bg-[#FEF9F3] px-10 py-4 rounded-xl font-bold transition-colors">
               立刻看 220 件商品 →
-            </a>
-          </Link>
+            </Link>
         </div>
       </section>
 

@@ -39,21 +39,13 @@ export default function TripVideos() {
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="text-2xl font-bold text-[#ff6b35]">
+            <Link href="/" className="text-2xl font-bold text-[#ff6b35]">
                 ろかいずみ合同会社
-              </a>
-            </Link>
+              </Link>
             <nav className="flex gap-6">
-              <Link href="/">
-                <a className="text-gray-700 hover:text-[#ff6b35]">首頁</a>
-              </Link>
-              <Link href="/products">
-                <a className="text-gray-700 hover:text-[#ff6b35]">產品</a>
-              </Link>
-              <Link href="/videos">
-                <a className="text-[#ff6b35] font-semibold">影片</a>
-              </Link>
+              <Link href="/" className="text-gray-700 hover:text-[#ff6b35]">首頁</Link>
+              <Link href="/products" className="text-gray-700 hover:text-[#ff6b35]">產品</Link>
+              <Link href="/videos" className="text-[#ff6b35] font-semibold">影片</Link>
             </nav>
           </div>
         </div>

@@ -90,16 +90,12 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
           </span>
         </a>
             <div className="flex flex-wrap gap-3 mb-7">
-              <Link href="/products">
-                <a className="inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:-translate-y-0.5 transition-all">
+              <Link href="/products" className="inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:-translate-y-0.5 transition-all">
                   立刻選購 →
-                </a>
-              </Link>
-              <Link href="/guides">
-                <a className="inline-flex items-center gap-2 bg-transparent border-2 border-[#0ABAB5] text-[#0ABAB5] hover:bg-[#0ABAB5] hover:text-white px-8 py-3.5 rounded-xl font-bold transition-colors">
+                </Link>
+              <Link href="/guides" className="inline-flex items-center gap-2 bg-transparent border-2 border-[#0ABAB5] text-[#0ABAB5] hover:bg-[#0ABAB5] hover:text-white px-8 py-3.5 rounded-xl font-bold transition-colors">
                   免費索取選品指南
-                </a>
-              </Link>
+                </Link>
             </div>
 
             {/* Hero 搜尋 */}

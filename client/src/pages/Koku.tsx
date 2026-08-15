@@ -83,16 +83,14 @@ export default function Koku() {
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
                 <span className="text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
-              </a>
-            </Link>
+              </Link>
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"

@@ -9,34 +9,34 @@ import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useCart } from '@/hooks/useCart';
+import { useProductsFallback } from '@/hooks/useProductsFallback';
+import { ProductImage } from '@/components/ProductImage';
 
 export default function Products() {
   const { user, isAuthenticated } = useAuth();
   const [location, setLocation] = useWouterLocation();
   const { language, setLanguage, t } = useLanguage();
-  const { data: categories = [] } = trpc.categories.list.useQuery();
-  const { data: products = [] } = trpc.products.list.useQuery();
+  // API 掛掉時退回靜態 products.json，否則整頁會是空的
+  const { data: apiCategories = [] } = trpc.categories.list.useQuery();
+  const { data: apiProducts = [] } = trpc.products.list.useQuery();
+  const { products: fallbackProducts, categories: fallbackCategories } = useProductsFallback();
+
+  const categories = apiCategories.length > 0 ? apiCategories : fallbackCategories;
+  const products = apiProducts.length > 0 ? apiProducts : fallbackProducts;
   
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   
-  const addToCartMutation = trpc.cart.add.useMutation({
-    onSuccess: () => {
-      toast.success(t('cart.addSuccess') || '已加入購物車');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || '加入購物車失敗');
-    },
-  });
+  const { add: addToCart } = useCart();
 
-  const handleAddToCart = (productId: number) => {
-    if (!isAuthenticated) {
-      toast.error(language === 'zh' ? '請先登入' : 'Please log in first');
-      setLocation('/login');
-      return;
-    }
-    const quantity = quantities[productId] || 1;
-    addToCartMutation.mutate({ productId, quantity });
-    setQuantities(prev => ({ ...prev, [productId]: 1 }));
+  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string }) => {
+    const quantity = quantities[product.id] || 1;
+    addToCart(
+      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl },
+      quantity
+    );
+    toast.success(t('cart.addSuccess') || '已加入購物車');
+    setQuantities(prev => ({ ...prev, [product.id]: 1 }));
   };
 
   // 根據 URL 參數獲取主分類
@@ -72,13 +72,18 @@ export default function Products() {
     }
 
     const relevantCategories = mainCategory === 'japanese' ? japaneseCategories : elderlyCareCategories;
-    const categoryIds = relevantCategories.map(cat => cat.id);
+    // API 商品用 categoryId(數字)，靜態回退商品用 category(字串)，兩種都要能對上
+    const allowed = selectedCategories.length > 0
+      ? relevantCategories.filter(cat => selectedCategories.includes(cat.id))
+      : relevantCategories;
+    const allowedIds = allowed.map(cat => cat.id);
+    const allowedNames = allowed.map(cat => cat.name);
 
-    if (selectedCategories.length > 0) {
-      return products.filter(product => selectedCategories.includes(product.categoryId));
-    }
-
-    return products.filter(product => categoryIds.includes(product.categoryId));
+    return products.filter((product: any) =>
+      product.categoryId !== undefined
+        ? allowedIds.includes(product.categoryId)
+        : allowedNames.includes(product.category)
+    );
   }, [products, mainCategory, selectedCategories, japaneseCategories, elderlyCareCategories]);
 
   // 切換分類選擇
@@ -106,35 +111,25 @@ export default function Products() {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/">
-              <a className="flex items-center gap-2 flex-shrink-0">
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-lg">
                   ろ
                 </div>
                 <span className="text-lg md:text-2xl font-bold text-[#0ABAB5] hidden sm:inline">
                   {t('home.company') || 'ろかいずみ合同会社'}
                 </span>
-              </a>
-            </Link>
+              </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-6">
               <nav className="flex gap-6">
-                <Link href="/">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.home') || '首頁'}</a>
-                </Link>
-                <Link href="/products">
-                  <a className="text-[#0ABAB5] font-semibold text-sm">{t('nav.products') || '產品'}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.videos') || '影片'}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-1 text-sm">
+                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.home') || '首頁'}</Link>
+                <Link href="/products" className="text-[#0ABAB5] font-semibold text-sm">{t('nav.products') || '產品'}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.videos') || '影片'}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-1 text-sm">
                     <ShoppingCart className="w-4 h-4" />
                     {t('nav.cart') || '購物車'}
-                  </a>
-                </Link>
+                  </Link>
               </nav>
               {isAuthenticated && user ? (
                 <div className="flex items-center gap-3">
@@ -151,12 +146,10 @@ export default function Products() {
                   </Button>
                 </div>
               ) : (
-                <Link href="/login">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] text-sm flex items-center gap-1">
+                <Link href="/login" className="text-gray-700 hover:text-[#0ABAB5] text-sm flex items-center gap-1">
                     <User className="w-4 h-4" />
                     {t('nav.login') || '登入'}
-                  </a>
-                </Link>
+                  </Link>
               )}
             </div>
 
@@ -185,21 +178,13 @@ export default function Products() {
           {showMobileMenu && (
             <div className="md:hidden border-t border-gray-200 mt-3 pt-3 pb-2">
               <nav className="flex flex-col gap-2">
-                <Link href="/">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.home') || '首頁'}</a>
-                </Link>
-                <Link href="/products">
-                  <a className="text-[#0ABAB5] font-semibold block py-2 px-2 text-sm">{t('nav.products') || '產品'}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.videos') || '影片'}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-2 py-2 px-2 text-sm">
+                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.home') || '首頁'}</Link>
+                <Link href="/products" className="text-[#0ABAB5] font-semibold block py-2 px-2 text-sm">{t('nav.products') || '產品'}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.videos') || '影片'}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-2 py-2 px-2 text-sm">
                     <ShoppingCart className="w-4 h-4" />
                     {t('nav.cart') || '購物車'}
-                  </a>
-                </Link>
+                  </Link>
               </nav>
             </div>
           )}
@@ -254,30 +239,24 @@ export default function Products() {
           {filteredProducts.map(product => (
             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               {/* 產品圖片 */}
-              <Link href={`/product/${product.id}`}>
-                <a className="block">
-                  {product.imageUrl && (
-                    <div className="w-full h-48 bg-gray-200 overflow-hidden">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform"
-                      />
-                    </div>
-                  )}
-                </a>
-              </Link>
+              <Link href={`/product/${product.id}`} className="block">
+                  <div className="w-full h-48 overflow-hidden">
+                    <ProductImage
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                    />
+                  </div>
+                </Link>
               
               {/* 產品信息 */}
               <div className="p-4">
                 {/* 產品名稱 - 可點擊連結到詳情頁 */}
-                <Link href={`/product/${product.id}`}>
-                  <a className="block">
+                <Link href={`/product/${product.id}`} className="block">
                     <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 hover:text-[#0ABAB5] transition-colors cursor-pointer">
                       {product.name}
                     </h3>
-                  </a>
-                </Link>
+                  </Link>
                 
                 {/* 價格 - 根據語言顯示不同幣別 */}
                 <div className="mb-4">
@@ -301,7 +280,7 @@ export default function Products() {
                     className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                   />
                   <Button
-                    onClick={() => handleAddToCart(product.id)}
+                    onClick={() => handleAddToCart(product)}
                     className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />

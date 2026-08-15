@@ -3,29 +3,60 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog } from '../drizzle/schema';
 import { ENV } from './_core/env';
-import { initializeFallbackDB, isFallbackActive, getFallbackProducts, getFallbackCategories } from './fallback-db';
+import {
+  initializeFallbackDB,
+  isFallbackActive,
+  getFallbackProducts,
+  getFallbackCategories,
+  getFallbackProductById,
+  getFallbackCategoryById,
+  getFallbackProductsByCategory,
+  searchFallbackProducts,
+} from './fallback-db';
 
 // Create database connection
 let pool: any;
 let db: any;
 let isDbConnected = false;
 
+// 靜態資料一律先載入。mysql.createPool() 是延遲連線、不會在這裡拋錯，
+// 所以「資料庫是否真的能用」只有等第一個查詢跑下去才知道；
+// 先把回退資料準備好，任何查詢在執行期失敗都能立刻接手。
+initializeFallbackDB();
+
 try {
   if (ENV.databaseUrl) {
     pool = mysql.createPool(ENV.databaseUrl);
     db = drizzle(pool);
     isDbConnected = true;
-    console.log('✅ 使用實際資料庫');
+    console.log('✅ 資料庫連線池已建立');
   } else {
     throw new Error('DATABASE_URL 未設置');
   }
 } catch (error) {
-  console.warn('⚠️  資料庫連接失敗，使用回退模式');
+  console.warn('⚠️  資料庫初始化失敗，改用回退模式');
   console.warn((error as Error).message);
-
-  // 初始化回退資料庫
-  initializeFallbackDB();
   isDbConnected = false;
+}
+
+/**
+ * 執行一個資料庫查詢；失敗時改用靜態資料。
+ *
+ * 這是整個回退機制的核心：連線池是延遲建立的，資料庫不通不會在啟動時
+ * 報錯，而是在每一次查詢才丟出例外。所以判斷點必須在查詢當下。
+ */
+async function withFallback<T>(runQuery: () => Promise<T>, fallback: () => Promise<T>): Promise<T> {
+  if (!isDbConnected) {
+    if (!isFallbackActive) throw new Error('資料庫不可用且回退資料未載入');
+    return await fallback();
+  }
+  try {
+    return await runQuery();
+  } catch (error) {
+    if (!isFallbackActive) throw error;
+    console.warn('⚠️  查詢失敗，改用回退資料:', (error as Error).message);
+    return await fallback();
+  }
 }
 
 export { db, isDbConnected };
@@ -34,15 +65,20 @@ export { db, isDbConnected };
 
 // ========== Categories ==========
 export async function getAllCategories() {
-  if (!isDbConnected && isFallbackActive) {
-    return await getFallbackCategories();
-  }
-  return await db.select().from(categories).orderBy(categories.name);
+  return await withFallback(
+    () => db.select().from(categories).orderBy(categories.name),
+    () => getFallbackCategories()
+  );
 }
 
 export async function getCategoryById(id: number) {
-  const result = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
-  return result[0] || null;
+  return await withFallback(
+    async () => {
+      const result = await db.select().from(categories).where(eq(categories.id, id)).limit(1);
+      return result[0] || null;
+    },
+    () => getFallbackCategoryById(id)
+  );
 }
 
 export async function createCategory(data: InsertCategory) {
@@ -52,19 +88,27 @@ export async function createCategory(data: InsertCategory) {
 
 // ========== Products ==========
 export async function getAllProducts() {
-  if (!isDbConnected && isFallbackActive) {
-    return await getFallbackProducts();
-  }
-  return await db.select().from(products).orderBy(desc(products.createdAt));
+  return await withFallback(
+    () => db.select().from(products).orderBy(desc(products.createdAt)),
+    () => getFallbackProducts()
+  );
 }
 
 export async function getProductById(id: number) {
-  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
-  return result[0] || null;
+  return await withFallback(
+    async () => {
+      const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+      return result[0] || null;
+    },
+    () => getFallbackProductById(id)
+  );
 }
 
 export async function getProductsByCategory(categoryId: number) {
-  return await db.select().from(products).where(eq(products.categoryId, categoryId)).orderBy(desc(products.createdAt));
+  return await withFallback(
+    () => db.select().from(products).where(eq(products.categoryId, categoryId)).orderBy(desc(products.createdAt)),
+    () => getFallbackProductsByCategory(categoryId)
+  );
 }
 
 export async function createProduct(data: InsertProduct) {
@@ -108,17 +152,16 @@ export async function getLowStockProducts(threshold?: number) {
  * Search products by name or description
  */
 export async function searchProducts(query: string) {
-  if (!isDbConnected && isFallbackActive) {
-    const { searchFallbackProducts } = await import('./fallback-db');
-    return await searchFallbackProducts(query);
-  }
   const searchTerm = `%${query}%`;
-  return await db.select().from(products).where(
-    or(
-      like(products.name, searchTerm),
-      like(products.description, searchTerm)
-    )
-  ).orderBy(desc(products.createdAt));
+  return await withFallback(
+    () =>
+      db
+        .select()
+        .from(products)
+        .where(or(like(products.name, searchTerm), like(products.description, searchTerm)))
+        .orderBy(desc(products.createdAt)),
+    () => searchFallbackProducts(query)
+  );
 }
 
 // ========== Suppliers ==========

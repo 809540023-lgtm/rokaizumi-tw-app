@@ -52,11 +52,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!--
+      Umami 分析：VITE_ANALYTICS_ENDPOINT / VITE_ANALYTICS_WEBSITE_ID 目前未設定，
+      直接留著會讓每一次載入都去抓 "/%VITE_ANALYTICS_ENDPOINT%/umami" 而回 400。
+      要啟用時設好這兩個環境變數再取消註解即可。
     <script
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
-    
+    -->
+
     <!-- Register Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {

@@ -38,11 +38,9 @@ export function B2BBanner() {
           </div>
 
           <div className="relative z-10">
-            <Link href="/b2b">
-              <a className="w-full inline-flex items-center justify-center gap-2 bg-white text-[#089B96] hover:bg-[#FEF9F3] font-bold text-base px-6 py-4 rounded-xl transition-colors">
+            <Link href="/b2b" className="w-full inline-flex items-center justify-center gap-2 bg-white text-[#089B96] hover:bg-[#FEF9F3] font-bold text-base px-6 py-4 rounded-xl transition-colors">
                 立即洽詢報價 →
-              </a>
-            </Link>
+              </Link>
             <p className="mt-3 text-[13px] opacity-85 text-center">
               已服務 140+ 間台灣長照與醫療機構
             </p>

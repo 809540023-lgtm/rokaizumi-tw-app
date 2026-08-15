@@ -11,6 +11,8 @@ import { useLocation as useWouterLocation } from 'wouter';
 import { MobileMenu } from '@/components/MobileMenu';
 import { HeroSection } from '@/components/HeroSection';
 import { useProductsFallback } from '../hooks/useProductsFallback';
+import { useCart } from '../hooks/useCart';
+import { ProductImage } from '@/components/ProductImage';
 
 export default function HomePage() {
   const [location, setLocation] = useWouterLocation();
@@ -42,24 +44,16 @@ export default function HomePage() {
     { enabled: searchQuery.length > 0 && isSearching }
   );
 
-  const addToCartMutation = trpc.cart.add.useMutation({
-    onSuccess: () => {
-      toast.success(t('cart.addSuccess') || '已加入購物車');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || '加入購物車失敗');
-    },
-  });
+  const { add: addToCart } = useCart();
 
-  const handleAddToCart = (productId: number) => {
-    if (!isAuthenticated) {
-      toast.error(language === 'zh' ? '請先登入' : 'Please log in first');
-      setLocation('/login');
-      return;
-    }
-    const quantity = quantities[productId] || 1;
-    addToCartMutation.mutate({ productId, quantity });
-    setQuantities(prev => ({ ...prev, [productId]: 1 }));
+  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string }) => {
+    const quantity = quantities[product.id] || 1;
+    addToCart(
+      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl },
+      quantity
+    );
+    toast.success(t('cart.addSuccess') || '已加入購物車');
+    setQuantities(prev => ({ ...prev, [product.id]: 1 }));
   };
 
   const handleSearchChange = (query: string) => {
@@ -141,27 +135,19 @@ export default function HomePage() {
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
                 <span className="text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
-              </a>
-            </Link>
+              </Link>
             <div className="flex items-center justify-between flex-1 ml-4">
               <nav className="hidden md:flex gap-6">
-                <Link href="/">
-                  <a className="text-[#0ABAB5] font-semibold">{t('nav.home')}</a>
-                </Link>
-                <Link href="/videos">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</a>
-                </Link>
-                <Link href="/cart">
-                  <a className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</a>
-                </Link>
+                <Link href="/" className="text-[#0ABAB5] font-semibold">{t('nav.home')}</Link>
+                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
               </nav>
               <div className="flex items-center gap-2 md:gap-3">
                 <MobileMenu />
@@ -309,27 +295,21 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.map(product => (
                 <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link href={`/product/${product.id}`}>
-                    <a className="block">
-                      {product.imageUrl && (
-                        <div className="w-full h-48 bg-gray-200 overflow-hidden">
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform"
-                          />
-                        </div>
-                      )}
-                    </a>
-                  </Link>
+                  <Link href={`/product/${product.id}`} className="block">
+                      <div className="w-full h-48 overflow-hidden">
+                        <ProductImage
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform"
+                        />
+                      </div>
+                    </Link>
                   <div className="p-4">
-                    <Link href={`/product/${product.id}`}>
-                      <a className="block">
+                    <Link href={`/product/${product.id}`} className="block">
                         <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 hover:text-[#0ABAB5] transition-colors cursor-pointer">
                           {product.name}
                         </h3>
-                      </a>
-                    </Link>
+                      </Link>
                     <div className="mb-4">
                       <span className="text-2xl font-bold text-[#0ABAB5]">
                         {language === 'zh' ? `NT$${Math.round(product.price)}` :
@@ -349,7 +329,7 @@ export default function HomePage() {
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                       />
                       <Button
-                        onClick={() => handleAddToCart(product.id)}
+                        onClick={() => handleAddToCart(product)}
                         className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
@@ -390,27 +370,21 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map(product => (
                 <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link href={`/product/${product.id}`}>
-                    <a className="block">
-                      {product.imageUrl && (
-                        <div className="w-full h-48 bg-gray-200 overflow-hidden">
-                          <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform"
-                          />
-                        </div>
-                      )}
-                    </a>
-                  </Link>
+                  <Link href={`/product/${product.id}`} className="block">
+                      <div className="w-full h-48 overflow-hidden">
+                        <ProductImage
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform"
+                        />
+                      </div>
+                    </Link>
                   <div className="p-4">
-                    <Link href={`/product/${product.id}`}>
-                      <a className="block">
+                    <Link href={`/product/${product.id}`} className="block">
                         <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 hover:text-[#0ABAB5] transition-colors cursor-pointer">
                           {product.name}
                         </h3>
-                      </a>
-                    </Link>
+                      </Link>
                     <div className="mb-4">
                       <span className="text-2xl font-bold text-[#0ABAB5]">
                         {language === 'zh' ? `NT$${Math.round(product.price)}` :
@@ -430,7 +404,7 @@ export default function HomePage() {
                         className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
                       />
                       <Button
-                        onClick={() => handleAddToCart(product.id)}
+                        onClick={() => handleAddToCart(product)}
                         className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />

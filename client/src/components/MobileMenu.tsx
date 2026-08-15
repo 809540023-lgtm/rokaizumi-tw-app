@@ -33,14 +33,11 @@ export function MobileMenu() {
         <div className="absolute top-16 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-50">
           <nav className="flex flex-col">
             {menuItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <a
-                  className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 text-gray-700 font-medium transition-colors"
+              <Link key={item.href} href={item.href} className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 text-gray-700 font-medium transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
-                </a>
-              </Link>
+                </Link>
             ))}
           </nav>
         </div>
