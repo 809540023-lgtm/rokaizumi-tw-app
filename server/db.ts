@@ -61,9 +61,14 @@ try {
 
     // createPool 不會真的連線，這裡主動探測一次，把失敗盡早記錄下來，
     // 免得每個請求都要靠 withFallback 才發現資料庫其實不通。
+    // 連得上就順便自檢：缺資料表就建、商品是空的就匯入。
     pool
       .query('SELECT 1')
-      .then(() => console.log('✅ 資料庫連線測試通過'))
+      .then(async () => {
+        console.log('✅ 資料庫連線測試通過');
+        const { bootstrapDatabase } = await import('./bootstrap-db');
+        await bootstrapDatabase(pool);
+      })
       .catch((e: Error) => console.error('❌ 資料庫連線測試失敗:', e.message));
   } else {
     throw new Error('DATABASE_URL 未設置');
