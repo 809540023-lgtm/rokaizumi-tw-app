@@ -38,24 +38,24 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
       >
         <span className="text-[11px] font-bold text-[#C0392B] leading-none">日本直採</span>
         <span className="text-2xl font-extrabold text-[#DC2626] leading-tight mt-0.5">百元批發</span>
-        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">91,132品</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">1,399 品項</span>
         <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#DC2626] px-2 py-0.5 rounded-full group-hover:bg-[#B91C1C]">前往目錄 →</span>
       </a>
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-12 lg:py-20">
+        <div className="grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16 items-center py-8 sm:py-12 lg:py-20">
           {/* 左側內容 */}
           <div>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0ABAB5]/12 text-[#089B96] text-xs font-bold mb-5">
               🇯🇵 日本大阪直送・服務台灣家庭已 8 年
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.15] tracking-tight mb-5 text-gray-900">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.2] sm:leading-[1.15] tracking-tight mb-4 sm:mb-5 text-gray-900">
               日本職人嚴選介護用品，
-              <br />
+              <br className="hidden sm:block" />
               讓長輩生活
               <span className="text-[#0ABAB5]">更自在</span>。
             </h1>
             <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-xl">
-              220 種精選輔具，從日本大阪直送台灣家門口。免關稅、7 天到貨、3 年保固，全中文客服協助選品。
+              1,600 種以上日本嚴選商品，從大阪直送台灣家門口。免關稅、7 天到貨、3 年保固，全中文客服協助選品。
             </p>
         {/* 手機版姊妹站入口（桌機改用右側圓形 logo） */}
         <a
@@ -86,14 +86,14 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
           </span>
           <span className="flex-1 text-left leading-tight">
             <span className="block text-sm font-bold text-gray-800">百元批發入口・KOKUBO 全目錄</span>
-            <span className="block text-xs text-gray-500">1,463 品項，整箱直採報價 →</span>
+            <span className="block text-xs text-gray-500">1,399 品項，整箱直採報價 →</span>
           </span>
         </a>
-            <div className="flex flex-wrap gap-3 mb-7">
-              <Link href="/products" className="inline-flex items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:-translate-y-0.5 transition-all">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-7">
+              <Link href="/products" className="inline-flex justify-center items-center gap-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:-translate-y-0.5 transition-all">
                   立刻選購 →
                 </Link>
-              <Link href="/guides" className="inline-flex items-center gap-2 bg-transparent border-2 border-[#0ABAB5] text-[#0ABAB5] hover:bg-[#0ABAB5] hover:text-white px-8 py-3.5 rounded-xl font-bold transition-colors">
+              <Link href="/guides" className="inline-flex justify-center items-center gap-2 bg-transparent border-2 border-[#0ABAB5] text-[#0ABAB5] hover:bg-[#0ABAB5] hover:text-white px-8 py-3.5 rounded-xl font-bold transition-colors">
                   免費索取選品指南
                 </Link>
             </div>

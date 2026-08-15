@@ -237,12 +237,12 @@ export default function Products() {
         )}
 
         {/* 產品網格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProducts.map(product => (
             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
               {/* 產品圖片 */}
               <Link href={`/product/${product.id}`} className="block">
-                  <div className="w-full aspect-square bg-white overflow-hidden p-3">
+                  <div className="w-full aspect-square bg-white overflow-hidden p-2 sm:p-3">
                     <ProductImage
                       src={product.imageUrl}
                       alt={product.name}
@@ -252,17 +252,17 @@ export default function Products() {
                 </Link>
               
               {/* 產品信息 */}
-              <div className="p-4 flex flex-col flex-1">
+              <div className="p-3 sm:p-4 flex flex-col flex-1">
                 {/* 產品名稱 - 可點擊連結到詳情頁 */}
                 <Link href={`/product/${product.id}`} className="block">
-                    <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 min-h-[2.75rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
                       {product.name}
                     </h3>
                   </Link>
                 
                 {/* 價格 - 根據語言顯示不同幣別 */}
                 <div className="mb-4 mt-auto">
-                  <span className="text-2xl font-bold text-[#0ABAB5]">
+                  <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
                     {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
                      language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 
                      `$${(product.price * 0.031).toFixed(2)}`}
@@ -270,7 +270,7 @@ export default function Products() {
                 </div>
 
                 {/* 加入購物車按鈕 */}
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="number"
                     min="1"
@@ -279,7 +279,7 @@ export default function Products() {
                       ...prev,
                       [product.id]: Math.max(1, parseInt(e.target.value) || 1)
                     }))}
-                    className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                   />
                   <Button
                     onClick={() => handleAddToCart(product)}

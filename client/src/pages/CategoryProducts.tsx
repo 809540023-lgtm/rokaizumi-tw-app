@@ -118,7 +118,7 @@ export default function CategoryProducts() {
                 <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                   ろ
                 </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
+                <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
               </Link>
@@ -170,7 +170,7 @@ export default function CategoryProducts() {
             <p className="text-xl text-gray-600">{t('products.noProducts') || '沒有找到商品'}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {filteredProducts.map((product: any) => (
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <Link href={`/product/${product.id}`} className="block">

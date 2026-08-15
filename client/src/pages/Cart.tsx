@@ -62,18 +62,18 @@ export default function Cart() {
     <div className="min-h-screen bg-[#fef9f3]">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-xl">
                   ろ
                 </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
+                <span className="hidden sm:inline text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
               </Link>
-            <div className="flex items-center gap-6">
-              <nav className="flex gap-6">
+            <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+              <nav className="hidden sm:flex gap-6">
                 <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
                 <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
                 <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
@@ -114,24 +114,24 @@ export default function Cart() {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item) => (
-                <div key={item.productId} className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex gap-6">
+                <div key={item.productId} className="bg-white rounded-lg shadow-sm p-3 sm:p-6">
+                  <div className="flex gap-3 sm:gap-6">
                     {/* Product Image */}
-                    <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white border border-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
                       {<ProductImage src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-1" />}
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold mb-2 text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-lg font-bold mb-1.5 sm:mb-2 text-gray-900">
                         {item.name}
                       </h3>
-                      <p className="text-2xl font-bold text-[#DC2626] mb-4">
+                      <p className="text-lg sm:text-2xl font-bold text-[#DC2626] mb-2 sm:mb-4">
                         ${item.price}
                       </p>
 
                       {/* Quantity Controls */}
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
@@ -168,7 +168,7 @@ export default function Cart() {
                     </div>
 
                     {/* Subtotal */}
-                    <div className="text-right">
+                    <div className="hidden sm:block text-right shrink-0">
                       <p className="text-sm text-gray-600 mb-1">{t('cart.subtotal')}</p>
                       <p className="text-2xl font-bold text-gray-900">
                         ${item.price * item.quantity}
@@ -181,17 +181,17 @@ export default function Cart() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 sticky top-24">
                 <h2 className="text-xl font-bold mb-6 text-gray-900">
                   {(language === 'zh' || language === 'cn') ? '訂單摘要' : 'Order Summary'}
                 </h2>
                 
                 <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between gap-3 text-gray-600">
                     <span>{t('cart.subtotal')}</span>
                     <span>${totalAmount}</span>
                   </div>
-                  <div className="border-t pt-3 flex justify-between text-xl font-bold text-gray-900">
+                  <div className="border-t pt-3 flex justify-between gap-3 text-lg sm:text-xl font-bold text-gray-900">
                     <span>{t('cart.total')}</span>
                     <span className="text-[#DC2626]">${totalAmount}</span>
                   </div>

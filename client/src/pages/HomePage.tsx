@@ -135,17 +135,17 @@ export default function HomePage() {
 
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-xl">
                   ろ
                 </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
+                <span className="hidden sm:inline text-lg sm:text-2xl font-bold text-[#0ABAB5]">
                   {t('home.company')}
                 </span>
               </Link>
-            <div className="flex items-center justify-between flex-1 ml-4">
+            <div className="flex items-center justify-end sm:justify-between flex-1 ml-0 sm:ml-4 gap-1.5 sm:gap-3 min-w-0">
               <nav className="hidden md:flex gap-6">
                 <Link href="/" className="text-[#0ABAB5] font-semibold">{t('nav.home')}</Link>
                 <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
@@ -178,11 +178,12 @@ export default function HomePage() {
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => window.location.href = getLoginUrl()}
-                    className="flex items-center gap-1 md:gap-2 bg-[#0ABAB5] hover:bg-[#089B96] order-3"
+                    onClick={() => setLocation('/login')}
+                    className="flex items-center gap-1 md:gap-2 bg-[#0ABAB5] hover:bg-[#089B96] order-3 shrink-0"
                   >
-                    <span className="hidden md:inline">{(language === 'zh' || language === 'cn') ? '登入' : language === 'ja' ? 'ログイン' : 'Login'}</span>
-                    <span className="md:hidden text-xs">{(language === 'zh' || language === 'cn') ? '登' : language === 'ja' ? 'ログ' : 'Log'}</span>
+                    <span className="text-xs md:text-sm whitespace-nowrap">
+                      {(language === 'zh' || language === 'cn') ? '登入' : language === 'ja' ? 'ログイン' : 'Login'}
+                    </span>
                   </Button>
                 )}
               </div>
@@ -294,11 +295,11 @@ export default function HomePage() {
               <p className="text-gray-600 mt-4">{(language === 'zh' || language === 'cn') ? '搜尋中...' : language === 'ja' ? '検索中...' : 'Searching...'}</p>
             </div>
           ) : searchResults.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               {searchResults.map(product => (
                 <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <Link href={`/product/${product.id}`} className="block">
-                      <div className="w-full aspect-square bg-white overflow-hidden p-3">
+                      <div className="w-full aspect-square bg-white overflow-hidden p-2 sm:p-3">
                         <ProductImage
                           src={product.imageUrl}
                           alt={product.name}
@@ -308,12 +309,12 @@ export default function HomePage() {
                     </Link>
                   <div className="p-4">
                     <Link href={`/product/${product.id}`} className="block">
-                        <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 min-h-[2.75rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
                           {product.name}
                         </h3>
                       </Link>
                     <div className="mb-4">
-                      <span className="text-2xl font-bold text-[#0ABAB5]">
+                      <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
                         {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` :
                          language === 'ja' ? `¥${Math.round(product.price * 4.5)}` :
                          `$${(product.price * 0.031).toFixed(2)}`}
@@ -328,7 +329,7 @@ export default function HomePage() {
                           ...prev,
                           [product.id]: Math.max(1, parseInt(e.target.value) || 1)
                         }))}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                        className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />
                       <Button
                         onClick={() => handleAddToCart(product)}
@@ -369,11 +370,11 @@ export default function HomePage() {
           </div>
 
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               {filteredProducts.map(product => (
                 <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   <Link href={`/product/${product.id}`} className="block">
-                      <div className="w-full aspect-square bg-white overflow-hidden p-3">
+                      <div className="w-full aspect-square bg-white overflow-hidden p-2 sm:p-3">
                         <ProductImage
                           src={product.imageUrl}
                           alt={product.name}
@@ -383,12 +384,12 @@ export default function HomePage() {
                     </Link>
                   <div className="p-4">
                     <Link href={`/product/${product.id}`} className="block">
-                        <h3 className="font-semibold text-gray-800 mb-3 line-clamp-2 min-h-[2.75rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] hover:text-[#0ABAB5] transition-colors cursor-pointer">
                           {product.name}
                         </h3>
                       </Link>
                     <div className="mb-4">
-                      <span className="text-2xl font-bold text-[#0ABAB5]">
+                      <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
                         {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` :
                          language === 'ja' ? `¥${Math.round(product.price * 4.5)}` :
                          `$${(product.price * 0.031).toFixed(2)}`}
@@ -403,7 +404,7 @@ export default function HomePage() {
                           ...prev,
                           [product.id]: Math.max(1, parseInt(e.target.value) || 1)
                         }))}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                        className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />
                       <Button
                         onClick={() => handleAddToCart(product)}
