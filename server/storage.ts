@@ -2,6 +2,7 @@
 // Uses the Biz-provided storage proxy (Authorization: Bearer <token>)
 
 import { ENV } from './_core/env';
+import { isS3Configured, missingS3Vars, s3Put } from './storage-s3';
 
 type StorageConfig = { baseUrl: string; apiKey: string };
 
@@ -72,8 +73,23 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream"
 ): Promise<{ key: string; url: string }> {
-  const { baseUrl, apiKey } = getStorageConfig();
   const key = normalizeKey(relKey);
+
+  // 優先走 S3。Manus 儲存代理的憑證在 Render 上沒有設定，
+  // 只留著會讓每一次上傳都失敗。
+  if (isS3Configured()) {
+    return await s3Put(key, data, contentType);
+  }
+
+  if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
+    throw new Error(
+      `圖片上傳未設定。請擇一設定：\n` +
+        `  S3（建議）— 缺少 ${missingS3Vars().join(", ")}\n` +
+        `  Manus 代理 — 缺少 BUILT_IN_FORGE_API_URL, BUILT_IN_FORGE_API_KEY`
+    );
+  }
+
+  const { baseUrl, apiKey } = getStorageConfig();
   const uploadUrl = buildUploadUrl(baseUrl, key);
   const formData = toFormData(data, contentType, key.split("/").pop() ?? key);
   const response = await fetch(uploadUrl, {
