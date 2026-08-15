@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
+import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -246,9 +247,7 @@ export default function Home() {
                       </Link>
                     <div className="mb-4">
                       <span className="text-2xl font-bold text-[#0ABAB5]">
-                        {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
-                         language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 
-                         `$${(product.price * 0.031).toFixed(2)}`}
+                        {formatPrice(product.price, language)}
                       </span>
                     </div>
                     <div className="flex gap-2">
@@ -327,9 +326,7 @@ export default function Home() {
                   {/* 價格 - 根據語言顯示不同幣別 */}
                   <div className="mb-4">
                     <span className="text-2xl font-bold text-[#0ABAB5]">
-                      {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
-                       language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 
-                       `$${(product.price * 0.031).toFixed(2)}`}
+                      {formatPrice(product.price, language)}
                     </span>
                   </div>
 

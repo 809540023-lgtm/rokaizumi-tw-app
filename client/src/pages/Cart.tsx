@@ -7,6 +7,7 @@ import { Loader2, Minus, Plus, Trash2, ShoppingBag, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLoginUrl } from '../const';
 import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/price';
 import { ProductImage } from '@/components/ProductImage';
 
 export default function Cart() {
@@ -127,7 +128,7 @@ export default function Cart() {
                         {item.name}
                       </h3>
                       <p className="text-lg sm:text-2xl font-bold text-[#DC2626] mb-2 sm:mb-4">
-                        ${item.price}
+                        {formatPrice(item.price, language)}
                       </p>
 
                       {/* Quantity Controls */}
@@ -171,7 +172,7 @@ export default function Cart() {
                     <div className="hidden sm:block text-right shrink-0">
                       <p className="text-sm text-gray-600 mb-1">{t('cart.subtotal')}</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${item.price * item.quantity}
+                        {formatPrice(item.price * item.quantity, language)}
                       </p>
                     </div>
                   </div>
@@ -189,11 +190,11 @@ export default function Cart() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between gap-3 text-gray-600">
                     <span>{t('cart.subtotal')}</span>
-                    <span>${totalAmount}</span>
+                    <span>{formatPrice(totalAmount, language)}</span>
                   </div>
                   <div className="border-t pt-3 flex justify-between gap-3 text-lg sm:text-xl font-bold text-gray-900">
                     <span>{t('cart.total')}</span>
-                    <span className="text-[#DC2626]">${totalAmount}</span>
+                    <span className="text-[#DC2626]">{formatPrice(totalAmount, language)}</span>
                   </div>
                 </div>
 

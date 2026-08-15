@@ -1,4 +1,5 @@
 import { Link, useRoute, useLocation } from 'wouter';
+import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -190,9 +191,7 @@ export default function CategoryProducts() {
                     </Link>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-[#DC2626]">
-                      {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price).toLocaleString()}` : 
-                       language === 'ja' ? `¥${Math.round(product.price * 4.5).toLocaleString()}` : 
-                       `$${(product.price * 0.031).toFixed(2)}`}
+                      {formatPrice(product.price, language)}
                     </span>
                     <Button
                       onClick={() => handleAddToCart(product.id)}

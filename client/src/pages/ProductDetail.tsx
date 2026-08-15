@@ -1,5 +1,6 @@
 import { useRoute, useLocation, Link } from 'wouter';
 import { trpc } from '../lib/trpc';
+import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -276,9 +277,7 @@ export default function ProductDetail() {
             
             <div className="mb-6">
               <p className="text-4xl font-bold text-[#DC2626] mb-3">
-                {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price).toLocaleString()}` : 
-                 language === 'ja' ? `¥${Math.round(product.price * 4.5).toLocaleString()}` : 
-                 `$${(product.price * 0.031).toFixed(2)}`}
+                {formatPrice(product.price, language)}
               </p>
               {/* Stock Status */}
               <div className="flex items-center gap-2">

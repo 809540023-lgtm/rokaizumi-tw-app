@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -263,9 +264,7 @@ export default function Products() {
                 {/* 價格 - 根據語言顯示不同幣別 */}
                 <div className="mb-4 mt-auto">
                   <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
-                    {(language === 'zh' || language === 'cn') ? `NT$${Math.round(product.price)}` : 
-                     language === 'ja' ? `¥${Math.round(product.price * 4.5)}` : 
-                     `$${(product.price * 0.031).toFixed(2)}`}
+                    {formatPrice(product.price, language)}
                   </span>
                 </div>
 

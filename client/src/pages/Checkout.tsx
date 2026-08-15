@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Globe, ArrowLeft, CreditCard, Banknote, Smartphone, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/price';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useState } from 'react';
 
@@ -285,7 +286,7 @@ export default function Checkout() {
                       <div className="text-sm text-gray-600">數量: {item.quantity}</div>
                     </div>
                     <div className="font-bold text-[#DC2626]">
-                      ${item.price * item.quantity}
+                      {formatPrice(item.price * item.quantity, language)}
                     </div>
                   </div>
                 ))}
@@ -293,7 +294,7 @@ export default function Checkout() {
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between items-center text-xl font-bold">
                   <span>總計</span>
-                  <span className="text-[#DC2626]">${totalAmount}</span>
+                  <span className="text-[#DC2626]">{formatPrice(totalAmount, language)}</span>
                 </div>
               </div>
               <Button
