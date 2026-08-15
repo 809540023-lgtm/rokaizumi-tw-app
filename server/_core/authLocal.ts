@@ -73,16 +73,16 @@ export function registerLocalAuthRoutes(app: Express) {
         return;
       }
 
-      const ADMIN_EMAILS = ["cia8885@gmail.com", "swannylo@gmail.com"];
-      const promoted: string[] = [];
-      const missing: string[] = [];
-      for (const em of ADMIN_EMAILS) {
-        const u = await db.getUserByEmail(em);
-        if (!u) { missing.push(em); continue; }
-        await db.updateUserRole(u.id, "admin" as any);
-        promoted.push(em);
+      // 升級最早註冊的帳號。原本是寫死的 email 清單，除了綁死信箱之外，
+      // 也讓「搶先用清單上的信箱註冊」變成一條提權路徑。
+      const first = await db.getFirstUser();
+      if (!first) {
+        res.status(404).json({ ok: false, error: "尚無任何使用者，請先註冊" });
+        return;
       }
-      res.json({ ok: true, promoted, missing });
+
+      await db.updateUserRole(first.id, "admin" as any);
+      res.json({ ok: true, promoted: first.email, name: first.name });
     } catch (e) {
       console.error("[auth] bootstrap-admin error", e);
       res.status(500).json({ ok: false, error: String((e as any)?.message || e) });

@@ -650,6 +650,12 @@ export async function countAdmins(): Promise<number> {
 // authLocal.ts 需要下列函式，但先前並未實作，
 // 導致 /api/auth/register 與 /api/auth/login 無法運作。
 
+/** 最早註冊的使用者。初次設定時用來決定誰是管理員。 */
+export async function getFirstUser() {
+  const rows = await db.select().from(users).orderBy(users.id).limit(1);
+  return rows[0] || null;
+}
+
 export async function getUserByEmail(email: string) {
   const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return rows[0] || null;
