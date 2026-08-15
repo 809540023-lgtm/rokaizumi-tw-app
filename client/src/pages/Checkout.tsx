@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Globe, ArrowLeft, CreditCard, Banknote, Smartphone, Loader } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useState } from 'react';
 
@@ -25,9 +26,11 @@ export default function Checkout() {
     notes: '',
   });
 
-  const { data: cartItems = [] } = trpc.cart.list.useQuery();
+  // 購物車存在瀏覽器本機（見 useCart），這裡必須讀同一份來源
+  const { lines: cartItems, total: totalAmount, clear: clearCart } = useCart();
   const createOrderMutation = trpc.orders.create.useMutation({
     onSuccess: () => {
+      clearCart();
       toast.success('訂單已成功建立！');
       setLocation('/orders');
     },
@@ -67,10 +70,6 @@ export default function Checkout() {
     }
   };
 
-  const totalAmount = cartItems.reduce((sum, item) => {
-    return sum + (item.product?.price || 0) * item.quantity;
-  }, 0);
-
   const handleSubmitOrder = () => {
     if (!shippingInfo.name || !shippingInfo.phone || !shippingInfo.address) {
       toast.error('請填寫完整的收件人信息');
@@ -79,10 +78,10 @@ export default function Checkout() {
 
     const items = cartItems.map(item => ({
       productId: item.productId,
-      productName: item.product?.name || '',
-      productPrice: item.product?.price || 0,
+      productName: item.name,
+      productPrice: item.price,
       quantity: item.quantity,
-      subtotal: (item.product?.price || 0) * item.quantity,
+      subtotal: item.price * item.quantity,
     }));
 
     if (paymentMethod === 'stripe') {
@@ -108,8 +107,13 @@ export default function Checkout() {
       <div className="min-h-screen bg-[#fef9f3] flex items-center justify-center">
         <Card className="p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">請先登入</h2>
-          <p className="text-gray-600 mb-4">您需要登入才能進行結帳</p>
-          <Button onClick={() => setLocation('/')}>返回首頁</Button>
+          <p className="text-gray-600 mb-6">您需要登入才能進行結帳，購物車內容會保留。</p>
+          <div className="flex flex-col gap-2">
+            <Button onClick={() => setLocation('/login')}>前往登入</Button>
+            <Button variant="outline" onClick={() => setLocation('/cart')}>
+              回購物車
+            </Button>
+          </div>
         </Card>
       </div>
     );
@@ -275,13 +279,13 @@ export default function Checkout() {
               <h2 className="text-2xl font-bold mb-6">訂單摘要</h2>
               <div className="space-y-4 mb-6">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between items-start">
+                  <div key={item.productId} className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="font-semibold">{item.product?.name}</div>
+                      <div className="font-semibold">{item.name}</div>
                       <div className="text-sm text-gray-600">數量: {item.quantity}</div>
                     </div>
                     <div className="font-bold text-[#DC2626]">
-                      ${(item.product?.price || 0) * item.quantity}
+                      ${item.price * item.quantity}
                     </div>
                   </div>
                 ))}
