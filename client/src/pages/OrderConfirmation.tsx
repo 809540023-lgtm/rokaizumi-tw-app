@@ -8,14 +8,19 @@ import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useState } from 'react';
 import { Link } from 'wouter';
+import { formatPrice } from '@/lib/price';
 
 export default function OrderConfirmation() {
   const [, setLocation] = useLocation();
   const { language, setLanguage, t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
-  const [sessionId] = useState(() => {
+  const { isAuthenticated } = useAuth();
+  const [{ sessionId, orderId }] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('session_id');
+    const parsedOrderId = Number(params.get('orderId'));
+    return {
+      sessionId: params.get('session_id'),
+      orderId: Number.isSafeInteger(parsedOrderId) && parsedOrderId > 0 ? parsedOrderId : null,
+    };
   });
 
   const toggleLanguage = () => {
@@ -38,10 +43,16 @@ export default function OrderConfirmation() {
   };
 
   // Query for order details based on session ID
-  const { data: order, isLoading } = trpc.orders.getBySessionId.useQuery(
+  const { data: orderBySession, isLoading: isSessionLoading } = trpc.orders.getBySessionId.useQuery(
     { sessionId: sessionId || '' },
     { enabled: !!sessionId && isAuthenticated }
   );
+  const { data: orderById, isLoading: isOrderLoading } = trpc.orders.getById.useQuery(
+    { id: orderId || 0 },
+    { enabled: !!orderId && isAuthenticated }
+  );
+  const order = orderBySession ?? orderById;
+  const isLoading = isSessionLoading || isOrderLoading;
 
   if (!isAuthenticated) {
     return (
@@ -111,6 +122,7 @@ export default function OrderConfirmation() {
 
   const totalAmount = (order as any).items?.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0) || 0;
   const orderDate = new Date(order.createdAt).toLocaleDateString(language === 'ja' ? 'ja-JP' : language === 'en' ? 'en-US' : 'zh-TW');
+  const paymentComplete = ['paid', 'completed', 'shipped'].includes(order.status);
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
@@ -266,8 +278,8 @@ export default function OrderConfirmation() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-[#DC2626]">¥{item.subtotal?.toLocaleString()}</div>
-                      <div className="text-sm text-gray-600">¥{item.productPrice?.toLocaleString()} × {item.quantity}</div>
+                      <div className="font-bold text-[#DC2626]">{formatPrice(item.subtotal, language)}</div>
+                      <div className="text-sm text-gray-600">{formatPrice(item.productPrice, language)} × {item.quantity}</div>
                     </div>
                   </div>
                 ))}
@@ -290,7 +302,7 @@ export default function OrderConfirmation() {
                     {language === 'en' && 'Subtotal'}
                     {language === 'ja' && '小計'}
                   </span>
-                  <span className="font-bold">¥{totalAmount.toLocaleString()}</span>
+                  <span className="font-bold">{formatPrice(totalAmount, language)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">
@@ -312,24 +324,44 @@ export default function OrderConfirmation() {
                     {language === 'en' && 'Total'}
                     {language === 'ja' && '合計'}
                   </span>
-                  <span className="text-[#DC2626]">¥{totalAmount.toLocaleString()}</span>
+                  <span className="text-[#DC2626]">{formatPrice(totalAmount, language)}</span>
                 </div>
               </div>
 
               {/* Payment Status */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className={`${paymentComplete ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'} border rounded-lg p-4 mb-6`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="font-bold text-green-700">
-                    {(language === 'zh' || language === 'cn') && '支付已完成'}
-                    {language === 'en' && 'Payment Completed'}
-                    {language === 'ja' && '支払い完了'}
+                  <CheckCircle className={`w-5 h-5 ${paymentComplete ? 'text-green-600' : 'text-amber-600'}`} />
+                  <span className={`font-bold ${paymentComplete ? 'text-green-700' : 'text-amber-700'}`}>
+                    {paymentComplete ? (
+                      <>
+                        {(language === 'zh' || language === 'cn') && '支付已完成'}
+                        {language === 'en' && 'Payment Completed'}
+                        {language === 'ja' && '支払い完了'}
+                      </>
+                    ) : (
+                      <>
+                        {(language === 'zh' || language === 'cn') && '等待付款'}
+                        {language === 'en' && 'Payment Pending'}
+                        {language === 'ja' && '支払い待ち'}
+                      </>
+                    )}
                   </span>
                 </div>
-                <p className="text-sm text-green-600">
-                  {(language === 'zh' || language === 'cn') && '您的支付已成功處理'}
-                  {language === 'en' && 'Your payment has been processed successfully'}
-                  {language === 'ja' && 'お支払いは正常に処理されました'}
+                <p className={`text-sm ${paymentComplete ? 'text-green-600' : 'text-amber-700'}`}>
+                  {paymentComplete ? (
+                    <>
+                      {(language === 'zh' || language === 'cn') && '您的支付已成功處理'}
+                      {language === 'en' && 'Your payment has been processed successfully'}
+                      {language === 'ja' && 'お支払いは正常に処理されました'}
+                    </>
+                  ) : (
+                    <>
+                      {(language === 'zh' || language === 'cn') && '訂單已建立，付款完成後將更新狀態。'}
+                      {language === 'en' && 'Your order is created and will update after payment is confirmed.'}
+                      {language === 'ja' && 'ご注文を受け付けました。お支払い確認後にステータスを更新します。'}
+                    </>
+                  )}
                 </p>
               </div>
 

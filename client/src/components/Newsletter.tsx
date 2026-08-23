@@ -6,13 +6,12 @@ export function Newsletter() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // 如果後端有 newsletter API 就直接接，否則先用 fallback toast
-  const subscribeMutation = (trpc as any).newsletter?.subscribe?.useMutation?.({
+  const subscribeMutation = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       toast.success('感謝訂閱，優惠券已寄至您的 Email');
       setEmail('');
     },
-    onError: (e: any) => toast.error(e.message || '訂閱失敗，請稍後再試'),
+    onError: (e) => toast.error(e.message || '訂閱失敗，請稍後再試'),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,14 +19,7 @@ export function Newsletter() {
     if (!email) return;
     setSubmitting(true);
 
-    if (subscribeMutation) {
-      subscribeMutation.mutate({ email });
-    } else {
-      // fallback：尚未實作 newsletter API
-      await new Promise(r => setTimeout(r, 400));
-      toast.success('感謝訂閱，優惠券已寄至您的 Email');
-      setEmail('');
-    }
+    subscribeMutation.mutate({ email });
     setSubmitting(false);
   };
 

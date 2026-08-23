@@ -3,20 +3,19 @@ import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
-import { Globe, ShoppingCart, Plus, X, Menu, User, LogOut } from 'lucide-react';
+import { Globe, ShoppingCart, X, Menu, User, LogOut } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useLocation as useWouterLocation } from 'wouter';
 import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { useCart } from '@/hooks/useCart';
+import { MAX_CART_QUANTITY, useCart } from '@/hooks/useCart';
 import { useProductsFallback } from '@/hooks/useProductsFallback';
 import { ProductImage } from '@/components/ProductImage';
 
 export default function Products() {
   const { user, isAuthenticated } = useAuth();
-  const [location, setLocation] = useWouterLocation();
+  const [, setLocation] = useWouterLocation();
   const { language, setLanguage, t } = useLanguage();
   // API 掛掉時退回靜態 products.json，否則整頁會是空的
   const { data: apiCategories = [] } = trpc.categories.list.useQuery();
@@ -28,12 +27,12 @@ export default function Products() {
   
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   
-  const { add: addToCart } = useCart();
+  const { add: addToCart, itemCount } = useCart();
 
-  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string }) => {
+  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
     const quantity = quantities[product.id] || 1;
     addToCart(
-      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl },
+      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? undefined },
       quantity
     );
     toast.success(t('cart.addSuccess') || '已加入購物車');
@@ -82,10 +81,10 @@ export default function Products() {
     const allowedIds = allowed.map(cat => cat.id);
     const allowedNames = allowed.map(cat => cat.name);
 
-    return products.filter((product: any) =>
+    return products.filter((product: { categoryId?: number; category?: string }) =>
       product.categoryId !== undefined
         ? allowedIds.includes(product.categoryId)
-        : allowedNames.includes(product.category)
+        : product.category !== undefined && allowedNames.includes(product.category)
     );
   }, [products, mainCategory, selectedCategories, japaneseCategories, elderlyCareCategories]);
 
@@ -129,9 +128,10 @@ export default function Products() {
                 <Link href="/" className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.home') || '首頁'}</Link>
                 <Link href="/products" className="text-[#0ABAB5] font-semibold text-sm">{t('nav.products') || '產品'}</Link>
                 <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5] text-sm">{t('nav.videos') || '影片'}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-1 text-sm">
+                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-1 text-sm" aria-label={`購物車，${itemCount} 件商品`}>
                     <ShoppingCart className="w-4 h-4" />
                     {t('nav.cart') || '購物車'}
+                    {itemCount > 0 && <span className="rounded-full bg-[#0ABAB5] px-1.5 text-xs text-white">{itemCount > 99 ? '99+' : itemCount}</span>}
                   </Link>
               </nav>
               {isAuthenticated && user ? (
@@ -158,6 +158,18 @@ export default function Products() {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center gap-2">
+              <Link
+                href="/cart"
+                className="relative rounded-md p-2 text-[#089B96] hover:bg-[#0ABAB5]/10"
+                aria-label={`購物車，${itemCount} 件商品`}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#DC2626] px-1 text-center text-[10px] font-bold leading-5 text-white">
+                    {itemCount > 99 ? '99+' : itemCount}
+                  </span>
+                )}
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"
@@ -171,6 +183,9 @@ export default function Products() {
                 size="sm"
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="p-2"
+                aria-label={showMobileMenu ? 'Close menu' : 'Open menu'}
+                aria-expanded={showMobileMenu}
+                aria-controls="products-mobile-navigation"
               >
                 <Menu className="w-5 h-5" />
               </Button>
@@ -180,13 +195,13 @@ export default function Products() {
           {/* Mobile Menu */}
           {showMobileMenu && (
             <div className="md:hidden border-t border-gray-200 mt-3 pt-3 pb-2">
-              <nav className="flex flex-col gap-2">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.home') || '首頁'}</Link>
-                <Link href="/products" className="text-[#0ABAB5] font-semibold block py-2 px-2 text-sm">{t('nav.products') || '產品'}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.videos') || '影片'}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-2 py-2 px-2 text-sm">
+              <nav id="products-mobile-navigation" className="flex flex-col gap-2" aria-label="Mobile navigation">
+                <Link href="/" onClick={() => setShowMobileMenu(false)} className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.home') || '首頁'}</Link>
+                <Link href="/products" onClick={() => setShowMobileMenu(false)} className="text-[#0ABAB5] font-semibold block py-2 px-2 text-sm">{t('nav.products') || '產品'}</Link>
+                <Link href="/videos" onClick={() => setShowMobileMenu(false)} className="text-gray-700 hover:text-[#0ABAB5] block py-2 px-2 text-sm">{t('nav.videos') || '影片'}</Link>
+                <Link href="/cart" onClick={() => setShowMobileMenu(false)} className="text-gray-700 hover:text-[#0ABAB5] flex items-center gap-2 py-2 px-2 text-sm">
                     <ShoppingCart className="w-4 h-4" />
-                    {t('nav.cart') || '購物車'}
+                    {t('nav.cart') || '購物車'}{itemCount > 0 ? ` (${itemCount})` : ''}
                   </Link>
               </nav>
             </div>
@@ -273,10 +288,12 @@ export default function Products() {
                   <input
                     type="number"
                     min="1"
+                    max={MAX_CART_QUANTITY}
+                    aria-label={`${product.name} 的數量`}
                     value={quantities[product.id] || 1}
                     onChange={(e) => setQuantities(prev => ({
                       ...prev,
-                      [product.id]: Math.max(1, parseInt(e.target.value) || 1)
+                      [product.id]: Math.min(MAX_CART_QUANTITY, Math.max(1, parseInt(e.target.value) || 1))
                     }))}
                     className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                   />

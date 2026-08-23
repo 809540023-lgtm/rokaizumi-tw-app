@@ -1,63 +1,48 @@
-import { useRoute, useLocation, Link } from 'wouter';
+import { useRoute, Link } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { formatPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Globe, ArrowLeft, ShoppingCart, Loader2, Share2, Facebook, Twitter, MessageCircle, Heart } from 'lucide-react';
-import { useState } from 'react';
+import { ShoppingCart, Loader2, Share2, Facebook, Twitter, MessageCircle, Heart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { MAX_CART_QUANTITY, useCart } from '@/hooks/useCart';
+import { SiteHeader } from '@/components/SiteHeader';
 // ReviewSection removed per user request
 
 export default function ProductDetail() {
-  const [match, params] = useRoute('/product/:productId');
-  const [, setLocation] = useLocation();
-  const { language, setLanguage, t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const [, params] = useRoute('/product/:productId');
+  const { language, t } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  const { add: addToCart, lines: cartLines } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [shareOpen, setShareOpen] = useState(false);
   
-  const productId = params?.productId ? parseInt(params.productId) : 0;
+  const parsedProductId = Number(params?.productId);
+  const productId = Number.isSafeInteger(parsedProductId) && parsedProductId > 0 ? parsedProductId : 0;
   
-  const { data: product, isLoading } = trpc.products.getById.useQuery({ id: productId });
+  const { data: product, isLoading } = trpc.products.getById.useQuery(
+    { id: productId },
+    { enabled: productId > 0 }
+  );
   const { data: relatedProducts = [] } = trpc.products.list.useQuery();
-  
-  const addToCartMutation = trpc.cart.add.useMutation({
-    onSuccess: () => {
-      toast.success(t('cart.addSuccess') || '已加入購物車');
-      setQuantity(1);
-    },
-    onError: (error: any) => {
-      toast.error(error.message || '加入購物車失敗');
-    },
-  });
-
-  const toggleLanguage = () => {
-    if ((language === 'zh' || language === 'cn')) {
-      setLanguage('en');
-    } else if (language === 'en') {
-      setLanguage('ja');
-    } else {
-      setLanguage('zh');
-    }
-  };
-
-  const getLanguageLabel = () => {
-    switch (language) {
-      case 'zh': return '中文';
-      case 'en': return 'EN';
-      case 'ja': return '日本語';
-      default: return '中文';
-    }
-  };
 
   const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      toast.error('請先登入');
-      return;
-    }
-    addToCartMutation.mutate({ productId, quantity });
+    if (!product) return;
+    addToCart(
+      {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl || undefined,
+      },
+      quantity
+    );
+    toast.success(t('cart.addSuccess') || '已加入購物車');
+    setQuantity(1);
   };
 
   const handleShare = () => {
@@ -78,8 +63,13 @@ export default function ProductDetail() {
         // Fallback if user cancels
       });
     } else {
-      toast.info((language === 'zh' || language === 'cn') ? '複製了產品連結' : 'Product link copied');
-      navigator.clipboard.writeText(productUrl);
+      if (!navigator.clipboard) {
+        toast.error((language === 'zh' || language === 'cn') ? '此瀏覽器無法複製連結' : 'Copying links is not supported by this browser');
+        return;
+      }
+      navigator.clipboard.writeText(productUrl)
+        .then(() => toast.success((language === 'zh' || language === 'cn') ? '已複製產品連結' : 'Product link copied'))
+        .catch(() => toast.error((language === 'zh' || language === 'cn') ? '無法複製產品連結' : 'Could not copy product link'));
     }
   };
 
@@ -87,7 +77,7 @@ export default function ProductDetail() {
     if (!product) return;
     const productUrl = `${window.location.origin}/product/${productId}`;
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    window.open(facebookUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
   const handleShareToTwitter = () => {
@@ -99,7 +89,7 @@ export default function ProductDetail() {
       ? `Check out this product: ${product.name}`
       : `この商品をチェック：${product.name}`;
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(shareText)}`;
-    window.open(twitterUrl, '_blank', 'width=600,height=400');
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
   const handleShareToLine = () => {
@@ -111,7 +101,7 @@ export default function ProductDetail() {
       ? `Check out this product: ${product.name}`
       : `この商品をチェック：${product.name}`;
     const lineUrl = `https://line.me/R/msg/0/?${encodeURIComponent(shareText + ' ' + productUrl)}`;
-    window.open(lineUrl, '_blank');
+    window.open(lineUrl, '_blank', 'noopener,noreferrer');
   };
 
   const addToWishlistMutation = trpc.wishlist.add.useMutation({
@@ -131,6 +121,12 @@ export default function ProductDetail() {
     addToWishlistMutation.mutate({ productId });
   };
 
+  useEffect(() => {
+    setQuantity(1);
+    setSelectedImageIndex(0);
+    setShareOpen(false);
+  }, [productId]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fef9f3]">
@@ -142,20 +138,7 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="min-h-screen bg-[#fef9f3]">
-        <header className="bg-white shadow-sm sticky top-0 z-10">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    ろ
-                  </div>
-                  <span className="text-2xl font-bold text-[#0ABAB5]">
-                    {t('home.company')}
-                  </span>
-                </Link>
-            </div>
-          </div>
-        </header>
+        <SiteHeader />
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold mb-4">
             {(language === 'zh' || language === 'cn') ? '產品未找到' : 'Product Not Found'}
@@ -171,41 +154,20 @@ export default function ProductDetail() {
   const filteredRelated = relatedProducts
     .filter(p => p.id !== productId && p.categoryId === product.categoryId)
     .slice(0, 4);
+  const productImages = [product.imageUrl, ...(product.images || [])]
+    .filter((image): image is string => typeof image === 'string' && image.length > 0)
+    .filter((image, index, images) => images.indexOf(image) === index);
+  const quantityInCart = cartLines.find(line => line.productId === product.id)?.quantity ?? 0;
+  const maxQuantity = Math.min(
+    MAX_CART_QUANTITY - quantityInCart,
+    product.stock === undefined ? MAX_CART_QUANTITY - quantityInCart : product.stock - quantityInCart
+  );
+  const selectorMax = Math.max(1, maxQuantity);
+  const isUnavailable = product.status !== 'available' || maxQuantity < 1;
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  ろ
-                </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
-                  {t('home.company')}
-                </span>
-              </Link>
-            <div className="flex items-center gap-6">
-              <nav className="flex gap-6">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
-                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
-              </nav>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleLanguage}
-                className="flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                {getLanguageLabel()}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-4">
@@ -219,18 +181,14 @@ export default function ProductDetail() {
       </div>
 
       {/* Product Detail */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-12 mb-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 mb-12">
           {/* Product Images */}
           <div className="flex flex-col gap-4">
             {/* Main Image */}
             <div className="w-full aspect-square bg-white rounded-lg shadow-sm overflow-hidden flex items-center justify-center">
               {(() => {
-                const allImages = [
-                  product.imageUrl,
-                  ...(product.images || [])
-                ].filter(Boolean) as string[];
-                const currentImage = allImages[selectedImageIndex] || product.imageUrl;
+                const currentImage = productImages[selectedImageIndex] || productImages[0];
                 return currentImage ? (
                   <img
                     src={currentImage}
@@ -244,17 +202,15 @@ export default function ProductDetail() {
             </div>
             
             {/* Thumbnail Gallery */}
-            {(() => {
-              const allImages = [
-                product.imageUrl,
-                ...(product.images || [])
-              ].filter(Boolean) as string[];
-              return allImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {allImages.map((img, index) => (
+            {productImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {productImages.map((img, index) => (
                     <button
                       key={index}
+                      type="button"
                       onClick={() => setSelectedImageIndex(index)}
+                      aria-label={`查看 ${product.name} 圖片 ${index + 1}`}
+                      aria-pressed={selectedImageIndex === index}
                       className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
                         selectedImageIndex === index ? 'border-[#0ABAB5]' : 'border-transparent'
                       }`}
@@ -267,13 +223,12 @@ export default function ProductDetail() {
                     </button>
                   ))}
                 </div>
-              );
-            })()}
+              )}
           </div>
 
           {/* Product Info */}
           <div>
-            <h1 className="text-4xl font-bold mb-4 text-gray-900">{product.name}</h1>
+            <h1 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">{product.name}</h1>
             
             <div className="mb-6">
               <p className="text-4xl font-bold text-[#DC2626] mb-3">
@@ -325,7 +280,10 @@ export default function ProductDetail() {
               </label>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  type="button"
+                  onClick={() => setQuantity(current => Math.max(1, current - 1))}
+                  disabled={isUnavailable || quantity <= 1}
+                  aria-label="減少數量"
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
                 >
                   -
@@ -333,12 +291,21 @@ export default function ProductDetail() {
                 <input
                   type="number"
                   min="1"
+                  max={selectorMax}
+                  disabled={isUnavailable}
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    setQuantity(Number.isFinite(next) ? Math.min(selectorMax, Math.max(1, Math.floor(next))) : 1);
+                  }}
+                  aria-label={(language === 'zh' || language === 'cn') ? '數量' : 'Quantity'}
                   className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-center"
                 />
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  type="button"
+                  onClick={() => setQuantity(current => Math.min(selectorMax, current + 1))}
+                  disabled={isUnavailable || quantity >= selectorMax}
+                  aria-label="增加數量"
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
                 >
                   +
@@ -349,11 +316,11 @@ export default function ProductDetail() {
             {/* Add to Cart Button */}
             <Button
               onClick={handleAddToCart}
-              disabled={addToCartMutation.isPending || (product.stock !== undefined && product.stock <= 0)}
+              disabled={isUnavailable}
               className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white py-6 text-lg font-semibold flex items-center justify-center gap-2 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingCart className="w-5 h-5" />
-              {product.stock !== undefined && product.stock <= 0 
+              {isUnavailable
                 ? ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
                 : ((language === 'zh' || language === 'cn') ? '加入購物車' : 'Add to Cart')
               }
@@ -370,15 +337,22 @@ export default function ProductDetail() {
                 <Heart className="w-4 h-4" />
                 {(language === 'zh' || language === 'cn') ? '加入願望清單' : 'Add to Wishlist'}
               </Button>
-              <Button
-                variant="outline"
-                className="flex-1 relative group flex items-center justify-center gap-2"
-              >
-                <Share2 className="w-4 h-4" />
-                {(language === 'zh' || language === 'cn') ? '分享' : 'Share'}
-                {/* Share dropdown menu */}
-                <div className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 w-48">
+              <div className="relative flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center gap-2"
+                  aria-haspopup="menu"
+                  aria-expanded={shareOpen}
+                  onClick={() => setShareOpen(open => !open)}
+                >
+                  <Share2 className="w-4 h-4" />
+                  {(language === 'zh' || language === 'cn') ? '分享' : 'Share'}
+                </Button>
+                {shareOpen && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-48" role="menu">
                   <button
+                    type="button"
                     onClick={() => handleShareToFacebook()}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                   >
@@ -386,6 +360,7 @@ export default function ProductDetail() {
                     <span className="text-sm">Facebook</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleShareToTwitter()}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                   >
@@ -393,6 +368,7 @@ export default function ProductDetail() {
                     <span className="text-sm">Twitter</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleShareToLine()}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                   >
@@ -400,14 +376,16 @@ export default function ProductDetail() {
                     <span className="text-sm">LINE</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleShare()}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4 text-gray-600" />
                     <span className="text-sm">{(language === 'zh' || language === 'cn') ? '更多' : 'More'}</span>
                   </button>
-                </div>
-              </Button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <Link href="/products" className="block text-center text-[#0ABAB5] hover:text-[#089B96] font-semibold py-2">
@@ -443,9 +421,9 @@ export default function ProductDetail() {
                         )}
                         {/* Quick View Overlay */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                          <Button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-[#0ABAB5] hover:bg-gray-100">
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-[#0ABAB5] px-4 py-2 rounded-md text-sm font-medium">
                             {(language === 'zh' || language === 'cn') ? '快速查看' : 'Quick View'}
-                          </Button>
+                          </span>
                         </div>
                       </div>
                       <div className="p-4">
@@ -454,7 +432,7 @@ export default function ProductDetail() {
                         </h3>
                         <div className="flex items-center justify-between mb-3">
                           <p className="text-xl font-bold text-[#DC2626]">
-                            ¥{relatedProduct.price?.toLocaleString()}
+                            {formatPrice(relatedProduct.price, language)}
                           </p>
                           <span className="text-xs bg-[#0ABAB5] text-white px-2 py-1 rounded-full">
                             {(language === 'zh' || language === 'cn') ? '推薦' : 'Recommended'}
@@ -475,7 +453,7 @@ export default function ProductDetail() {
         )}
 
         {/* Reviews Section removed per user request */}
-      </div>
+      </main>
     </div>
   );
 }

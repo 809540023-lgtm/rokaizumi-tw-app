@@ -133,7 +133,7 @@ DNS 那邊把 A 紀錄指向 VPS IP 即可。
 
 - [ ] **資料庫**：MySQL 8.0+
 - [ ] **JWT 密鑰**：`openssl rand -base64 48` 產一個
-- [ ] **Stripe 帳號** + 拿到 sk_live、pk_live、webhook secret
+- [ ] **Stripe 帳號** + 拿到 sk_live、pk_live、webhook secret。部署後在 Stripe Dashboard 建立 `https://你的網域/api/stripe/webhook` endpoint，訂閱 `checkout.session.completed` 與 `checkout.session.async_payment_succeeded`。
 - [ ] **S3 / R2 帳號** + 開好 bucket + 拿到 access key
 - [ ] **Email 服務**（Resend 推薦，免費 3000 封/月）
 - [ ] **網域**：在 DNS 商把 A / CNAME 指好

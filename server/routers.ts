@@ -6,12 +6,45 @@ import { z } from "zod";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
+import { ENV } from "./_core/env";
 import { suppliers, purchases, orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { b2bInquiries, newsletter } from "./routers/extra";
+
+const checkoutItemInput = z.object({
+  productId: z.number().int().positive(),
+  quantity: z.number().int().min(1).max(99),
+});
+
+type CheckoutItemInput = z.infer<typeof checkoutItemInput>;
+
+async function resolveOrderItems(items: CheckoutItemInput[]) {
+  if (items.length === 0) throw new Error('Your cart is empty');
+
+  return Promise.all(items.map(async ({ productId, quantity }) => {
+    const product = await db.getProductById(productId);
+    if (!product || product.status !== 'available') {
+      throw new Error(`Product ${productId} is unavailable`);
+    }
+    if (product.stock < quantity) {
+      throw new Error(`${product.name} does not have enough stock`);
+    }
+
+    return {
+      productId: product.id,
+      productName: product.name,
+      productPrice: product.price,
+      quantity,
+      subtotal: product.price * quantity,
+    };
+  }));
+}
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
+  b2bInquiries,
+  newsletter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -211,12 +244,12 @@ export const appRouter = router({
     updateQuantity: protectedProcedure
       .input(z.object({ 
         id: z.number(),
-        quantity: z.number(),
+        quantity: z.number().int().min(1).max(99),
       }))
-      .mutation(({ input }) => db.updateCartItemQuantity(input.id, input.quantity)),
+      .mutation(({ input, ctx }) => db.updateCartItemQuantity(ctx.user.id, input.id, input.quantity)),
     remove: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(({ input }) => db.removeCartItem(input.id)),
+      .mutation(({ input, ctx }) => db.removeCartItem(ctx.user.id, input.id)),
     clear: protectedProcedure
       .mutation(({ ctx }) => db.clearCart(ctx.user.id)),
   }),
@@ -226,15 +259,11 @@ export const appRouter = router({
     list: protectedProcedure.query(({ ctx }) => db.getOrdersByUserId(ctx.user.id)),
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(({ input }) => db.getOrderById(input.id)),
+      .query(({ input, ctx }) => db.getOrderByIdForUser(input.id, ctx.user.id)),
     getBySessionId: protectedProcedure
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ input, ctx }) => {
-        // For now, return the latest order for the user with items
-        // In production, you would query by Stripe session ID from database
-        const orders = await db.getOrdersByUserId(ctx.user.id);
-        if (orders.length === 0) return null;
-        return await db.getOrderById(orders[0].id);
+        return db.getOrderByStripeSessionIdForUser(input.sessionId, ctx.user.id);
       }),
     create: protectedProcedure
       .input(z.object({
@@ -243,16 +272,11 @@ export const appRouter = router({
         contactPhone: z.string(),
         contactEmail: z.string().optional(),
         notes: z.string().optional(),
-        items: z.array(z.object({
-          productId: z.number(),
-          productName: z.string(),
-          productPrice: z.number(),
-          quantity: z.number(),
-          subtotal: z.number(),
-        })),
+        items: z.array(checkoutItemInput).min(1),
       }))
       .mutation(async ({ input, ctx }) => {
-        const totalAmount = input.items.reduce((sum, item) => sum + item.subtotal, 0);
+        const items = await resolveOrderItems(input.items);
+        const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
         
         const orderId = await db.createOrder(
           {
@@ -265,7 +289,7 @@ export const appRouter = router({
             notes: input.notes || null,
             status: 'pending',
           },
-          input.items
+          items
         );
         
         // Clear cart after order is created
@@ -388,13 +412,7 @@ export const appRouter = router({
   payments: router({
     createCheckoutSession: protectedProcedure
       .input(z.object({
-        items: z.array(z.object({
-          productId: z.number(),
-          productName: z.string(),
-          productPrice: z.number(),
-          quantity: z.number(),
-          subtotal: z.number(),
-        })),
+        items: z.array(checkoutItemInput).min(1),
         shippingInfo: z.object({
           name: z.string(),
           phone: z.string(),
@@ -403,7 +421,12 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input, ctx }) => {
-        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        if (!ENV.stripeSecretKey) {
+          throw new Error('Stripe payment is not configured');
+        }
+        const stripe = require('stripe')(ENV.stripeSecretKey);
+        const items = await resolveOrderItems(input.items);
+        const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
         
         try {
           // Create order first
@@ -415,32 +438,27 @@ export const appRouter = router({
               contactPhone: input.shippingInfo.phone,
               notes: input.shippingInfo.notes || '',
               status: 'pending',
-              totalAmount: input.items.reduce((sum, item) => sum + item.subtotal, 0),
+              totalAmount,
             },
-            input.items.map(item => ({
-              productId: item.productId,
-              productName: item.productName,
-              productPrice: item.productPrice,
-              quantity: item.quantity,
-              subtotal: item.subtotal,
-            }))
+            items
           );
 
           // Create Stripe checkout session
           const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
-            line_items: input.items.map((item) => ({
+            line_items: items.map((item) => ({
               price_data: {
                 currency: 'jpy',
                 product_data: {
                   name: item.productName,
                 },
-                unit_amount: Math.round(item.productPrice * 100),
+                // JPY is a zero-decimal currency; Stripe expects the exact yen amount.
+                unit_amount: item.productPrice,
               },
               quantity: item.quantity,
             })),
             mode: 'payment',
-            success_url: `${ctx.req.headers.origin}/orders?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${ctx.req.headers.origin}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${ctx.req.headers.origin}/checkout`,
             customer_email: ctx.user.email,
             metadata: {
@@ -448,6 +466,7 @@ export const appRouter = router({
               userId: ctx.user.id.toString(),
             },
           });
+          await db.setOrderStripeSessionId(orderId, session.id);
 
           return {
             url: session.url,

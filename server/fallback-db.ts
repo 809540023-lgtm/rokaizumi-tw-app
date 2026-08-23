@@ -8,6 +8,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import type { Product } from '../drizzle/schema';
 
 interface FallbackCategory {
   id: number;
@@ -15,19 +16,25 @@ interface FallbackCategory {
   description?: string;
 }
 
-interface FallbackProduct {
-  id: number;
-  name: string;
+type ProductListItem = Pick<
+  Product,
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'price'
+  | 'categoryId'
+  | 'imageUrl'
+  | 'images'
+  | 'status'
+  | 'stock'
+  | 'lowStockThreshold'
+>;
+
+interface FallbackProduct extends ProductListItem {
   nameJa?: string;
-  category: string;
-  categoryId?: number;
-  price: number;
   priceJpy?: number;
-  description?: string;
+  category: string;
   specifications?: string;
-  imageUrl?: string;
-  images?: string[];
-  status: string;
 }
 
 let fallbackProducts: FallbackProduct[] = [];
@@ -75,9 +82,35 @@ export function initializeFallbackDB() {
     }));
 
     const idByName = new Map(fallbackCategories.map(c => [c.name, c.id]));
-    fallbackProducts = data.map((p: any) => ({
-      ...p,
+    fallbackProducts = data.map((p: {
+      id: number;
+      name: string;
+      nameJa?: string;
+      category: string;
+      price: number;
+      priceJpy?: number;
+      description?: string;
+      specifications?: string;
+      imageUrl?: string;
+      images?: string[];
+      status?: string;
+      stock?: number;
+      lowStockThreshold?: number;
+    }) => ({
+      id: p.id,
+      name: p.name,
+      nameJa: p.nameJa,
+      category: p.category,
       categoryId: idByName.get(p.category) ?? 0,
+      price: p.price,
+      priceJpy: p.priceJpy,
+      description: p.description ?? null,
+      specifications: p.specifications,
+      imageUrl: p.imageUrl ?? null,
+      images: p.images ?? null,
+      status: p.status === 'sold' || p.status === 'reserved' ? p.status : 'available',
+      stock: p.stock ?? 0,
+      lowStockThreshold: p.lowStockThreshold ?? 5,
     }));
 
     isFallbackActive = true;

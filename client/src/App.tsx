@@ -1,39 +1,45 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
-import ProductDetail from "./pages/ProductDetail";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import HomePage from "./pages/HomePage";
-import Products from "./pages/Products";
-import CategoryProducts from "./pages/CategoryProducts";
-import TripVideos from "./pages/TripVideos";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import Profile from "./pages/Profile";
 import AIChat from "./components/AIChat";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { NetworkStatusBanner } from "./components/NetworkStatusBanner";
-import AdminDashboard from "./pages/AdminDashboard";
-import FinancialDashboard from "./pages/FinancialDashboard";
-import AdminPanel from "./pages/AdminPanel";
-import Koku from "./pages/Koku";
-import Yamada from "./pages/Yamada";
-import Guides from "./pages/Guides";
-import GuideDetail from "./pages/GuideDetail";
-import Login from "./pages/Login";
-import B2B from "./pages/B2B";
-import Daiko from "./pages/Daiko";
-import Selection from "./pages/Selection";
-import AdminManage from "./pages/AdminManage";
-import About from "./pages/About";
+
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const Products = lazy(() => import("./pages/Products"));
+const CategoryProducts = lazy(() => import("./pages/CategoryProducts"));
+const TripVideos = lazy(() => import("./pages/TripVideos"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Profile = lazy(() => import("./pages/Profile"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const FinancialDashboard = lazy(() => import("./pages/FinancialDashboard"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const Koku = lazy(() => import("./pages/Koku"));
+const Yamada = lazy(() => import("./pages/Yamada"));
+const Guides = lazy(() => import("./pages/Guides"));
+const GuideDetail = lazy(() => import("./pages/GuideDetail"));
+const Login = lazy(() => import("./pages/Login"));
+const B2B = lazy(() => import("./pages/B2B"));
+const Daiko = lazy(() => import("./pages/Daiko"));
+const Selection = lazy(() => import("./pages/Selection"));
+const AdminManage = lazy(() => import("./pages/AdminManage"));
+const About = lazy(() => import("./pages/About"));
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
+    <Suspense
+      fallback={<div className="min-h-screen bg-[#fef9f3]" aria-busy="true" />}
+    >
+      <Switch>
       <Route path={"/admin-panel/financial"} component={FinancialDashboard} />
       <Route path={"/admin-panel/koku"} component={AdminPanel} />
       <Route path={"/admin-panel/orders"} component={AdminPanel} />
@@ -62,12 +68,14 @@ function Router() {
       <Route path={"/videos"} component={TripVideos} />
       <Route path={"/cart"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/orders"} component={Orders} />
       <Route path={"/order-confirmation"} component={OrderConfirmation} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
-    </Switch>
+      </Switch>
+    </Suspense>
   );
 }
 

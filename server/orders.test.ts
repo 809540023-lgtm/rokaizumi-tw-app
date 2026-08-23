@@ -1,171 +1,100 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { appRouter } from './routers';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const store = vi.hoisted(() => ({
+  nextOrderId: 1,
+  orders: [] as Array<Record<string, unknown> & { id: number; userId: number; items: unknown[] }>,
+}));
+
+vi.mock('./db', () => ({
+  getProductById: async (id: number) => ({
+    id,
+    name: `Product ${id}`,
+    price: id * 1000,
+    stock: 99,
+    status: 'available',
+  }),
+  getOrdersByUserId: async (userId: number) => store.orders.filter(order => order.userId === userId),
+  createOrder: async (order: Record<string, unknown>, items: unknown[]) => {
+    const id = store.nextOrderId++;
+    store.orders.push({ ...order, id, userId: order.userId as number, items });
+    return id;
+  },
+  getOrderByIdForUser: async (id: number, userId: number) =>
+    store.orders.find(order => order.id === id && order.userId === userId) ?? null,
+  getOrderByStripeSessionIdForUser: async () => null,
+  clearCart: vi.fn(),
+}));
+
+const { appRouter } = await import('./routers');
 
 describe('Orders API', () => {
-  let caller: any;
+  const context = {
+    user: { id: 1, email: 'test@example.com', name: 'Test User', role: 'user' as const },
+    req: { headers: { origin: 'http://localhost:3000' } },
+    res: {},
+  };
 
   beforeEach(() => {
-    // Create a test caller with mock context
-    caller = appRouter.createCaller({
-      user: {
-        id: 1,
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'user',
-      },
-      req: {
-        headers: {
-          origin: 'http://localhost:3000',
-        },
-      },
-      res: {},
-    });
+    store.nextOrderId = 1;
+    store.orders = [];
   });
 
-  it('should list orders for authenticated user', async () => {
-    const result = await caller.orders.list();
-    expect(Array.isArray(result)).toBe(true);
-  });
-
-  it('should create an order with items', async () => {
-    const result = await caller.orders.create({
-      shippingAddress: '123 Main St, City, Country',
+  it('lists only the authenticated user’s orders', async () => {
+    const caller = appRouter.createCaller(context);
+    await caller.orders.create({
+      shippingAddress: '123 Main St',
       contactName: 'John Doe',
       contactPhone: '09123456789',
-      contactEmail: 'john@example.com',
-      notes: 'Please deliver carefully',
-      items: [
-        {
-          productId: 1,
-          productName: 'Test Product 1',
-          productPrice: 10000,
-          quantity: 2,
-          subtotal: 20000,
-        },
-        {
-          productId: 2,
-          productName: 'Test Product 2',
-          productPrice: 5000,
-          quantity: 1,
-          subtotal: 5000,
-        },
-      ],
+      items: [{ productId: 1, quantity: 2 }],
     });
 
-    expect(result).toBeDefined();
-    expect(result.orderId).toBeDefined();
-    expect(typeof result.orderId).toBe('number');
+    const result = await caller.orders.list();
+    expect(result).toHaveLength(1);
+    expect(result[0].userId).toBe(1);
   });
 
-  it('should get order by ID with items', async () => {
-    // First create an order
-    const createResult = await caller.orders.create({
-      shippingAddress: '456 Oak Ave, City, Country',
-      contactName: 'Jane Doe',
-      contactPhone: '09987654321',
-      items: [
-        {
-          productId: 1,
-          productName: 'Test Product',
-          productPrice: 10000,
-          quantity: 1,
-          subtotal: 10000,
-        },
-      ],
-    });
-
-    // Then get the order
-    const order = await caller.orders.getById({ id: createResult.orderId });
-
-    expect(order).toBeDefined();
-    expect(order.id).toBe(createResult.orderId);
-    expect(order.contactName).toBe('Jane Doe');
-    expect(order.shippingAddress).toBe('456 Oak Ave, City, Country');
-    expect(Array.isArray(order.items)).toBe(true);
-    expect(order.items.length).toBeGreaterThan(0);
-  });
-
-  it('should get order by session ID', async () => {
-    // First create an order
-    const createResult = await caller.orders.create({
-      shippingAddress: '789 Pine Rd, City, Country',
-      contactName: 'Bob Smith',
-      contactPhone: '09555555555',
-      items: [
-        {
-          productId: 1,
-          productName: 'Test Product',
-          productPrice: 10000,
-          quantity: 1,
-          subtotal: 10000,
-        },
-      ],
-    });
-
-    // Then get the order by session ID
-    const order = await caller.orders.getBySessionId({ sessionId: 'cs_test_123' });
-
-    expect(order).toBeDefined();
-    expect(order.id).toBe(createResult.orderId);
-    expect(Array.isArray(order.items)).toBe(true);
-  });
-
-  it('should require authentication for order operations', async () => {
-    const unauthenticatedCaller = appRouter.createCaller({
-      user: null,
-      req: { headers: { origin: 'http://localhost:3000' } },
-      res: {},
-    });
-
-    await expect(
-      unauthenticatedCaller.orders.list()
-    ).rejects.toThrow();
-
-    await expect(
-      unauthenticatedCaller.orders.create({
-        shippingAddress: '123 Main St',
-        contactName: 'Test User',
-        contactPhone: '09123456789',
-        items: [],
-      })
-    ).rejects.toThrow();
-  });
-
-  it('should handle order with multiple items correctly', async () => {
-    const items = [
-      {
-        productId: 1,
-        productName: 'Product A',
-        productPrice: 5000,
-        quantity: 2,
-        subtotal: 10000,
-      },
-      {
-        productId: 2,
-        productName: 'Product B',
-        productPrice: 3000,
-        quantity: 3,
-        subtotal: 9000,
-      },
-      {
-        productId: 3,
-        productName: 'Product C',
-        productPrice: 7000,
-        quantity: 1,
-        subtotal: 7000,
-      },
-    ];
-
+  it('uses server-side product prices rather than client supplied prices', async () => {
+    const caller = appRouter.createCaller(context);
     const result = await caller.orders.create({
-      shippingAddress: '999 Test St',
-      contactName: 'Test User',
-      contactPhone: '09999999999',
-      items,
+      shippingAddress: '123 Main St',
+      contactName: 'John Doe',
+      contactPhone: '09123456789',
+      items: [{ productId: 2, quantity: 3 }],
     });
 
     const order = await caller.orders.getById({ id: result.orderId });
+    expect(order?.totalAmount).toBe(6000);
+    expect(order?.items).toEqual([
+      { productId: 2, productName: 'Product 2', productPrice: 2000, quantity: 3, subtotal: 6000 },
+    ]);
+  });
 
-    expect(order.items.length).toBe(3);
-    expect(order.totalAmount).toBe(26000); // 10000 + 9000 + 7000
+  it('does not expose another user’s order', async () => {
+    const owner = appRouter.createCaller(context);
+    const { orderId } = await owner.orders.create({
+      shippingAddress: '123 Main St',
+      contactName: 'John Doe',
+      contactPhone: '09123456789',
+      items: [{ productId: 1, quantity: 1 }],
+    });
+    const otherUser = appRouter.createCaller({
+      ...context,
+      user: { ...context.user, id: 2 },
+    });
+
+    await expect(otherUser.orders.getById({ id: orderId })).resolves.toBeNull();
+  });
+
+  it('requires authentication and a non-empty cart', async () => {
+    const unauthenticated = appRouter.createCaller({ ...context, user: null });
+
+    await expect(unauthenticated.orders.list()).rejects.toThrow();
+    const caller = appRouter.createCaller(context);
+    await expect(caller.orders.create({
+      shippingAddress: '123 Main St',
+      contactName: 'John Doe',
+      contactPhone: '09123456789',
+      items: [],
+    })).rejects.toThrow();
   });
 });

@@ -1,24 +1,23 @@
 import { useLanguage } from '../contexts/LanguageContext';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Globe, ArrowLeft, CreditCard, Banknote, Smartphone, Loader } from 'lucide-react';
+import { ArrowLeft, CreditCard, Banknote, Smartphone, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/price';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useState } from 'react';
-
-const COOKIE_NAME = 'auth_token';
+import { SiteHeader } from '@/components/SiteHeader';
 
 export default function Checkout() {
   const [, setLocation] = useLocation();
-  const { language, setLanguage, t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState('stripe');
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -43,8 +42,10 @@ export default function Checkout() {
   const createCheckoutSessionMutation = trpc.payments.createCheckoutSession.useMutation({
     onSuccess: (data: any) => {
       if (data.url) {
-        window.open(data.url, '_blank');
+        window.location.assign(data.url);
         toast.success('正在跳轉到 Stripe 支付頁面...');
+      } else {
+        toast.error('無法建立付款頁面');
       }
     },
     onError: (error: any) => {
@@ -52,56 +53,53 @@ export default function Checkout() {
     },
   });
 
-  const toggleLanguage = () => {
-    if ((language === 'zh' || language === 'cn')) {
-      setLanguage('en');
-    } else if (language === 'en') {
-      setLanguage('ja');
-    } else {
-      setLanguage('zh');
-    }
-  };
-
-  const getLanguageLabel = () => {
-    switch (language) {
-      case 'zh': return '中文';
-      case 'en': return 'EN';
-      case 'ja': return '日本語';
-      default: return '中文';
-    }
-  };
-
   const handleSubmitOrder = () => {
-    if (!shippingInfo.name || !shippingInfo.phone || !shippingInfo.address) {
+    if (cartItems.length === 0) {
+      toast.error('購物車是空的');
+      setLocation('/cart');
+      return;
+    }
+
+    const normalizedShippingInfo = {
+      name: shippingInfo.name.trim(),
+      phone: shippingInfo.phone.trim(),
+      address: shippingInfo.address.trim(),
+      notes: shippingInfo.notes.trim(),
+    };
+
+    if (!normalizedShippingInfo.name || !normalizedShippingInfo.phone || !normalizedShippingInfo.address) {
       toast.error('請填寫完整的收件人信息');
       return;
     }
 
     const items = cartItems.map(item => ({
       productId: item.productId,
-      productName: item.name,
-      productPrice: item.price,
       quantity: item.quantity,
-      subtotal: item.price * item.quantity,
     }));
 
     if (paymentMethod === 'stripe') {
-      // Create Stripe checkout session
       createCheckoutSessionMutation.mutate({
         items,
-        shippingInfo,
+        shippingInfo: normalizedShippingInfo,
       });
     } else {
-      // Create order for other payment methods
       createOrderMutation.mutate({
-        shippingAddress: shippingInfo.address,
-        contactName: shippingInfo.name,
-        contactPhone: shippingInfo.phone,
-        notes: shippingInfo.notes,
+        shippingAddress: normalizedShippingInfo.address,
+        contactName: normalizedShippingInfo.name,
+        contactPhone: normalizedShippingInfo.phone,
+        notes: normalizedShippingInfo.notes,
         items,
       });
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#fef9f3] flex items-center justify-center">
+        <Loader className="h-8 w-8 animate-spin text-[#0ABAB5]" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -134,41 +132,10 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  ろ
-                </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
-                  {t('home.company')}
-                </span>
-              </Link>
-            <div className="flex items-center gap-6">
-              <nav className="flex gap-6">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
-                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
-              </nav>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleLanguage}
-                className="flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                {getLanguageLabel()}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
         <Button
           variant="outline"
           onClick={() => setLocation('/cart')}
@@ -178,9 +145,15 @@ export default function Checkout() {
           返回購物車
         </Button>
 
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">結帳</h1>
+        <h1 className="mb-8 text-3xl font-bold text-gray-800 sm:text-4xl">結帳</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form
+          className="grid grid-cols-1 gap-8 lg:grid-cols-3"
+          onSubmit={event => {
+            event.preventDefault();
+            handleSubmitOrder();
+          }}
+        >
           {/* Left Column: Shipping Info & Payment */}
           <div className="lg:col-span-2 space-y-6">
             {/* Shipping Information */}
@@ -191,6 +164,8 @@ export default function Checkout() {
                   <Label htmlFor="name">姓名 *</Label>
                   <Input
                     id="name"
+                    autoComplete="name"
+                    required
                     value={shippingInfo.name}
                     onChange={(e) => setShippingInfo({ ...shippingInfo, name: e.target.value })}
                     placeholder="請輸入收件人姓名"
@@ -200,6 +175,9 @@ export default function Checkout() {
                   <Label htmlFor="phone">電話 *</Label>
                   <Input
                     id="phone"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    required
                     value={shippingInfo.phone}
                     onChange={(e) => setShippingInfo({ ...shippingInfo, phone: e.target.value })}
                     placeholder="請輸入聯絡電話"
@@ -209,6 +187,8 @@ export default function Checkout() {
                   <Label htmlFor="address">地址 *</Label>
                   <Input
                     id="address"
+                    autoComplete="street-address"
+                    required
                     value={shippingInfo.address}
                     onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
                     placeholder="請輸入收件地址"
@@ -297,8 +277,17 @@ export default function Checkout() {
                   <span className="text-[#DC2626]">{formatPrice(totalAmount, language)}</span>
                 </div>
               </div>
+              {paymentMethod === 'stripe' && (
+                <p className="mb-4 text-sm text-gray-600">
+                  {(language === 'zh' || language === 'cn')
+                    ? '信用卡將以日圓請款；發卡行將依其匯率換算。'
+                    : language === 'ja'
+                      ? 'クレジットカードは日本円で請求され、カード会社のレートで換算されます。'
+                      : 'Your card will be charged in JPY and converted at your card issuer’s rate.'}
+                </p>
+              )}
               <Button
-                onClick={handleSubmitOrder}
+                type="submit"
                 disabled={createOrderMutation.isPending || createCheckoutSessionMutation.isPending}
                 className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-lg py-6 flex items-center justify-center gap-2"
               >
@@ -313,7 +302,7 @@ export default function Checkout() {
               </Button>
             </Card>
           </div>
-        </div>
+          </form>
       </main>
     </div>
   );

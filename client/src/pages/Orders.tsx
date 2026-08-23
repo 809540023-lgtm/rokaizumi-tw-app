@@ -4,6 +4,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Package, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { formatPrice } from "@/lib/price";
 
 const STATUS_MAP: Record<string, string> = {
   pending: "處理中",
@@ -20,11 +22,11 @@ const STATUS_MAP: Record<string, string> = {
 
 export default function Orders() {
   const { user } = useAuth() as any;
+  const { language } = useLanguage();
   const { data: orders = [], isLoading } = trpc.orders.list.useQuery(undefined as any, {
     enabled: !!user,
   });
 
-  const fmt = (n: number) => "¥" + Number(n || 0).toLocaleString();
   const fmtDate = (d: string) => {
     try {
       return new Date(d).toLocaleDateString("zh-TW");
@@ -86,7 +88,7 @@ export default function Orders() {
                   <div className="text-xs text-gray-500 mt-0.5">{fmtDate(o.createdAt)}</div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="font-bold text-[#E26D5C]">{fmt(o.totalAmount)}</div>
+                  <div className="font-bold text-[#E26D5C]">{formatPrice(o.totalAmount, language)}</div>
                   <div className="text-xs text-gray-400 flex items-center justify-end gap-0.5">
                     查看明細 <ChevronRight className="w-3 h-3" />
                   </div>

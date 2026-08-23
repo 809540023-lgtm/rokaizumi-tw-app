@@ -132,6 +132,7 @@ export type InsertCartItem = typeof cartItems.$inferInsert;
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull().references(() => users.id),
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }).unique(),
   totalAmount: int("totalAmount").notNull(),
   status: mysqlEnum("status", ["pending", "paid", "shipped", "completed", "cancelled"]).default("pending").notNull(),
   shippingAddress: text("shippingAddress").notNull(),
@@ -244,6 +245,50 @@ export const announcements = mysqlTable("announcements", {
 
 export type Announcement = typeof announcements.$inferSelect;
 export type InsertAnnouncement = typeof announcements.$inferInsert;
+
+export const newsletterSubscribers = mysqlTable("newsletter_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  source: varchar("source", { length: 50 }).default("web"),
+  couponCode: varchar("coupon_code", { length: 50 }),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type InsertNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
+
+export const b2bInquiries = mysqlTable("b2b_inquiries", {
+  id: int("id").autoincrement().primaryKey(),
+  company: varchar("company", { length: 255 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  email: varchar("email", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(),
+  monthlyBudget: varchar("monthly_budget", { length: 50 }).notNull(),
+  message: text("message"),
+  status: varchar("status", { length: 20 }).default("new").notNull(),
+  internalNote: text("internal_note"),
+  assignedTo: int("assigned_to"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type B2bInquiry = typeof b2bInquiries.$inferSelect;
+export type InsertB2bInquiry = typeof b2bInquiries.$inferInsert;
+
+export const productReviews = mysqlTable("product_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  productId: int("product_id").notNull(),
+  userId: int("user_id").notNull(),
+  rating: int("rating").notNull(),
+  title: varchar("title", { length: 255 }),
+  body: text("body").notNull(),
+  status: varchar("status", { length: 20 }).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type ProductReview = typeof productReviews.$inferSelect;
+export type InsertProductReview = typeof productReviews.$inferInsert;
 
 // API Keys table for external integrations (e.g., OpenClaw)
 export const apiKeys = mysqlTable("apiKeys", {

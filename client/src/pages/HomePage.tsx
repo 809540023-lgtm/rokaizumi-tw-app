@@ -12,7 +12,7 @@ import { useLocation as useWouterLocation } from 'wouter';
 import { MobileMenu } from '@/components/MobileMenu';
 import { HeroSection } from '@/components/HeroSection';
 import { useProductsFallback } from '../hooks/useProductsFallback';
-import { useCart } from '../hooks/useCart';
+import { MAX_CART_QUANTITY, useCart } from '../hooks/useCart';
 import { ProductImage } from '@/components/ProductImage';
 
 export default function HomePage() {
@@ -45,12 +45,12 @@ export default function HomePage() {
     { enabled: searchQuery.length > 0 && isSearching }
   );
 
-  const { add: addToCart } = useCart();
+  const { add: addToCart, itemCount } = useCart();
 
-  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string }) => {
+  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
     const quantity = quantities[product.id] || 1;
     addToCart(
-      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl },
+      { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? undefined },
       quantity
     );
     toast.success(t('cart.addSuccess') || '已加入購物車');
@@ -111,7 +111,7 @@ export default function HomePage() {
     const relevantCategories = selectedCategory === 'hundred' ? japaneseCategories : elderlyCareCategories;
 
     // 支援兩種產品結構：API products (categoryId) 和 fallback products (category)
-    return products.filter(product => {
+    return products.filter((product: { categoryId?: number; category?: string }) => {
       if (product.categoryId !== undefined) {
         // API products - 使用 categoryId
         const categoryIds = relevantCategories.map(cat => cat.id);
@@ -150,10 +150,26 @@ export default function HomePage() {
               <nav className="hidden md:flex gap-6">
                 <Link href="/" className="text-[#0ABAB5] font-semibold">{t('nav.home')}</Link>
                 <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
+                <Link href="/cart" className="flex items-center gap-1 text-gray-700 hover:text-[#0ABAB5]" aria-label={`購物車，${itemCount} 件商品`}>
+                  <ShoppingCart className="h-4 w-4" />
+                  {t('nav.cart')}
+                  {itemCount > 0 && <span className="rounded-full bg-[#0ABAB5] px-1.5 text-xs text-white">{itemCount > 99 ? '99+' : itemCount}</span>}
+                </Link>
               </nav>
               <div className="flex items-center gap-2 md:gap-3">
                 <MobileMenu />
+                <Link
+                  href="/cart"
+                  className="relative rounded-lg p-2 text-[#089B96] hover:bg-[#0ABAB5]/10"
+                  aria-label={`購物車，${itemCount} 件商品`}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#DC2626] px-1 text-center text-[10px] font-bold leading-5 text-white">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
+                </Link>
                 <Button
                   variant="outline"
                   size="sm"
@@ -197,7 +213,7 @@ export default function HomePage() {
       {isMarqueeVisible && announcements.length > 0 && (
         <div className="bg-gradient-to-r from-[#0ABAB5] to-[#089B96] text-white py-2 overflow-hidden relative">
           <div className="animate-marquee whitespace-nowrap pr-12">
-            {announcements.map((announcement, index) => {
+            {announcements.map((announcement: { id: number; contentZh: string; contentJa?: string | null; contentEn?: string | null }, index: number) => {
               const content = (language === 'zh' || language === 'cn')
                 ? announcement.contentZh
                 : language === 'ja'
@@ -209,7 +225,7 @@ export default function HomePage() {
                 </span>
               );
             })}
-            {announcements.map((announcement, index) => {
+            {announcements.map((announcement: { id: number; contentZh: string; contentJa?: string | null; contentEn?: string | null }, index: number) => {
               const content = (language === 'zh' || language === 'cn')
                 ? announcement.contentZh
                 : language === 'ja'
@@ -323,10 +339,12 @@ export default function HomePage() {
                       <input
                         type="number"
                         min="1"
+                        max={MAX_CART_QUANTITY}
+                        aria-label={`${product.name} 的數量`}
                         value={quantities[product.id] || 1}
                         onChange={(e) => setQuantities(prev => ({
                           ...prev,
-                          [product.id]: Math.max(1, parseInt(e.target.value) || 1)
+                          [product.id]: Math.min(MAX_CART_QUANTITY, Math.max(1, parseInt(e.target.value) || 1))
                         }))}
                         className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />
@@ -396,10 +414,12 @@ export default function HomePage() {
                       <input
                         type="number"
                         min="1"
+                        max={MAX_CART_QUANTITY}
+                        aria-label={`${product.name} 的數量`}
                         value={quantities[product.id] || 1}
                         onChange={(e) => setQuantities(prev => ({
                           ...prev,
-                          [product.id]: Math.max(1, parseInt(e.target.value) || 1)
+                          [product.id]: Math.min(MAX_CART_QUANTITY, Math.max(1, parseInt(e.target.value) || 1))
                         }))}
                         className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />

@@ -2,6 +2,15 @@ import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { useState } from 'react';
 
+interface TripVideo {
+  id: number;
+  title: string;
+  description: string | null;
+  videoUrl: string;
+  thumbnailUrl: string;
+  uploadedAt: Date;
+}
+
 export default function TripVideos() {
   const { data: trips } = trpc.trips.list.useQuery();
   const { data: allVideos } = trpc.tripVideos.list.useQuery();
@@ -13,7 +22,7 @@ export default function TripVideos() {
     videos: allVideos?.filter(v => v.tripId === trip.id) || []
   })).filter(group => group.videos.length > 0);
 
-  const handleShare = async (video: any) => {
+  const handleShare = async (video: TripVideo) => {
     const shareData = {
       title: video.title,
       text: video.description || '',

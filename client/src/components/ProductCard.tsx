@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
-import { Heart, ShoppingCart, Eye, Star } from 'lucide-react';
+import { ShoppingCart, Eye, Star } from 'lucide-react';
+import { formatPrice, type PriceLanguage } from '@/lib/price';
 
 interface Product {
   id: number;
@@ -15,17 +16,8 @@ interface Product {
 
 interface Props {
   product: Product;
-  language: 'zh' | 'en' | 'ja';
-  quantity: number;
-  onQuantityChange: (q: number) => void;
+  language: PriceLanguage;
   onAddToCart: () => void;
-}
-
-/** 幣別與顯示 */
-function formatPrice(price: number, language: 'zh' | 'en' | 'ja'): string {
-  if ((language === 'zh' || language === 'cn')) return `NT$ ${Math.round(price).toLocaleString()}`;
-  if (language === 'ja') return `¥ ${Math.round(price * 4.5).toLocaleString()}`;
-  return `$ ${(price * 0.031).toFixed(2)}`;
 }
 
 export function ProductCard({
@@ -41,7 +33,8 @@ export function ProductCard({
   return (
     <article className="group bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(10,186,181,0.14)] hover:-translate-y-1 transition-all flex flex-col">
       {/* 圖片區 */}
-      <Link href={`/product/${product.id}`} className="block relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative">
+        <Link href={`/product/${product.id}`} className="block relative aspect-square bg-gray-100 overflow-hidden">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -71,15 +64,8 @@ export function ProductCard({
             </div>
           )}
 
-          {/* 收藏按鈕 */}
-          <button
-            className="absolute bottom-3 right-3 w-9 h-9 bg-white/95 rounded-full flex items-center justify-center text-gray-400 hover:text-[#DC2626] hover:bg-white shadow"
-            title="加入收藏"
-            onClick={e => e.preventDefault()}
-          >
-            <Heart className="w-4 h-4" />
-          </button>
         </Link>
+      </div>
 
       {/* 內容區 */}
       <div className="p-4 flex flex-col flex-1">
@@ -122,6 +108,7 @@ export function ProductCard({
               <Eye className="w-3.5 h-3.5" /> 詳情
             </Link>
           <button
+            type="button"
             onClick={onAddToCart}
             className="flex-1 flex items-center justify-center gap-1.5 bg-[#DC2626] hover:bg-[#B91C1C] text-white px-2 py-2 rounded-lg text-xs font-bold transition-colors"
           >

@@ -60,12 +60,12 @@ export default function B2B() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const submitInquiry = (trpc as any).b2bInquiries?.create?.useMutation?.({
+  const submitInquiry = trpc.b2bInquiries.create.useMutation({
     onSuccess: () => {
       toast.success('已收到您的詢價，業務 1 個工作天內聯繫您');
       setForm({ company: '', name: '', phone: '', email: '', type: '長照中心', monthlyBudget: '5-10 萬', message: '' });
     },
-    onError: (e: any) => toast.error(e.message || '送出失敗，請稍後再試'),
+    onError: (e) => toast.error(e.message || '送出失敗，請稍後再試'),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -237,7 +237,15 @@ export default function B2B() {
 }
 
 /* ---------- 表單元件 ---------- */
-function Field({ label, value, onChange, required, type = 'text' }: any) {
+interface FieldProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  type?: React.HTMLInputTypeAttribute;
+}
+
+function Field({ label, value, onChange, required, type = 'text' }: FieldProps) {
   return (
     <div>
       <label className="block text-sm font-bold mb-1.5">
@@ -254,7 +262,14 @@ function Field({ label, value, onChange, required, type = 'text' }: any) {
   );
 }
 
-function Select({ label, value, onChange, options }: any) {
+interface SelectProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+}
+
+function Select({ label, value, onChange, options }: SelectProps) {
   return (
     <div>
       <label className="block text-sm font-bold mb-1.5">{label}</label>

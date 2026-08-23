@@ -1,7 +1,7 @@
 import { eq, desc, and, gte, lt, lte, avg, sql, or, like } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
-import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog } from '../drizzle/schema';
+import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type Announcement, type ApiLog, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog, type Order, type Product, type Review, type Trip, type TripVideo } from '../drizzle/schema';
 import { ENV } from './_core/env';
 import {
   initializeFallbackDB,
@@ -18,6 +18,22 @@ import {
 let pool: any;
 let db: any;
 let isDbConnected = false;
+
+export type ProductListItem = Pick<
+  Product,
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'price'
+  | 'categoryId'
+  | 'imageUrl'
+  | 'images'
+  | 'status'
+  | 'stock'
+  | 'lowStockThreshold'
+>;
+
+export type CategoryListItem = Pick<typeof categories.$inferSelect, 'id' | 'name'>;
 
 // 靜態資料一律先載入。mysql.createPool() 是延遲連線、不會在這裡拋錯，
 // 所以「資料庫是否真的能用」只有等第一個查詢跑下去才知道；
@@ -104,8 +120,8 @@ export { db, isDbConnected };
 
 
 // ========== Categories ==========
-export async function getAllCategories() {
-  return await withFallback(
+export async function getAllCategories(): Promise<CategoryListItem[]> {
+  return withFallback<CategoryListItem[]>(
     () => db.select().from(categories).orderBy(categories.name),
     () => getFallbackCategories()
   );
@@ -127,8 +143,8 @@ export async function createCategory(data: InsertCategory) {
 }
 
 // ========== Products ==========
-export async function getAllProducts() {
-  return await withFallback(
+export async function getAllProducts(): Promise<ProductListItem[]> {
+  return withFallback<ProductListItem[]>(
     () => db.select().from(products).orderBy(desc(products.createdAt)),
     () => getFallbackProducts()
   );
@@ -282,7 +298,7 @@ export async function getProductsWithLowStock(threshold?: number) {
 }
 
 // ========== Trips ==========
-export async function getAllTrips() {
+export async function getAllTrips(): Promise<Trip[]> {
   return await db.select().from(trips).orderBy(desc(trips.tripDate));
 }
 
@@ -307,7 +323,7 @@ export async function deleteTrip(id: number) {
 }
 
 // ========== Trip Videos ==========
-export async function getAllTripVideos() {
+export async function getAllTripVideos(): Promise<TripVideo[]> {
   return await db.select().from(tripVideos).orderBy(desc(tripVideos.uploadedAt));
 }
 
@@ -315,7 +331,7 @@ export async function getTripVideosByTripId(tripId: number) {
   return await db.select().from(tripVideos).where(eq(tripVideos.tripId, tripId)).orderBy(desc(tripVideos.uploadedAt));
 }
 
-export async function getLatestVideos(limit: number = 10) {
+export async function getLatestVideos(limit: number = 10): Promise<TripVideo[]> {
   return await db.select().from(tripVideos).orderBy(desc(tripVideos.uploadedAt)).limit(limit);
 }
 
@@ -360,13 +376,18 @@ export async function addToCart(data: InsertCartItem) {
   }
 }
 
-export async function updateCartItemQuantity(id: number, quantity: number) {
-  const result = await db.update(cartItems).set({ quantity, updatedAt: new Date() }).where(eq(cartItems.id, id));
+export async function updateCartItemQuantity(userId: number, id: number, quantity: number) {
+  const result = await db
+    .update(cartItems)
+    .set({ quantity, updatedAt: new Date() })
+    .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)));
   return result;
 }
 
-export async function removeCartItem(id: number) {
-  const result = await db.delete(cartItems).where(eq(cartItems.id, id));
+export async function removeCartItem(userId: number, id: number) {
+  const result = await db
+    .delete(cartItems)
+    .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)));
   return result;
 }
 
@@ -402,6 +423,46 @@ export async function getOrderById(id: number) {
     ...order[0],
     items,
   };
+}
+
+export async function getOrderByIdForUser(id: number, userId: number) {
+  const order = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.id, id), eq(orders.userId, userId)))
+    .limit(1);
+  if (order.length === 0) return null;
+
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+  return { ...order[0], items };
+}
+
+export async function getOrderByStripeSessionIdForUser(stripeSessionId: string, userId: number) {
+  const order = await db
+    .select()
+    .from(orders)
+    .where(and(eq(orders.stripeSessionId, stripeSessionId), eq(orders.userId, userId)))
+    .limit(1);
+  if (order.length === 0) return null;
+
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order[0].id));
+  return { ...order[0], items };
+}
+
+export async function setOrderStripeSessionId(orderId: number, stripeSessionId: string) {
+  await db.update(orders).set({ stripeSessionId }).where(eq(orders.id, orderId));
+}
+
+export async function markOrderPaidByStripeSessionId(stripeSessionId: string) {
+  return db
+    .update(orders)
+    .set({ status: 'paid' })
+    .where(
+      and(
+        eq(orders.stripeSessionId, stripeSessionId),
+        eq(orders.status, 'pending')
+      )
+    );
 }
 
 export async function createTripVideo(data: InsertTripVideo) {
@@ -458,7 +519,7 @@ export async function upsertUser(data: { openId: string; name?: string | null; e
 }
 
 // ========== Reviews ==========
-export async function getReviewsByProductId(productId: number) {
+export async function getReviewsByProductId(productId: number): Promise<Review[]> {
   return await db.select().from(reviews).where(eq(reviews.productId, productId)).orderBy(desc(reviews.createdAt));
 }
 
@@ -482,7 +543,7 @@ export async function deleteReview(id: number) {
   return result;
 }
 
-export async function getAverageRating(productId: number) {
+export async function getAverageRating(productId: number): Promise<number> {
   const result = await db.select({ avgRating: avg(reviews.rating) }).from(reviews).where(eq(reviews.productId, productId));
   return result[0]?.avgRating || 0;
 }
@@ -532,7 +593,7 @@ export async function getTodayRevenue() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const result = await db.select().from(orders)
+  const result: Order[] = await db.select().from(orders)
     .where(and(
       gte(orders.createdAt, today),
       lt(orders.createdAt, tomorrow),
@@ -556,7 +617,7 @@ export async function getMonthRevenue() {
   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   lastDay.setHours(23, 59, 59, 999);
 
-  const result = await db.select().from(orders)
+  const result: Order[] = await db.select().from(orders)
     .where(and(
       gte(orders.createdAt, firstDay),
       lte(orders.createdAt, lastDay),
@@ -575,7 +636,7 @@ export async function getMonthRevenue() {
  * Get all orders with financial details
  */
 export async function getAllOrdersWithDetails() {
-  const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
+  const allOrders: Order[] = await db.select().from(orders).orderBy(desc(orders.createdAt));
   
   return Promise.all(allOrders.map(async (order) => {
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
@@ -606,7 +667,7 @@ export async function getFinancialMetrics(exchangeRateUSDtoTWD: number = 30) {
   const monthData = await getMonthRevenue();
   
   // Get all paid orders for total profit calculation
-  const allPaidOrders = await db.select().from(orders)
+  const allPaidOrders: Order[] = await db.select().from(orders)
     .where(eq(orders.status, 'paid'));
   
   const totalRevenueUSD = allPaidOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0) / 100;
@@ -680,7 +741,7 @@ export async function createLocalUser(data: {
 
 
 // ========== Announcements ==========
-export async function getActiveAnnouncements() {
+export async function getActiveAnnouncements(): Promise<Announcement[]> {
   const now = new Date();
   return await db.select().from(announcements)
     .where(
@@ -699,7 +760,7 @@ export async function getActiveAnnouncements() {
     .orderBy(desc(announcements.priority), desc(announcements.createdAt));
 }
 
-export async function getAllAnnouncements() {
+export async function getAllAnnouncements(): Promise<Announcement[]> {
   return await db.select().from(announcements).orderBy(desc(announcements.createdAt));
 }
 
@@ -790,7 +851,7 @@ export async function deleteOldApiLogs(daysOld: number = 30) {
 }
 
 export async function getApiLogs(limit: number = 20, offset: number = 0) {
-  const logs = await db.select()
+  const logs: ApiLog[] = await db.select()
     .from(apiLogs)
     .orderBy(desc(apiLogs.createdAt))
     .limit(limit)
@@ -817,7 +878,7 @@ export async function getApiStats() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const todayLogs = await db.select()
+  const todayLogs: ApiLog[] = await db.select()
     .from(apiLogs)
     .where(gte(apiLogs.createdAt, today));
   

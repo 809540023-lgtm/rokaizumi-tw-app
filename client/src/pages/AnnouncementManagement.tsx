@@ -35,6 +35,17 @@ interface AnnouncementFormData {
   endDate: string;
 }
 
+interface Announcement {
+  id: number;
+  contentZh: string;
+  contentEn: string | null;
+  contentJa: string | null;
+  isActive: boolean;
+  priority: number;
+  startDate: Date | string | null;
+  endDate: Date | string | null;
+}
+
 const defaultFormData: AnnouncementFormData = {
   contentZh: '',
   contentEn: '',
@@ -101,7 +112,7 @@ export default function AnnouncementManagement() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const data: any = {
+    const data = {
       contentZh: formData.contentZh,
       contentEn: formData.contentEn || undefined,
       contentJa: formData.contentJa || undefined,
@@ -118,7 +129,7 @@ export default function AnnouncementManagement() {
     }
   };
 
-  const handleEdit = (announcement: any) => {
+  const handleEdit = (announcement: Announcement) => {
     setEditingId(announcement.id);
     setFormData({
       contentZh: announcement.contentZh || '',

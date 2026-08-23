@@ -47,7 +47,7 @@ export default function AIChat() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setInput('');
 
-    chatMutation.mutate({ message: userMessage, language });
+    chatMutation.mutate({ message: userMessage, language: language === 'cn' ? 'zh' : language });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

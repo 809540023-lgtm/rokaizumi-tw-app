@@ -56,7 +56,7 @@ export function registerAiRoutes(app: Express) {
       const body = await readJsonBody(req);
       let imageBase64: string = String(body.imageBase64 || "");
       let mediaType: string = String(body.mediaType || "image/jpeg");
-      const dm = imageBase64.match(/^data:([^;]+);base64,(.*)$/s);
+      const dm = imageBase64.match(/^data:([^;]+);base64,([\s\S]*)$/);
       if (dm) {
         mediaType = dm[1];
         imageBase64 = dm[2];

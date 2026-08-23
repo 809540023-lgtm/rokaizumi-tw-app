@@ -4,18 +4,23 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Globe, ArrowLeft, Loader2, Save, Heart, ShoppingCart, Trash2, Share2, Facebook, Twitter, MessageCircle } from 'lucide-react';
+import { Loader2, Save, Heart, ShoppingCart, Trash2, Share2, Facebook, Twitter, MessageCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
+import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/price';
+import { ProductImage } from '@/components/ProductImage';
+import { SiteHeader } from '@/components/SiteHeader';
 
 export default function Profile() {
-  const [, setLocation] = useLocation();
-  const { language, setLanguage, t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { language } = useLanguage();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { add: addToCart } = useCart();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'wishlist'>('profile');
+  const [sharedWishlistId, setSharedWishlistId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -40,12 +45,6 @@ export default function Profile() {
     },
   });
 
-  const addToCartMutation = trpc.cart.add.useMutation({
-    onSuccess: () => {
-      toast.success((language === 'zh' || language === 'cn') ? '已添加到購物車' : 'Added to cart');
-    },
-  });
-
   useEffect(() => {
     if (user) {
       setFormData({
@@ -60,25 +59,6 @@ export default function Profile() {
       });
     }
   }, [user]);
-
-  const toggleLanguage = () => {
-    if ((language === 'zh' || language === 'cn')) {
-      setLanguage('en');
-    } else if (language === 'en') {
-      setLanguage('ja');
-    } else {
-      setLanguage('zh');
-    }
-  };
-
-  const getLanguageLabel = () => {
-    switch (language) {
-      case 'zh': return '中文';
-      case 'en': return 'EN';
-      case 'ja': return '日本語';
-      default: return '中文';
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -105,12 +85,19 @@ export default function Profile() {
     removeFromWishlistMutation.mutate({ productId });
   };
 
-  const handleAddToCart = (productId: number) => {
-    addToCartMutation.mutate({ productId, quantity: 1 });
+  const handleAddToCart = (product?: { id?: number; name?: string; price?: number; imageUrl?: string | null }) => {
+    if (!product || !product.id || !product.name || typeof product.price !== 'number') return;
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl || undefined,
+    });
+    toast.success((language === 'zh' || language === 'cn') ? '已添加到購物車' : 'Added to cart');
   };
 
   const handleShare = (productId: number, productName: string) => {
-    const productUrl = `${window.location.origin}/products?id=${productId}`;
+    const productUrl = `${window.location.origin}/product/${productId}`;
     const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
@@ -127,57 +114,56 @@ export default function Profile() {
         // Fallback if user cancels
       });
     } else {
-      // Fallback: show share options
-      toast.info((language === 'zh' || language === 'cn') ? '複製了產品連結' : 'Product link copied');
-      navigator.clipboard.writeText(productUrl);
+      if (!navigator.clipboard) {
+        toast.error((language === 'zh' || language === 'cn') ? '此瀏覽器無法複製連結' : 'Copying links is not supported by this browser');
+        return;
+      }
+      navigator.clipboard.writeText(productUrl)
+        .then(() => toast.success((language === 'zh' || language === 'cn') ? '已複製產品連結' : 'Product link copied'))
+        .catch(() => toast.error((language === 'zh' || language === 'cn') ? '無法複製產品連結' : 'Could not copy product link'));
     }
   };
 
   const handleShareToFacebook = (productId: number, productName: string) => {
-    const productUrl = `${window.location.origin}/products?id=${productId}`;
+    const productUrl = `${window.location.origin}/product/${productId}`;
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    window.open(facebookUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
   const handleShareToTwitter = (productId: number, productName: string) => {
-    const productUrl = `${window.location.origin}/products?id=${productId}`;
+    const productUrl = `${window.location.origin}/product/${productId}`;
     const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
       ? `Check out this product: ${productName}`
       : `この商品をチェック：${productName}`;
     const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(productUrl)}&text=${encodeURIComponent(shareText)}`;
-    window.open(twitterUrl, '_blank', 'width=600,height=400');
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
   const handleShareToLine = (productId: number, productName: string) => {
-    const productUrl = `${window.location.origin}/products?id=${productId}`;
+    const productUrl = `${window.location.origin}/product/${productId}`;
     const shareText = (language === 'zh' || language === 'cn') 
       ? `看看這個商品：${productName}` 
       : language === 'en'
       ? `Check out this product: ${productName}`
       : `この商品をチェック：${productName}`;
     const lineUrl = `https://line.me/R/msg/0/?${encodeURIComponent(shareText + ' ' + productUrl)}`;
-    window.open(lineUrl, '_blank');
+    window.open(lineUrl, '_blank', 'noopener,noreferrer');
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#fef9f3] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0ABAB5]" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#fef9f3]">
-        <header className="bg-white shadow-sm sticky top-0 z-10">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    ろ
-                  </div>
-                  <span className="text-2xl font-bold text-[#0ABAB5]">
-                    {t('home.company')}
-                  </span>
-                </Link>
-            </div>
-          </div>
-        </header>
+        <SiteHeader />
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold mb-4">
             {(language === 'zh' || language === 'cn') ? '請先登入' : 'Please log in first'}
@@ -192,41 +178,10 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  ろ
-                </div>
-                <span className="text-2xl font-bold text-[#0ABAB5]">
-                  {t('home.company')}
-                </span>
-              </Link>
-            <div className="flex items-center gap-6">
-              <nav className="flex gap-6">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
-                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
-              </nav>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleLanguage}
-                className="flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                {getLanguageLabel()}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Profile Content */}
-      <div className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Tabs */}
           <div className="flex gap-4 mb-8 border-b border-gray-200">
@@ -432,21 +387,23 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {wishlistData.map((item: any) => (
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <div className="aspect-square bg-gray-200 flex items-center justify-center text-4xl">
-                        📦
-                      </div>
+                      <ProductImage
+                        src={item.wishlists_product?.imageUrl}
+                        alt={item.wishlists_product?.name || 'Product'}
+                        className="aspect-square w-full bg-white object-contain p-3"
+                      />
                       <div className="p-4">
                         <h3 className="font-semibold text-lg mb-2 line-clamp-2">
                           {item.wishlists_product?.name || 'Product'}
                         </h3>
                         <p className="text-[#0ABAB5] font-bold text-lg mb-4">
-                          ¥{item.wishlists_product?.price || 0}
+                          {formatPrice(item.wishlists_product?.price || 0, language)}
                         </p>
                         <div className="flex flex-col gap-2">
                           <Button
-                            onClick={() => handleAddToCart(item.wishlists_product?.id)}
+                            onClick={() => handleAddToCart(item.wishlists_product)}
                             className="w-full bg-[#0ABAB5] hover:bg-[#089B96] text-white flex items-center justify-center gap-2"
-                            disabled={addToCartMutation.isPending}
+                            disabled={!item.wishlists_product?.id}
                           >
                             <ShoppingCart className="w-4 h-4" />
                             {(language === 'zh' || language === 'cn') ? '加入購物車' : 'Add to Cart'}
@@ -460,13 +417,23 @@ export default function Profile() {
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="outline"
-                              className="flex-1 relative group"
-                            >
-                              <Share2 className="w-4 h-4" />
-                              <div className="absolute bottom-full right-0 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 w-48">
+                            <div className="relative flex-1">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full"
+                                disabled={!item.wishlists_product?.id}
+                                aria-haspopup="menu"
+                                aria-expanded={sharedWishlistId === item.id}
+                                onClick={() => setSharedWishlistId(openId => openId === item.id ? null : item.id)}
+                              >
+                                <Share2 className="w-4 h-4" />
+                              </Button>
+                              {sharedWishlistId === item.id && (
+                                <div className="absolute bottom-full right-0 z-10 mb-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg" role="menu">
                                 <button
+                                  type="button"
+                                  role="menuitem"
                                   onClick={() => handleShareToFacebook(item.wishlists_product?.id, item.wishlists_product?.name)}
                                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                                 >
@@ -474,6 +441,8 @@ export default function Profile() {
                                   <span className="text-sm">Facebook</span>
                                 </button>
                                 <button
+                                  type="button"
+                                  role="menuitem"
                                   onClick={() => handleShareToTwitter(item.wishlists_product?.id, item.wishlists_product?.name)}
                                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                                 >
@@ -481,6 +450,8 @@ export default function Profile() {
                                   <span className="text-sm">Twitter</span>
                                 </button>
                                 <button
+                                  type="button"
+                                  role="menuitem"
                                   onClick={() => handleShareToLine(item.wishlists_product?.id, item.wishlists_product?.name)}
                                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-200"
                                 >
@@ -488,14 +459,17 @@ export default function Profile() {
                                   <span className="text-sm">LINE</span>
                                 </button>
                                 <button
+                                  type="button"
+                                  role="menuitem"
                                   onClick={() => handleShare(item.wishlists_product?.id, item.wishlists_product?.name)}
                                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
                                 >
                                   <Share2 className="w-4 h-4 text-gray-600" />
                                   <span className="text-sm">{(language === 'zh' || language === 'cn') ? '更多' : 'More'}</span>
                                 </button>
-                              </div>
-                            </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -506,7 +480,7 @@ export default function Profile() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

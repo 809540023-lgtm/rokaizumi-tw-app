@@ -18,24 +18,35 @@ export type PriceLanguage = 'zh' | 'cn' | 'ja' | 'en';
 
 /** 把日圓價格換算成該語言對應的幣別字串 */
 export function formatPrice(priceJpy: number, language: string): string {
-  const jpy = Math.max(0, Math.round(priceJpy || 0));
+  const jpy = Number.isFinite(priceJpy) ? Math.max(0, Math.round(priceJpy)) : 0;
 
   switch (language) {
     case 'ja':
       // 本來就是日圓，不需換算
-      return `¥${jpy.toLocaleString('ja-JP')}`;
+      return new Intl.NumberFormat('ja-JP', {
+        style: 'currency',
+        currency: 'JPY',
+        maximumFractionDigits: 0,
+      }).format(jpy);
     case 'en':
-      return `$${(jpy * JPY_TO_USD).toFixed(2)}`;
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(jpy * JPY_TO_USD);
     case 'zh':
     case 'cn':
     default:
-      return `NT$${Math.round(jpy * JPY_TO_TWD).toLocaleString('zh-TW')}`;
+      return new Intl.NumberFormat('zh-TW', {
+        style: 'currency',
+        currency: 'TWD',
+        maximumFractionDigits: 0,
+      }).format(Math.round(jpy * JPY_TO_TWD));
   }
 }
 
 /** 只要數值不要幣別符號（例如計算小計時） */
 export function convertPrice(priceJpy: number, language: string): number {
-  const jpy = Math.max(0, priceJpy || 0);
+  const jpy = Number.isFinite(priceJpy) ? Math.max(0, priceJpy) : 0;
   if (language === 'ja') return Math.round(jpy);
   if (language === 'en') return Number((jpy * JPY_TO_USD).toFixed(2));
   return Math.round(jpy * JPY_TO_TWD);

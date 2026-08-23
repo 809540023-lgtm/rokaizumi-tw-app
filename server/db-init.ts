@@ -55,5 +55,5 @@ export async function initializeDatabase() {
 export async function getDb() {
   await initializeDatabase();
   const pool = mysql.createPool(ENV.databaseUrl);
-  return drizzle(pool, { schema });
+  return drizzle(pool, { schema, mode: 'default' });
 }

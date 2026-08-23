@@ -39,7 +39,7 @@ export async function apiKeyAuth(req: Request, res: Response, next: NextFunction
     // 檢查 IP 白名單
     if (keyRecord.ipWhitelist) {
       const clientIp = getClientIp(req);
-      const allowedIps = keyRecord.ipWhitelist.split(',').map(ip => ip.trim());
+      const allowedIps = keyRecord.ipWhitelist.split(',').map((ip: string) => ip.trim());
 
       if (!allowedIps.includes(clientIp)) {
         await createApiLog({

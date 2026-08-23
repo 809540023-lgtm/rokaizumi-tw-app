@@ -4,10 +4,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Globe, ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/_core/hooks/useAuth';
 import { useMemo } from 'react';
+import { useCart } from '@/hooks/useCart';
+import { ProductImage } from '@/components/ProductImage';
+import { SiteHeader } from '@/components/SiteHeader';
 
 // 定義分類映射
 const ELDERLY_SUBCATEGORIES = ['健康監測', '安全監控', '床邊照護', '復健器材', '行動輔助', '衛浴安全', '護理用品', '生活輔具'];
@@ -16,50 +18,24 @@ const ELDERLY_MAIN_CATEGORY = '銀髮生活品質加乘輔具';
 const JAPANESE_MAIN_CATEGORY = '日本精美小商品';
 
 export default function CategoryProducts() {
-  const [match, params] = useRoute('/products/:categoryId');
+  const [, params] = useRoute('/products/:categoryId');
   const [, setLocation] = useLocation();
-  const { language, setLanguage, t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { language, t } = useLanguage();
+  const { add: addToCart } = useCart();
   
   const categoryType = params?.categoryId; // 'elderly' or 'japanese'
   
   const { data: categories = [] } = trpc.categories.list.useQuery();
   const { data: products = [] } = trpc.products.list.useQuery();
   
-  const addToCartMutation = trpc.cart.add.useMutation({
-    onSuccess: () => {
-      toast.success(t('cart.addSuccess') || '已加入購物車');
-    },
-    onError: (error: any) => {
-      toast.error(error.message || '加入購物車失敗');
-    },
-  });
-
-  const toggleLanguage = () => {
-    if ((language === 'zh' || language === 'cn')) {
-      setLanguage('en');
-    } else if (language === 'en') {
-      setLanguage('ja');
-    } else {
-      setLanguage('zh');
-    }
-  };
-
-  const getLanguageLabel = () => {
-    switch (language) {
-      case 'zh': return '中文';
-      case 'en': return 'EN';
-      case 'ja': return '日本語';
-      default: return '中文';
-    }
-  };
-
-  const handleAddToCart = (productId: number) => {
-    if (!isAuthenticated) {
-      toast.error('請先登入');
-      return;
-    }
-    addToCartMutation.mutate({ productId, quantity: 1 });
+  const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl || undefined,
+    });
+    toast.success(t('cart.addSuccess') || '已加入購物車');
   };
 
   // 根據 categoryType 獲取所有相關分類 ID（包含主分類和子分類）
@@ -96,7 +72,7 @@ export default function CategoryProducts() {
   // 篩選該分類下的所有商品
   const filteredProducts = useMemo(() => {
     if (relevantCategoryIds.length === 0) return [];
-    return products.filter(product => relevantCategoryIds.includes(product.categoryId));
+    return products.filter(product => product.categoryId != null && relevantCategoryIds.includes(product.categoryId));
   }, [relevantCategoryIds, products]);
 
   // 獲取分類標題
@@ -111,40 +87,10 @@ export default function CategoryProducts() {
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                  ろ
-                </div>
-                <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
-                  {t('home.company')}
-                </span>
-              </Link>
-            <div className="flex items-center gap-6">
-              <nav className="flex gap-6">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.cart')}</Link>
-              </nav>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleLanguage}
-                className="flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                {getLanguageLabel()}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-8 sm:py-12">
         {/* Back Button */}
         <Button
           variant="outline"
@@ -157,7 +103,7 @@ export default function CategoryProducts() {
 
         {/* Category Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 sm:text-4xl">
             {getCategoryTitle()}
           </h1>
           <p className="text-xl text-gray-600">
@@ -176,30 +122,32 @@ export default function CategoryProducts() {
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                 <Link href={`/product/${product.id}`} className="block">
                     <div className="relative">
-                      <img
-                        src={product.imageUrl || 'https://placehold.co/400x300?text=Product'}
+                      <ProductImage
+                        src={product.imageUrl}
                         alt={product.name}
                         className="w-full aspect-square bg-white object-contain p-3 hover:scale-105 transition-transform"
                       />
                     </div>
                   </Link>
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                   <Link href={`/product/${product.id}`} className="block">
-                      <h3 className="text-lg font-bold text-gray-800 mb-3 hover:text-[#0ABAB5] transition-colors cursor-pointer line-clamp-2">
+                      <h3 className="text-sm sm:text-lg font-bold text-gray-800 mb-3 hover:text-[#0ABAB5] transition-colors cursor-pointer line-clamp-2">
                         {product.name}
                       </h3>
                     </Link>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-[#DC2626]">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-lg sm:text-2xl font-bold text-[#DC2626]">
                       {formatPrice(product.price, language)}
                     </span>
                     <Button
-                      onClick={() => handleAddToCart(product.id)}
-                      disabled={addToCartMutation.isPending}
-                      className="bg-[#0ABAB5] hover:bg-[#089B96] text-white"
+                      onClick={() => handleAddToCart(product)}
+                      disabled={product.status !== 'available' || product.stock <= 0}
+                      className="w-full bg-[#0ABAB5] hover:bg-[#089B96] text-white sm:w-auto"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      {t('products.addToCart') || '加入購物車'}
+                      {product.status !== 'available' || product.stock <= 0
+                        ? ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
+                        : (t('products.addToCart') || '加入購物車')}
                     </Button>
                   </div>
                 </div>

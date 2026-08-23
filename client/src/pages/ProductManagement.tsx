@@ -26,11 +26,6 @@ interface Product {
   status: 'available' | 'sold' | 'reserved';
   stock: number;
   lowStockThreshold: number;
-  costJPY?: string | number | null;
-  priceUSD?: string | number | null;
-  profitTWD?: string | number | null;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface Category {

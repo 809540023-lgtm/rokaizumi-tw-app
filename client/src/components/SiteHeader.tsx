@@ -3,6 +3,8 @@ import { Link } from "wouter";
 import { Search, ShoppingCart, Building2, LogIn, LogOut, User, Heart, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const LANGS: { code: "zh" | "cn" | "ja" | "en"; label: string }[] = [
   { code: "zh", label: "繁中" },
@@ -40,7 +42,9 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }: SiteHeaderProps) {
   const [local, setLocal] = useState(searchQuery);
-  const { user, logout } = useAuth() as any;
+  const { user, logout } = useAuth();
+  const { language, setLanguage } = useLanguage();
+  const { itemCount } = useCart();
   const value = onSearchChange ? searchQuery : local;
   const setValue = (v: string) => {
     if (onSearchChange) onSearchChange(v);
@@ -56,6 +60,11 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
     setTimeout(() => {
       window.location.href = "/";
     }, 200);
+  };
+
+  const cycleLanguage = () => {
+    const currentIndex = LANGS.findIndex(lang => lang.code === language);
+    setLanguage(LANGS[(currentIndex + 1) % LANGS.length].code);
   };
 
   return (
@@ -85,8 +94,8 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           />
         </form>
 
-        <nav className="flex items-center gap-2 ml-auto">
-          <div className="hidden md:block">
+        <nav className="ml-auto hidden items-center gap-2 md:flex">
+          <div>
             <LanguageSwitcher />
           </div>
           <Link
@@ -138,11 +147,42 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
 
           <Link
             href="/cart"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold"
+            className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold"
+            aria-label={`購物車，${itemCount} 件商品`}
           >
             <ShoppingCart className="w-4 h-4" /> 購物車
+            {itemCount > 0 && (
+              <span className="min-w-5 rounded-full bg-white px-1.5 py-0.5 text-center text-xs leading-none text-[#089B96]">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </Link>
         </nav>
+        <div className="ml-auto flex items-center gap-1 md:hidden">
+          <button
+            type="button"
+            onClick={cycleLanguage}
+            className="flex items-center gap-1 rounded-lg p-2 text-gray-700 hover:bg-gray-100"
+            aria-label="Change language"
+            title="Change language"
+          >
+            <Globe className="h-4 w-4" />
+            <span className="text-xs font-bold">{LANGS.find(lang => lang.code === language)?.label}</span>
+          </button>
+          <Link
+            href="/cart"
+            className="relative rounded-lg p-2 text-[#089B96] hover:bg-[#0ABAB5]/10"
+            aria-label={`購物車，${itemCount} 件商品`}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-[#DC2626] px-1 text-center text-[10px] font-bold leading-5 text-white">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </Link>
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );

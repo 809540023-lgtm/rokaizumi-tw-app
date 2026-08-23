@@ -1,41 +1,18 @@
 import { Link, useLocation } from 'wouter';
-import { trpc } from '../lib/trpc';
-import { useAuth } from '../_core/hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Loader2, Minus, Plus, Trash2, ShoppingBag, Globe } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
-import { getLoginUrl } from '../const';
-import { useCart } from '@/hooks/useCart';
+import { MAX_CART_QUANTITY, useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/price';
 import { ProductImage } from '@/components/ProductImage';
+import { SiteHeader } from '@/components/SiteHeader';
 
 export default function Cart() {
   const [, setLocation] = useLocation();
-  const { user, loading: authLoading } = useAuth();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, t } = useLanguage();
   // 購物車存在瀏覽器本機，不需要登入也不依賴資料庫
   const { lines: cartItems, setQuantity, remove, total: totalAmount } = useCart();
-  const isLoading = false;
-
-  const toggleLanguage = () => {
-    if ((language === 'zh' || language === 'cn')) {
-      setLanguage('en');
-    } else if (language === 'en') {
-      setLanguage('ja');
-    } else {
-      setLanguage('zh');
-    }
-  };
-
-  const getLanguageLabel = () => {
-    switch (language) {
-      case 'zh': return '中文';
-      case 'en': return 'EN';
-      case 'ja': return '日本語';
-      default: return '中文';
-    }
-  };
 
   const handleUpdateQuantity = (productId: number, currentQuantity: number, delta: number) => {
     const newQuantity = currentQuantity + delta;
@@ -51,58 +28,15 @@ export default function Cart() {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fef9f3]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#0ABAB5]" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#fef9f3]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
-          <div className="flex items-center justify-between gap-2">
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
-                <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-[#0ABAB5] to-[#089B96] rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-xl">
-                  ろ
-                </div>
-                <span className="hidden sm:inline text-2xl font-bold text-[#0ABAB5]">
-                  {t('home.company')}
-                </span>
-              </Link>
-            <div className="flex items-center gap-3 sm:gap-6 shrink-0">
-              <nav className="hidden sm:flex gap-6">
-                <Link href="/" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.home')}</Link>
-                <Link href="/products" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.products')}</Link>
-                <Link href="/videos" className="text-gray-700 hover:text-[#0ABAB5]">{t('nav.videos')}</Link>
-                <Link href="/cart" className="text-[#0ABAB5] font-semibold">{t('nav.cart')}</Link>
-              </nav>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleLanguage}
-                className="flex items-center gap-2"
-              >
-                <Globe className="w-4 h-4" />
-                {getLanguageLabel()}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Cart Content */}
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 text-gray-900">{t('cart.title')}</h1>
+      <main className="container mx-auto px-4 py-8 sm:py-12">
+        <h1 className="mb-6 text-3xl font-bold text-gray-900 sm:mb-8 sm:text-4xl">{t('cart.title')}</h1>
 
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#0ABAB5]" />
-          </div>
-        ) : !cartItems || cartItems.length === 0 ? (
+        {cartItems.length === 0 ? (
           <div className="text-center py-20">
             <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <h2 className="text-2xl font-bold mb-4 text-gray-900">{t('cart.empty')}</h2>
@@ -124,11 +58,16 @@ export default function Cart() {
 
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm sm:text-lg font-bold mb-1.5 sm:mb-2 text-gray-900">
-                        {item.name}
-                      </h3>
+                      <Link href={`/product/${item.productId}`} className="block">
+                        <h2 className="mb-1.5 text-sm font-bold text-gray-900 hover:text-[#0ABAB5] sm:mb-2 sm:text-lg">
+                          {item.name}
+                        </h2>
+                      </Link>
                       <p className="text-lg sm:text-2xl font-bold text-[#DC2626] mb-2 sm:mb-4">
                         {formatPrice(item.price, language)}
+                      </p>
+                      <p className="mb-2 text-sm text-gray-600 sm:hidden">
+                        {t('cart.subtotal')}: <span className="font-semibold text-gray-900">{formatPrice(item.price * item.quantity, language)}</span>
                       </p>
 
                       {/* Quantity Controls */}
@@ -139,17 +78,19 @@ export default function Cart() {
                             size="sm"
                             onClick={() => handleUpdateQuantity(item.productId, item.quantity, -1)}
                             disabled={item.quantity <= 1}
+                            aria-label={`減少 ${item.name} 的數量`}
                           >
                             <Minus className="w-4 h-4" />
                           </Button>
-                          <span className="w-12 text-center font-semibold text-gray-900">
+                          <span className="w-12 text-center font-semibold text-gray-900" aria-live="polite">
                             {item.quantity}
                           </span>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleUpdateQuantity(item.productId, item.quantity, 1)}
-                            
+                            disabled={item.quantity >= MAX_CART_QUANTITY}
+                            aria-label={`增加 ${item.name} 的數量`}
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -159,7 +100,7 @@ export default function Cart() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleRemoveItem(item.productId)}
-                          
+                          aria-label={`${t('cart.remove')} ${item.name}`}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -212,7 +153,7 @@ export default function Cart() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

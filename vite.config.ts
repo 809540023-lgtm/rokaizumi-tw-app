@@ -24,6 +24,25 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("/scheduler/")) {
+            return "react-vendor";
+          }
+          if (id.includes("@trpc") || id.includes("@tanstack/react-query") || id.includes("superjson")) {
+            return "data-vendor";
+          }
+          if (id.includes("@radix-ui") || id.includes("lucide-react") || id.includes("vaul")) {
+            return "ui-vendor";
+          }
+          if (id.includes("recharts") || id.includes("d3-")) {
+            return "charts-vendor";
+          }
+        },
+      },
+    },
   },
   server: {
     host: true,
