@@ -12,6 +12,16 @@ import { MAX_CART_QUANTITY, useCart } from '@/hooks/useCart';
 import { SiteHeader } from '@/components/SiteHeader';
 // ReviewSection removed per user request
 
+const manufacturerPageLine = /^(?:原廠頁面|原厂页面|原廠網站|原厂网站|メーカー(?:サイト|ページ)|公式(?:サイト|ページ)|official (?:page|website)|source url)\s*[:：].*$/i;
+
+function withoutManufacturerPage(value?: string | null) {
+  return value
+    ?.split(/\r?\n/)
+    .filter(line => !manufacturerPageLine.test(line.trim()))
+    .join('\n')
+    .trim();
+}
+
 export default function ProductDetail() {
   const [, params] = useRoute('/product/:productId');
   const { language, t } = useLanguage();
@@ -157,6 +167,8 @@ export default function ProductDetail() {
   const productImages = [product.imageUrl, ...(product.images || [])]
     .filter((image): image is string => typeof image === 'string' && image.length > 0)
     .filter((image, index, images) => images.indexOf(image) === index);
+  const description = withoutManufacturerPage(product.description);
+  const specifications = withoutManufacturerPage(product.specifications);
   const quantityInCart = cartLines.find(line => line.productId === product.id)?.quantity ?? 0;
   const maxQuantity = Math.min(
     MAX_CART_QUANTITY - quantityInCart,
@@ -260,15 +272,13 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              {product.description}
-            </p>
+            {description && <p className="text-gray-700 mb-6 leading-relaxed">{description}</p>}
 
-            {product.specifications && (
+            {specifications && (
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">{(language === 'zh' || language === 'cn') ? '規格' : 'Specifications'}</h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-700 whitespace-pre-wrap">{product.specifications}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{specifications}</p>
                 </div>
               </div>
             )}
