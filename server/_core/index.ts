@@ -34,6 +34,9 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok" });
+  });
   // Stripe requires the untouched request body to verify its webhook signature.
   app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
   // Configure body parser with larger size limit for file uploads
