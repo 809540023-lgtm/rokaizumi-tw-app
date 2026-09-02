@@ -14,7 +14,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 1,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534184212",
@@ -31,7 +37,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 2,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534184311",
@@ -48,7 +60,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 3,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180023",
@@ -67,7 +85,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 4,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1800",
+    "officialQuantity": "(5×40袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "706×461×439mm (重量　14.83kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534184410",
@@ -84,7 +108,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 5,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180078",
@@ -103,7 +133,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 6,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1800",
+    "officialQuantity": "(5×40袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "706×461×439mm (重量　14.83kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180092",
@@ -122,7 +158,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 7,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1800",
+    "officialQuantity": "(5×40袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "706×461×439mm (重量　14.83kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180320",
@@ -141,7 +183,13 @@
     "material": "フタ・取手 PS、本体 PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 8,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1803",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "565×465×537mm (重量　16.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180610",
@@ -160,7 +208,13 @@
     "material": "PP",
     "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
     "sortOrder": 9,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1806",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "615×540×407mm (重量　11.89kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180726",
@@ -179,7 +233,13 @@
     "material": "PP",
     "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
     "sortOrder": 10,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1807",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "625×455×520mm (重量　16.13kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534180818",
@@ -198,7 +258,13 @@
     "material": "PP",
     "assortment": "ペールピンク×1、グレー×2、ホワイト×3",
     "sortOrder": 11,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1808",
+    "officialQuantity": "(6×24袋)144入",
+    "officialPackageSize": "約235×115×48mm",
+    "officialCaseSize": "551×425×590mm (重量　17.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181013",
@@ -217,7 +283,13 @@
     "material": "PP",
     "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
     "sortOrder": 12,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1810",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "490×346×340mm (重量　16.58kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181174",
@@ -236,7 +308,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 13,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1811",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "405×350×230mm (重量　13.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181129",
@@ -255,7 +333,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 14,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1811",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "405×350×230mm (重量　13.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534887779",
@@ -274,7 +358,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 15,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "887",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": "約195×73×19mm",
+    "officialCaseSize": "455×402×189mm (重量　12.08kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534887007",
@@ -293,7 +383,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 16,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "887",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": "約195×73×19mm",
+    "officialCaseSize": "455×402×189mm (重量　12.08kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534888776",
@@ -312,7 +408,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 17,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "888",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": "約195×73×29mm",
+    "officialCaseSize": "449×396×180mm (重量　12.93kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534888004",
@@ -331,7 +433,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 18,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "888",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": "約195×73×29mm",
+    "officialCaseSize": "449×396×180mm (重量　12.93kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181778",
@@ -350,7 +458,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 19,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1817",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約140×85×35mm",
+    "officialCaseSize": "406×306×419mm (重量　16.59kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534182812",
@@ -369,7 +483,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 20,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1828",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約140×85×35mm",
+    "officialCaseSize": "436×336×329mm (重量　16.90kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534355612",
@@ -388,7 +508,13 @@
     "material": "AS樹脂",
     "assortment": "パープル×グリーン×2、ブルー×ブラウン×2、ピンク×イエロー×2",
     "sortOrder": 21,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3556",
+    "officialQuantity": "(6×102袋)612入",
+    "officialPackageSize": null,
+    "officialCaseSize": "515×515×330mm (重量　10.78kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181211",
@@ -407,7 +533,13 @@
     "material": "ケース PP、はし・フォーク・スプーン PS",
     "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
     "sortOrder": 22,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1812",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "680×335×300mm (重量　12.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181891",
@@ -426,7 +558,13 @@
     "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
     "assortment": "なし",
     "sortOrder": 23,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1818",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "487×411×387mm (重量　15.54kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181877",
@@ -445,7 +583,13 @@
     "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
     "assortment": "なし",
     "sortOrder": 24,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1818",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "487×411×387mm (重量　15.54kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534181822",
@@ -464,7 +608,13 @@
     "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
     "assortment": "なし",
     "sortOrder": 25,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1818",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "487×411×387mm (重量　15.54kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534109918",
@@ -483,7 +633,13 @@
     "material": "シリコーンゴム",
     "assortment": "レッド×4、ピンク×4、ベージュ×2、ブルー×2",
     "sortOrder": 26,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1099",
+    "officialQuantity": "(12×40袋)480入",
+    "officialPackageSize": null,
+    "officialCaseSize": "595×390×210mm (重量　10.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534824729",
@@ -502,7 +658,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 27,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "824",
+    "officialQuantity": "(9×9袋)81入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×420×525mm (重量　8.88kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534824743",
@@ -521,7 +683,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 28,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "824",
+    "officialQuantity": "(9×9袋)81入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×420×525mm (重量　8.88kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534825726",
@@ -540,7 +708,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 29,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "825",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "405×350×230mm (重量　13.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534826723",
@@ -559,7 +733,13 @@
     "material": "ゴム・ポリエステル・ポリ塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 30,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "826",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約151×85×4mm",
+    "officialCaseSize": "477×287×145mm (重量　3.46kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534751117",
@@ -578,7 +758,13 @@
     "material": "PS",
     "assortment": "ホワイト×5、グリーン×2、レッド×3",
     "sortOrder": 31,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "751",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "425×375×265mm (重量　11.16kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534752114",
@@ -597,7 +783,13 @@
     "material": "PS",
     "assortment": "ホワイト×4、ブラック×3、ネイビー×3",
     "sortOrder": 32,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "752",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "470×375×265mm (重量　12.10kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534753111",
@@ -616,7 +808,13 @@
     "material": "PS",
     "assortment": "ホワイト×5、グリーン×2、レッド×3",
     "sortOrder": 33,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "753",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "620×430×300mm (重量　14.99kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158817",
@@ -635,7 +833,13 @@
     "material": "本体 PE、フタ・はし PS",
     "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
     "sortOrder": 34,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1588",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "400×320×275mm (重量　14.44kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158596",
@@ -654,7 +858,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 35,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1585",
+    "officialQuantity": "(8×30袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "661×501×432mm (重量　16.95kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158794",
@@ -673,7 +883,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 36,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1587",
+    "officialQuantity": "(8×18袋)144入",
+    "officialPackageSize": null,
+    "officialCaseSize": "656×438×397mm (重量　11.14kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159395",
@@ -692,7 +908,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 37,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1593",
+    "officialQuantity": "(10×25袋)250入",
+    "officialPackageSize": null,
+    "officialCaseSize": "438×421×523mm (重量　12.08kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159890",
@@ -711,7 +933,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 38,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1598",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "558×398×551mm (重量　13.04kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159692",
@@ -730,7 +958,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 39,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1596",
+    "officialQuantity": "(8×18袋)144入",
+    "officialPackageSize": null,
+    "officialCaseSize": "556×496×524mm (重量　13.85kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534106092",
@@ -749,7 +983,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 40,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1060",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "569×459×551mm (重量　13.35kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534106078",
@@ -768,7 +1008,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 41,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1060",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "569×459×551mm (重量　13.35kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158312",
@@ -787,7 +1033,13 @@
     "material": "PP",
     "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
     "sortOrder": 42,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1583",
+    "officialQuantity": "(10×30袋)300入",
+    "officialPackageSize": "約142×90×38mm",
+    "officialCaseSize": "396×361×679mm (重量　8.64kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158411",
@@ -806,7 +1058,13 @@
     "material": "PP",
     "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
     "sortOrder": 43,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1584",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約155×70×29mm",
+    "officialCaseSize": "406×401×454mm (重量　8.10kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534158619",
@@ -825,7 +1083,13 @@
     "material": "シリコーンゴム",
     "assortment": "ベージュ×4、レッド×6",
     "sortOrder": 44,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1586",
+    "officialQuantity": "(10×48袋)480入",
+    "officialPackageSize": null,
+    "officialCaseSize": "480×420×320mm (重量　8.85kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159999",
@@ -844,7 +1108,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 45,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1599",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "649×314×427mm (重量　10.38kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159975",
@@ -863,7 +1133,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 46,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1599",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "649×314×427mm (重量　10.38kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353014",
@@ -882,7 +1158,13 @@
     "material": "本体・仕切り PP、フタ PE",
     "assortment": "犬×2、猫×2、鳥×2、花×2",
     "sortOrder": 47,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3530",
+    "officialQuantity": "(8×20袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "593×541×397mm (重量　14.67kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534356312",
@@ -901,7 +1183,13 @@
     "material": "本体・中子 PP、フタ ポリエチレン",
     "assortment": "グレージュ×6、グリーン×4",
     "sortOrder": 48,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3563",
+    "officialQuantity": "(10×15袋)150入",
+    "officialPackageSize": null,
+    "officialCaseSize": "520×510×500mm (重量　14.28kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350013",
@@ -920,7 +1208,13 @@
     "material": "PP",
     "assortment": "ホワイト×5、ネイビー×3",
     "sortOrder": 49,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3500",
+    "officialQuantity": "(8×18袋)144入",
+    "officialPackageSize": null,
+    "officialCaseSize": "465×465×617mm (重量　15.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350129",
@@ -939,7 +1233,13 @@
     "material": "PP",
     "assortment": "ホワイト×6、ライトブルー×4",
     "sortOrder": 50,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3501",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "505×505×540mm (重量　13.25kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350211",
@@ -958,7 +1258,13 @@
     "material": "PP",
     "assortment": "ホワイト×6、グレー×4",
     "sortOrder": 51,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3502",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "520×418×541mm (重量　12.54kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350310",
@@ -977,7 +1283,13 @@
     "material": "PP",
     "assortment": "ホワイト×6、ターコイズブルー×4",
     "sortOrder": 52,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3503",
+    "officialQuantity": "(10×28袋)280入",
+    "officialPackageSize": null,
+    "officialCaseSize": "600×344×548mm (重量　11.98kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352512",
@@ -996,7 +1308,13 @@
     "material": "PP",
     "assortment": "ベージュ×2、ブルーグレー×2、ダークグレー×2",
     "sortOrder": 53,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3525",
+    "officialQuantity": "(6×30袋)180入",
+    "officialPackageSize": null,
+    "officialCaseSize": "495×412×408mm (重量　15.18kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534115025",
@@ -1015,7 +1333,13 @@
     "material": "PP",
     "assortment": "恐竜×2、アヒル×2、ペンギン×2、ハムスター×2",
     "sortOrder": 54,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1150",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "436×426×554mm (重量　14.98kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351041",
@@ -1034,7 +1358,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 55,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3510",
+    "officialQuantity": "(6×35袋)210入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×455×490mm (重量　15.36kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351096",
@@ -1053,7 +1383,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 56,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3510",
+    "officialQuantity": "(6×35袋)210入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×455×490mm (重量　15.36kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534355315",
@@ -1072,7 +1408,13 @@
     "material": "PP",
     "assortment": "ブルーグレー×5、ライトグレー×5",
     "sortOrder": 57,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3553",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "655×425×460mm (重量　14.62kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352215",
@@ -1091,7 +1433,13 @@
     "material": "PP",
     "assortment": "ベージュ×6、ブルーグレー×4",
     "sortOrder": 58,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3522",
+    "officialQuantity": "(10×32袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "560×435×475mm (重量　15.98kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352116",
@@ -1110,7 +1458,13 @@
     "material": "PP",
     "assortment": "ベージュ×6、ブルーグレー×4",
     "sortOrder": 59,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3521",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "546×455×330mm (重量　12.41kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352611",
@@ -1129,7 +1483,13 @@
     "material": "PP",
     "assortment": "ベージュ×6、ネイビー×4",
     "sortOrder": 60,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3526",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "528×258×347mm (重量　18.75kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534325028",
@@ -1148,7 +1508,13 @@
     "material": "PP",
     "assortment": "グレー×6、アイボリー×4",
     "sortOrder": 61,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3250",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約230×95×28mm",
+    "officialCaseSize": "419×485×535mm (重量　12.20kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534333412",
@@ -1167,7 +1533,13 @@
     "material": "本体 PS、滑り止め 熱可塑性エラストマー",
     "assortment": "グレー×6、ライトブルー×4",
     "sortOrder": 62,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3334",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "654×615×375mm (重量　16.57kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534355711",
@@ -1186,7 +1558,13 @@
     "material": "AS樹脂",
     "assortment": "クリアブルー×クリアイエロー×4、クリアピンク×クリアブルー×4",
     "sortOrder": 63,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3557",
+    "officialQuantity": "(8×36袋)288入",
+    "officialPackageSize": null,
+    "officialCaseSize": "465×465×519mm (重量　18.29kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534355728",
@@ -1205,7 +1583,13 @@
     "material": "AS樹脂",
     "assortment": "クリア×クリアブラウン×3、クリア×クリアブルー×3、クリア×クリアグリーン×2",
     "sortOrder": 64,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3557",
+    "officialQuantity": "(8×36袋)288入",
+    "officialPackageSize": null,
+    "officialCaseSize": "465×465×519mm (重量　18.29kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353915",
@@ -1224,7 +1608,13 @@
     "material": "AS樹脂",
     "assortment": "なし",
     "sortOrder": 65,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3539",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "446×446×333mm (重量　15.97kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353939",
@@ -1243,7 +1633,13 @@
     "material": "AS樹脂",
     "assortment": "なし",
     "sortOrder": 66,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3539",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "446×446×333mm (重量　15.97kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353946",
@@ -1262,7 +1658,13 @@
     "material": "AS樹脂",
     "assortment": "なし",
     "sortOrder": 67,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3539",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "446×446×333mm (重量　15.97kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354028",
@@ -1281,7 +1683,13 @@
     "material": "AS樹脂",
     "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
     "sortOrder": 68,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3540",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "421×421×392mm (重量　18.00kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353922",
@@ -1300,7 +1708,13 @@
     "material": "AS樹脂",
     "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
     "sortOrder": 69,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3539",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "446×446×333mm (重量　15.97kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354127",
@@ -1319,7 +1733,13 @@
     "material": "AS樹脂",
     "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
     "sortOrder": 70,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3541",
+    "officialQuantity": "(8×20袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "691×346×519mm (重量　15.38kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353724",
@@ -1338,7 +1758,13 @@
     "material": "AS樹脂",
     "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
     "sortOrder": 71,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3537",
+    "officialQuantity": "(8×36袋)288入",
+    "officialPackageSize": null,
+    "officialCaseSize": "326×326×344mm (重量　15.20kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534156219",
@@ -1357,7 +1783,13 @@
     "material": "PS",
     "assortment": "ホワイト×5、ブラック×5",
     "sortOrder": 72,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1562",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "415×335×426mm (重量　17.77kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354516",
@@ -1376,7 +1808,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 73,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3545",
+    "officialQuantity": "(8×40袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "590×470×330mm (重量　14.23kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354714",
@@ -1395,7 +1833,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 74,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3547",
+    "officialQuantity": "(8×40袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "420×340×490mm (重量　16.66kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354912",
@@ -1414,7 +1858,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 75,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3549",
+    "officialQuantity": "(8×24袋)192入",
+    "officialPackageSize": null,
+    "officialCaseSize": "550×430×475mm (重量　10.81kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354417",
@@ -1433,7 +1883,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 76,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3544",
+    "officialQuantity": "(6×49袋)294入",
+    "officialPackageSize": null,
+    "officialCaseSize": "540×450×585mm (重量　17.16kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354318",
@@ -1452,7 +1908,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 77,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3543",
+    "officialQuantity": "(8×24袋)192入",
+    "officialPackageSize": null,
+    "officialCaseSize": "615×385×560mm (重量　10.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534354219",
@@ -1471,7 +1933,13 @@
     "material": "PET(ECOZEN)",
     "assortment": "なし",
     "sortOrder": 78,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3542",
+    "officialQuantity": "(8×40袋)320入",
+    "officialPackageSize": null,
+    "officialCaseSize": "565×510×430mm (重量　12.84kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534159012",
@@ -1490,7 +1958,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "ベージュ×2、ブルーグレー×2、ブラック×2",
     "sortOrder": 79,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1590",
+    "officialQuantity": "(6×24袋)144入",
+    "officialPackageSize": null,
+    "officialCaseSize": "501×481×501mm (重量　15.24kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350617",
@@ -1509,7 +1983,13 @@
     "material": "PP",
     "assortment": "グレー×5、ブルー×5",
     "sortOrder": 80,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3506",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "415×335×485mm (重量　13.69kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534356213",
@@ -1528,7 +2008,13 @@
     "material": "PP",
     "assortment": "クリアグリーン×5、クリアネイビー×5",
     "sortOrder": 81,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3562",
+    "officialQuantity": "(10×30袋)300入",
+    "officialPackageSize": null,
+    "officialCaseSize": "501×420×296mm (重量　14.32kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534350624",
@@ -1545,7 +2031,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 82,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534356114",
@@ -1564,7 +2056,13 @@
     "material": "PP",
     "assortment": "クリアグリーン×5、クリアネイビー×5",
     "sortOrder": 83,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3561",
+    "officialQuantity": "(10×30袋)300入",
+    "officialPackageSize": null,
+    "officialCaseSize": "595×247×377mm (重量　15.46kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534356015",
@@ -1583,7 +2081,13 @@
     "material": "PP",
     "assortment": "クリアグリーン×4、クリアネイビー×4",
     "sortOrder": 84,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3560",
+    "officialQuantity": "(8×27袋)216入",
+    "officialPackageSize": null,
+    "officialCaseSize": "411×411×313mm (重量　15.90kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534355919",
@@ -1602,7 +2106,13 @@
     "material": "PP",
     "assortment": "クリアグリーン×5、クリアネイビー×5",
     "sortOrder": 85,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3559",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "535×405×230mm (重量　16.06kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351751",
@@ -1621,7 +2131,13 @@
     "material": "本体 PET(ECOZEN)、フタ・中フタ PP",
     "assortment": "四連×3、フレーム×3",
     "sortOrder": 86,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3517",
+    "officialQuantity": "(6×36袋)216入",
+    "officialPackageSize": null,
+    "officialCaseSize": "610×400×615mm (重量　14.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351768",
@@ -1640,7 +2156,13 @@
     "material": "本体 PET(ECOZEN)、フタ・中フタ PP",
     "assortment": "英字×2、チューリップ×2、うさぎ×2",
     "sortOrder": 87,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3517",
+    "officialQuantity": "(6×36袋)216入",
+    "officialPackageSize": null,
+    "officialCaseSize": "610×410×615mm (重量　15.49kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351812",
@@ -1659,7 +2181,13 @@
     "material": "本体 PET(ECOZEN)、フタ(内側) ABS樹脂、フタ(外側) AS樹脂",
     "assortment": "鳥×2、恐竜×2、動物×2",
     "sortOrder": 88,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3518",
+    "officialQuantity": "(6×60袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "560×475×430mm (重量　18.35kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351829",
@@ -1678,7 +2206,13 @@
     "material": "本体 PET(ECOZEN)、フタ(内側) ABS樹脂、フタ(外側) AS樹脂",
     "assortment": "オレンジ×2、イエロー×2、ブルー×2",
     "sortOrder": 89,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3518",
+    "officialQuantity": "(6×60袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "560×475×430mm (重量　18.35kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534356411",
@@ -1697,7 +2231,13 @@
     "material": "本体 AS樹脂、フタ・中フタ PP",
     "assortment": "なし",
     "sortOrder": 90,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3564",
+    "officialQuantity": "(6×27袋)162入",
+    "officialPackageSize": null,
+    "officialCaseSize": "600×401×606mm (重量　13.53kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534335218",
@@ -1716,7 +2256,13 @@
     "material": "本体 合成ゴム・ポリエステル、ジョイント PP",
     "assortment": "ブラック×5、アイボリー×4、ライトグリーン×3",
     "sortOrder": 91,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3352",
+    "officialQuantity": "(12×40袋)480入",
+    "officialPackageSize": null,
+    "officialCaseSize": "565×560×345mm (重量　15.58kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534335010",
@@ -1735,7 +2281,13 @@
     "material": "本体 合成ゴム・ポリエステル・PP、カラビナ アルミ合金",
     "assortment": "グレー×4、ブルー×4、アイボリー×4",
     "sortOrder": 92,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3350",
+    "officialQuantity": "(12×50袋)600入",
+    "officialPackageSize": null,
+    "officialCaseSize": "500×410×340mm (重量　10.13kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534859004",
@@ -1754,7 +2306,13 @@
     "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
     "assortment": "なし",
     "sortOrder": 93,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "859",
+    "officialQuantity": "(6×16袋)96入",
+    "officialPackageSize": "約150×129×17mm",
+    "officialCaseSize": "460×285×190mm (重量　15.46kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534860000",
@@ -1773,7 +2331,13 @@
     "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
     "assortment": "なし",
     "sortOrder": 94,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "860",
+    "officialQuantity": "(6×16袋)96入",
+    "officialPackageSize": "約185×118×13mm",
+    "officialCaseSize": "350×317×230mm (重量　15.38kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534864008",
@@ -1792,7 +2356,13 @@
     "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
     "assortment": "なし",
     "sortOrder": 95,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "864",
+    "officialQuantity": "(6×16袋)96入",
+    "officialPackageSize": null,
+    "officialCaseSize": "458×283×188mm (重量　12.35kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534152815",
@@ -1811,7 +2381,13 @@
     "material": "本体・フタ・底スノコ PP、底栓 ナイロン",
     "assortment": "なし",
     "sortOrder": 96,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1528",
+    "officialQuantity": "(6×20袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "643×545×408mm (重量　10.67kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534104517",
@@ -1830,7 +2406,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 97,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1045",
+    "officialQuantity": "(12×9袋)108入",
+    "officialPackageSize": null,
+    "officialCaseSize": "528×528×558mm (重量　14.17kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534520713",
@@ -1849,7 +2431,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 98,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "520",
+    "officialQuantity": "(9×6袋)54入",
+    "officialPackageSize": null,
+    "officialCaseSize": "510×530×520mm (重量　8.34kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534522717",
@@ -1868,7 +2456,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 99,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "522",
+    "officialQuantity": "(9×9袋)81入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×420×525mm (重量　8.88kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534522748",
@@ -1887,7 +2481,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 100,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "522",
+    "officialQuantity": "(9×9袋)81入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×420×525mm (重量　8.88kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534523714",
@@ -1906,7 +2506,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 101,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "523",
+    "officialQuantity": "(6×16袋)96入",
+    "officialPackageSize": "約100×150×86mm",
+    "officialCaseSize": "625×420×510mm (重量　10.78kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351614",
@@ -1925,7 +2531,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 102,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3516",
+    "officialQuantity": "(8×16袋)128入",
+    "officialPackageSize": "約117×80×102mm",
+    "officialCaseSize": "600×483×425mm (重量　12.67kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534526036",
@@ -1944,7 +2556,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 103,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "526",
+    "officialQuantity": "(8×16袋)128入",
+    "officialPackageSize": "約69×98×143mm",
+    "officialCaseSize": "535×406×577mm (重量　14.79kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534517003",
@@ -1963,7 +2581,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 104,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "517",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": "約64×89×103mm",
+    "officialCaseSize": "510×450×535mm (重量　17.84kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534154024",
@@ -1982,7 +2606,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 105,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1540",
+    "officialQuantity": "(12×4袋)48入",
+    "officialPackageSize": null,
+    "officialCaseSize": "556×490×449mm (重量　7.11kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534154123",
@@ -2001,7 +2631,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 106,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1541",
+    "officialQuantity": "(10×9袋)90入",
+    "officialPackageSize": null,
+    "officialCaseSize": "731×436×389mm (重量　10.17kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534154222",
@@ -2020,7 +2656,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 107,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1542",
+    "officialQuantity": "(10×9袋)90入",
+    "officialPackageSize": null,
+    "officialCaseSize": "575×505×400mm (重量　7.97kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534154321",
@@ -2039,7 +2681,13 @@
     "material": "本体 PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 108,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1543",
+    "officialQuantity": "(10×9袋)90入",
+    "officialPackageSize": "約164×92×80mm",
+    "officialCaseSize": "575×505×400mm (重量　11.74kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534212762",
@@ -2058,7 +2706,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 109,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "212",
+    "officialQuantity": "(11×16袋)176入",
+    "officialPackageSize": null,
+    "officialCaseSize": "555×440×520mm (重量　15.39kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534214766",
@@ -2077,7 +2731,13 @@
     "material": "本体・フタ PP、パッキン シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 110,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "214",
+    "officialQuantity": "(9×16袋)144入",
+    "officialPackageSize": null,
+    "officialCaseSize": "564×561×505mm (重量　16.19kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351331",
@@ -2096,7 +2756,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 111,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3513",
+    "officialQuantity": "(5×18袋)90入",
+    "officialPackageSize": null,
+    "officialCaseSize": "594×394×541mm (重量　8.32kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534351539",
@@ -2115,7 +2781,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 112,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3515",
+    "officialQuantity": "(6×20袋)120入",
+    "officialPackageSize": "約94×145×73mm",
+    "officialCaseSize": "605×470×437mm (重量　12.01kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353120",
@@ -2134,7 +2806,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 113,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3531",
+    "officialQuantity": "(7×12袋)84入",
+    "officialPackageSize": "約130×89×81mm",
+    "officialCaseSize": "550×435×374mm (重量　10.31kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353427",
@@ -2153,7 +2831,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 114,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3534",
+    "officialQuantity": "(9×10袋)90入",
+    "officialPackageSize": null,
+    "officialCaseSize": "630×441×505mm (重量　9.32kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353526",
@@ -2172,7 +2856,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 115,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3535",
+    "officialQuantity": "(7×15袋)105入",
+    "officialPackageSize": "約180×131×70mm",
+    "officialCaseSize": "665×405×460mm (重量　9.88kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534353625",
@@ -2191,7 +2881,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 116,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3536",
+    "officialQuantity": "(7×20袋)140入",
+    "officialPackageSize": "約148×135×83mm",
+    "officialCaseSize": "565×455×560mm (重量　14.26kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352925",
@@ -2210,7 +2906,13 @@
     "material": "本体・フラップ PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 117,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3529",
+    "officialQuantity": "(10×10袋)100入",
+    "officialPackageSize": null,
+    "officialCaseSize": "481×380×540mm (重量　13.04kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352932",
@@ -2229,7 +2931,13 @@
     "material": "本体・フラップ PP、フタ PE",
     "assortment": "なし",
     "sortOrder": 118,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3529",
+    "officialQuantity": "(10×10袋)100入",
+    "officialPackageSize": null,
+    "officialCaseSize": "481×380×540mm (重量　13.04kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534772334",
@@ -2248,7 +2956,13 @@
     "material": "本体 PET、フタ シリコーンゴム",
     "assortment": "ブラック×3、ホワイト×3",
     "sortOrder": 119,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "772",
+    "officialQuantity": "(6×60袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "610×345×565mm (重量　13.70kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4955934529006",
@@ -2265,7 +2979,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 120,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965634529747",
@@ -2282,7 +3002,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 121,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534529730",
@@ -2301,7 +3027,13 @@
     "material": "本体・フタ PS、取手・スプーン PP",
     "assortment": "なし",
     "sortOrder": 122,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "529",
+    "officialQuantity": "(5×20袋)100入",
+    "officialPackageSize": null,
+    "officialCaseSize": "598×456×510mm (重量　13.36kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534253000",
@@ -2320,7 +3052,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 123,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "253",
+    "officialQuantity": "(8×30袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "444×410×388mm (重量　10.77kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4966534182676",
@@ -2337,7 +3075,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 124,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352819",
@@ -2356,7 +3100,13 @@
     "material": "PP",
     "assortment": "ホワイト×6、ブラック×4",
     "sortOrder": 125,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3528",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "665×560×315mm (重量　14.31kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352420",
@@ -2375,7 +3125,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 126,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3524",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": "約133×133×85mm",
+    "officialCaseSize": "610×331×411mm (重量　18.66kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534715713",
@@ -2394,7 +3150,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 127,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "715",
+    "officialQuantity": "(8×20袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "531×531×629mm (重量　18.59kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534902779",
@@ -2413,7 +3175,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 128,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "902",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×495×500mm (重量　12.25kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534910712",
@@ -2432,7 +3200,13 @@
     "material": "本体 PE、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 129,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "910",
+    "officialQuantity": "(8×32袋)256入",
+    "officialPackageSize": null,
+    "officialCaseSize": "585×553×625mm (重量　17.66kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534340229",
@@ -2451,7 +3225,13 @@
     "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
     "assortment": "なし",
     "sortOrder": 130,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3402",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": "約495×317×6mm",
+    "officialCaseSize": "670×500×360mm (重量　15.02kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534340328",
@@ -2470,7 +3250,13 @@
     "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
     "assortment": "なし",
     "sortOrder": 131,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3403",
+    "officialQuantity": "(10×14袋)140入",
+    "officialPackageSize": "約447×270×6mm",
+    "officialCaseSize": "585×455×445mm (重量　13.40kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534340427",
@@ -2489,7 +3275,13 @@
     "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
     "assortment": "なし",
     "sortOrder": 132,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3404",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": "約407×228×8mm",
+    "officialCaseSize": "505×445×495mm (重量　11.09kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534334716",
@@ -2508,7 +3300,13 @@
     "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス・ガラス・PE",
     "assortment": "なし",
     "sortOrder": 133,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3347",
+    "officialQuantity": "(10×16箱)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "645×610×360mm (重量　13.12kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534334914",
@@ -2527,7 +3325,13 @@
     "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス",
     "assortment": "なし",
     "sortOrder": 134,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3349",
+    "officialQuantity": "(10×30袋)300入",
+    "officialPackageSize": null,
+    "officialCaseSize": "425×390×365mm (重量　10.31kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534130523",
@@ -2546,7 +3350,13 @@
     "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス",
     "assortment": "なし",
     "sortOrder": 135,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1305",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "400×330×430mm (重量　8.60kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534310116",
@@ -2565,7 +3375,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 136,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "310",
+    "officialQuantity": "(8×60袋)480入",
+    "officialPackageSize": "約137×58×16mm",
+    "officialCaseSize": "540×270×390mm (重量　5.26kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534163910",
@@ -2584,7 +3400,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 137,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1639",
+    "officialQuantity": "(8×60袋)480入",
+    "officialPackageSize": "約140×83×18mm",
+    "officialCaseSize": "615×265×375mm (重量　7.64kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534337427",
@@ -2603,7 +3425,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 138,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3374",
+    "officialQuantity": "(8×24袋)192入",
+    "officialPackageSize": null,
+    "officialCaseSize": "579×401×617mm (重量　13.61kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534141420",
@@ -2622,7 +3450,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 139,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1414",
+    "officialQuantity": "(8×25袋)200入",
+    "officialPackageSize": null,
+    "officialCaseSize": "641×461×439mm (重量　15.36kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534663717",
@@ -2641,7 +3475,13 @@
     "material": "本体・中皿 PP、フタ PS",
     "assortment": "なし",
     "sortOrder": 140,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "663",
+    "officialQuantity": "(10×25袋)250入",
+    "officialPackageSize": null,
+    "officialCaseSize": "630×505×525mm (重量　15.93kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534664714",
@@ -2660,7 +3500,13 @@
     "material": "本体 PP、底フタ PE",
     "assortment": "なし",
     "sortOrder": 141,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "664",
+    "officialQuantity": "(10×30袋)300入",
+    "officialPackageSize": null,
+    "officialCaseSize": "615×478×465mm (重量　15.51kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534352703",
@@ -2679,7 +3525,13 @@
     "material": "ポリウレタン、PET",
     "assortment": "なし",
     "sortOrder": 142,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3527",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": "約140×72×1mm",
+    "officialCaseSize": "300×280×80mm (重量　1.83kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534657600",
@@ -2698,7 +3550,13 @@
     "material": "塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 143,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "657",
+    "officialQuantity": "(6×48袋)288入",
+    "officialPackageSize": "約175×109×22mm",
+    "officialCaseSize": "479×409×288mm (重量　6.78kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534659604",
@@ -2717,7 +3575,13 @@
     "material": "塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 144,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "659",
+    "officialQuantity": "(6×48袋)288入",
+    "officialPackageSize": "約180×109×19mm",
+    "officialCaseSize": "485×415×297mm (重量　9.28kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534646116",
@@ -2736,7 +3600,13 @@
     "material": "本体 PP、球 PS、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 145,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "646",
+    "officialQuantity": "(10×16箱)160入",
+    "officialPackageSize": "約145×170×75mm",
+    "officialCaseSize": "726×390×385mm (重量　10.07kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534649117",
@@ -2755,7 +3625,13 @@
     "material": "本体 PP、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 146,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "649",
+    "officialQuantity": "(10×16箱)160入",
+    "officialPackageSize": "約140×130×46mm",
+    "officialCaseSize": "625×486×525mm (重量　11.51kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534650113",
@@ -2774,7 +3650,13 @@
     "material": "本体 PP、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 147,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "650",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "728×448×454mm (重量　12.95kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534651110",
@@ -2793,7 +3675,13 @@
     "material": "本体 PP、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 148,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "651",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "630×440×510mm (重量　14.10kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534652117",
@@ -2812,7 +3700,13 @@
     "material": "本体 PP、輪ゴム ポリウレタン、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 149,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "652",
+    "officialQuantity": "(10×12箱)120入",
+    "officialPackageSize": "約144×148×55mm",
+    "officialCaseSize": "600×314×600mm (重量　8.71kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534122528",
@@ -2831,7 +3725,13 @@
     "material": "本体・フック PP、吸盤 塩化ビニル樹脂",
     "assortment": "なし",
     "sortOrder": 150,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1225",
+    "officialQuantity": "(8×12袋)96入",
+    "officialPackageSize": null,
+    "officialCaseSize": "690×395×473mm (重量　9.42kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534386609",
@@ -2850,7 +3750,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 151,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "386",
+    "officialQuantity": "(5×24袋)120入",
+    "officialPackageSize": null,
+    "officialCaseSize": "478×410×447mm (重量　14.76kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534949712",
@@ -2869,7 +3775,13 @@
     "material": "本体・底フタ PP、ヒンジ部分 シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 152,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "949",
+    "officialQuantity": "(10×25袋)250入",
+    "officialPackageSize": null,
+    "officialCaseSize": "546×496×544mm (重量　16.61kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534950718",
@@ -2888,7 +3800,13 @@
     "material": "本体 PP、ヒンジ部分 シリコーンゴム、粘着テープ アクリル・ウレタン系",
     "assortment": "なし",
     "sortOrder": 153,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "950",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "535×410×245mm (重量　11.71kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534951715",
@@ -2907,7 +3825,13 @@
     "material": "本体 PP、ヒンジ部分 シリコーンゴム、粘着テープ アクリル・ウレタン系",
     "assortment": "なし",
     "sortOrder": 154,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "951",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "420×320×230mm (重量　6.90kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534952729",
@@ -2926,7 +3850,13 @@
     "material": "本体・底フタ PP、ヒンジ部分 シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 155,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "952",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "540×530×695mm (重量　19.14kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534134316",
@@ -2945,7 +3875,13 @@
     "material": "本体 PP、ヒンジ部分 シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 156,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1343",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "611×468×479mm (重量　12.27kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534133616",
@@ -2964,7 +3900,13 @@
     "material": "本体 PP、ヒンジ部分 シリコーンゴム",
     "assortment": "なし",
     "sortOrder": 157,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1336",
+    "officialQuantity": "(10×24袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "445×397×625mm (重量　17.69kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534338127",
@@ -2983,7 +3925,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 158,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "338",
+    "officialQuantity": "(8×6袋)48入",
+    "officialPackageSize": null,
+    "officialCaseSize": "460×455×550mm (重量　7.64kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534339124",
@@ -3002,7 +3950,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 159,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "339",
+    "officialQuantity": "(8×6袋)48入",
+    "officialPackageSize": null,
+    "officialCaseSize": "460×455×550mm (重量　7.54kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534225007",
@@ -3019,7 +3973,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 160,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534226004",
@@ -3036,7 +3996,13 @@
     "material": null,
     "assortment": null,
     "sortOrder": 161,
-    "status": "available"
+    "status": "available",
+    "officialMatched": false,
+    "officialProductNumber": null,
+    "officialQuantity": null,
+    "officialPackageSize": null,
+    "officialCaseSize": null,
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534142724",
@@ -3055,7 +4021,13 @@
     "material": "本体 PP、バネ 鉄",
     "assortment": "なし",
     "sortOrder": 162,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "142",
+    "officialQuantity": "(6×14袋)84入",
+    "officialPackageSize": null,
+    "officialCaseSize": "515×400×685mm (重量　10.80kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534222723",
@@ -3074,7 +4046,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 163,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "222",
+    "officialQuantity": "(10×12袋)120入",
+    "officialPackageSize": "約411×202×23mm",
+    "officialCaseSize": "535×446×650mm (重量　20.32kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534231114",
@@ -3093,7 +4071,13 @@
     "material": "本体 PP、フック 鉄、ストップバー PS",
     "assortment": "ベージュ×5、ブルーグレー×5",
     "sortOrder": 164,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "231",
+    "officialQuantity": "(10×6袋)60入",
+    "officialPackageSize": null,
+    "officialCaseSize": "450×425×570mm (重量　7.76kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534335928",
@@ -3112,7 +4096,13 @@
     "material": "本体・クリップ PS、フック・バー・バネ 鉄",
     "assortment": "なし",
     "sortOrder": 165,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3359",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "670×340×290mm (重量　14.50kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534335942",
@@ -3131,7 +4121,13 @@
     "material": "本体・クリップ PS、フック・バー・バネ 鉄",
     "assortment": "なし",
     "sortOrder": 166,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3359",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "670×340×290mm (重量　14.50kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534335911",
@@ -3150,7 +4146,13 @@
     "material": "本体・クリップ PS、フック・バー・バネ 鉄",
     "assortment": "なし",
     "sortOrder": 167,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3359",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "670×340×290mm (重量　14.50kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534140416",
@@ -3169,7 +4171,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 168,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1404",
+    "officialQuantity": "(10×18袋)180入",
+    "officialPackageSize": null,
+    "officialCaseSize": "621×446×505mm (重量　15.15kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534118804",
@@ -3188,7 +4196,13 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 169,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1188",
+    "officialQuantity": "(10×20袋)200入",
+    "officialPackageSize": "約215×75×38mm",
+    "officialCaseSize": "390×385×755mm (重量　10.73kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534133517",
@@ -3207,7 +4221,13 @@
     "material": "本体 ABS樹脂、カッター ステンレス",
     "assortment": "なし",
     "sortOrder": 170,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "1335",
+    "officialQuantity": "(10×48袋)480入",
+    "officialPackageSize": null,
+    "officialCaseSize": "505×390×275mm (重量　10.16kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534148115",
@@ -3226,7 +4246,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 171,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "148",
+    "officialQuantity": "(6×21袋)126入",
+    "officialPackageSize": null,
+    "officialCaseSize": "546×501×604mm (重量　17.43kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534296007",
@@ -3245,7 +4271,13 @@
     "material": "本体 PP、トレー PS",
     "assortment": "なし",
     "sortOrder": 172,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "296",
+    "officialQuantity": "(6×30袋)180入",
+    "officialPackageSize": "約41×76×86mm",
+    "officialCaseSize": "396×376×353mm (重量　14.75kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534304009",
@@ -3264,7 +4296,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 173,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "304",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "392×355×420mm (重量　14.72kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534305006",
@@ -3283,7 +4321,13 @@
     "material": "PP",
     "assortment": "なし",
     "sortOrder": 174,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "305",
+    "officialQuantity": "(10×16袋)160入",
+    "officialPackageSize": null,
+    "officialCaseSize": "392×355×420mm (重量　14.33kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534328319",
@@ -3302,7 +4346,13 @@
     "material": "本体 PS、底フタ PE",
     "assortment": "クリア×ホワイト×4、ホワイト×グレー×4",
     "sortOrder": 175,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3283",
+    "officialQuantity": "(8×42袋)336入",
+    "officialPackageSize": null,
+    "officialCaseSize": "645×329×603mm (重量　18.52kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534322218",
@@ -3321,7 +4371,13 @@
     "material": "本体 PS、バネ ポリアセタール樹脂",
     "assortment": "クリア×5、ブルー×5",
     "sortOrder": 176,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3222",
+    "officialQuantity": "(10×36袋)360入",
+    "officialPackageSize": null,
+    "officialCaseSize": "586×341×615mm (重量　11.85kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   },
   {
     "id": "yamada-4965534337915",
@@ -3340,6 +4396,12 @@
     "material": "PS",
     "assortment": "なし",
     "sortOrder": 177,
-    "status": "available"
+    "status": "available",
+    "officialMatched": true,
+    "officialProductNumber": "3379",
+    "officialQuantity": "(8×30袋)240入",
+    "officialPackageSize": null,
+    "officialCaseSize": "609×581×349mm (重量　14.70kg)",
+    "officialSourceUrl": "https://www.yamadakagaku.co.jp/products/"
   }
 ]

@@ -26,4 +26,11 @@ describe("AG public catalog", () => {
       expect(forbidden.filter((field) => Object.hasOwn(row, field))).toEqual([]);
     }
   });
+
+  it("includes public manufacturer specifications when an official match exists", () => {
+    const matched = rows.filter((row) => row.officialMatched === true);
+    expect(matched).toHaveLength(167);
+    expect(matched.every((row) => row.officialProductNumber && row.officialSourceUrl)).toBe(true);
+    expect(matched.every((row) => row.officialQuantity && row.officialCaseSize)).toBe(true);
+  });
 });
