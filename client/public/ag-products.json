@@ -1,0 +1,3345 @@
+[
+  {
+    "id": "yamada-4965534184144",
+    "catalog": "1841B",
+    "barcode": "4965534184144",
+    "nameJa": "ピッケ　２段ランチボックス　ブルー",
+    "nameEn": "PLASTIC LUNCH BOX 2TIER BLUE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 1,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534184212",
+    "catalog": "1842",
+    "barcode": "4965534184212",
+    "nameJa": "ピッケ　はしケースセット１８",
+    "nameEn": "PLASTIC CHOPSTICKS W/CASE 18",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 2,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534184311",
+    "catalog": "1843",
+    "barcode": "4965534184311",
+    "nameJa": "ピッケ　スリムランチパック",
+    "nameEn": "PLASTIC SLIM LUNCH BOX",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 3,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180023",
+    "catalog": "1800WH",
+    "barcode": "4965534180023",
+    "nameJa": "Ｇ＆Ｂフタ付きマグカップ ホワイト",
+    "nameEn": "PLASTIC MUG CUP WITH LID WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180023.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180023.jpg"
+    ],
+    "size": "89×106×92mm",
+    "capacity": "300ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 4,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534184410",
+    "catalog": "1844",
+    "barcode": "4965534184410",
+    "nameJa": "ピッケ　オーバルランチパック アソート",
+    "nameEn": "PLASTIC LUNCH BOX 260ml ASSORTED COLORS",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 5,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180078",
+    "catalog": "1800GRAY",
+    "barcode": "4965534180078",
+    "nameJa": "Ｇ＆Ｂフタ付きマグカップ グレー",
+    "nameEn": "PLASTIC MUG CUP WITH LID GRAY",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180078.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180078.jpg"
+    ],
+    "size": "89×106×92mm",
+    "capacity": "300ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 6,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180092",
+    "catalog": "1800PP",
+    "barcode": "4965534180092",
+    "nameJa": "Ｇ＆Ｂフタ付きマグカップ ピンク",
+    "nameEn": "PLASTIC MUG CUP WITH LID PINK",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180092.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180092.jpg"
+    ],
+    "size": "89×106×92mm",
+    "capacity": "300ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 7,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180320",
+    "catalog": "1803WH",
+    "barcode": "4965534180320",
+    "nameJa": "G&B ランチボックス　ホワイト",
+    "nameEn": "PLASTIC LUNCH BOX G&B  WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180320.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180320.jpg"
+    ],
+    "size": "152×135×52mm",
+    "capacity": "480ml",
+    "material": "フタ・取手 PS、本体 PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 8,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180610",
+    "catalog": "1806",
+    "barcode": "4965534180610",
+    "nameJa": "G&B オーバルランチパック　 アソート対応のみ（ホワイト5/グレー3/ペールピンク2)",
+    "nameEn": "PLASTIC OVAL LUNCH PACK G&B ASSORT(WH/GRAY/PP)",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180610.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180610.jpg"
+    ],
+    "size": "116×100×47mm",
+    "capacity": "260ml",
+    "material": "PP",
+    "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
+    "sortOrder": 9,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180726",
+    "catalog": "1807",
+    "barcode": "4965534180726",
+    "nameJa": "G&B スリムランチパック アソート対応のみ（ホワイト5/グレー3/ペールピンク2)",
+    "nameEn": "PLASTIC SLIM LUNCH PACK G&B  ASSORT(WH/GRAY/PP)",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180726.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180726.jpg"
+    ],
+    "size": "155×90×50mm",
+    "capacity": "380ml",
+    "material": "PP",
+    "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
+    "sortOrder": 10,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534180818",
+    "catalog": "1808",
+    "barcode": "4965534180818",
+    "nameJa": "G&B おにぎりケース２Ｐ アソート対応のみ（ホワイト3/グレー2/ペールピンク1)",
+    "nameEn": "PLASTIC RICE BALL CASE 2P G&B　ASSORT(WH/GRAY/PP)",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180818.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534180818.jpg"
+    ],
+    "size": "106×100×48mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "ペールピンク×1、グレー×2、ホワイト×3",
+    "sortOrder": 11,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181013",
+    "catalog": "1810",
+    "barcode": "4965534181013",
+    "nameJa": "G&B サンドイッチケース  アソート対応のみ（ホワイト5/グレー3/ペールピンク2)",
+    "nameEn": "PLASTIC SANDWITCH CASE G&B  　ASSORT(WH/GRAY/PP)",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181013-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181013-1.jpg"
+    ],
+    "size": "167×117×18mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
+    "sortOrder": 12,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181174",
+    "catalog": "1811",
+    "barcode": "4965534181174",
+    "nameJa": "G&B はし・ケースセット　グレー",
+    "nameEn": "PLASTIC CHOPSTICK/CASE SET G&B GRAY",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181174.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181174.jpg"
+    ],
+    "size": "ケース 190×29×13mm、はし 180×7×7mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 13,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181129",
+    "catalog": "1811",
+    "barcode": "4965534181129",
+    "nameJa": "G&B はし・ケースセット　ホワイト",
+    "nameEn": "PLASTIC CHOPSTICK/CASE SET G&B  WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181129.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181129.jpg"
+    ],
+    "size": "ケース 190×29×13mm、はし 180×7×7mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 14,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534887779",
+    "catalog": "887MT",
+    "barcode": "4965534887779",
+    "nameJa": "G&B フォーク８Ｐ　モノトーン",
+    "nameEn": "PLASTIC FORK 8P G&B MONOTONE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534887779.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534887779.jpg"
+    ],
+    "size": "142×25×15mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 15,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534887007",
+    "catalog": "887COL",
+    "barcode": "4965534887007",
+    "nameJa": "G&B フォーク８Ｐ　カラー",
+    "nameEn": "PLASTIC FORK 8P G&B",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534887007.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534887007.jpg"
+    ],
+    "size": "142×25×15mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 16,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534888776",
+    "catalog": "888MT",
+    "barcode": "4965534888776",
+    "nameJa": "G&B スプーン８Ｐ　 モノトーン",
+    "nameEn": "PLASTIC SPOON 8P G&B  MONOTONE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534888776.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534888776.jpg"
+    ],
+    "size": "142×29×12mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 17,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534888004",
+    "catalog": "888COL",
+    "barcode": "4965534888004",
+    "nameJa": "G&B スプーン８Ｐ　カラー",
+    "nameEn": "PLASTIC SPOON 8P G&B",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534888004.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534888004.jpg"
+    ],
+    "size": "142×29×12mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 18,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181778",
+    "catalog": "1817",
+    "barcode": "4965534181778",
+    "nameJa": "G&Bアイススプーン８P",
+    "nameEn": "PLASTIC ICE SPOON 8P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181778.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181778.jpg"
+    ],
+    "size": "93×33×13mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 19,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534182812",
+    "catalog": "1828",
+    "barcode": "4965534182812",
+    "nameJa": "アイススプーン８Ｐ ペールカラー",
+    "nameEn": "PLASTIC ICE SPOON 8P COLOR",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534182812.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534182812.jpg"
+    ],
+    "size": "93×33×13mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 20,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534355612",
+    "catalog": "3556",
+    "barcode": "4965534355612",
+    "nameJa": "ガラス風スプーン  POPカラー",
+    "nameEn": "PLASTIC SPOON POP COLOR",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355612.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355612.jpg"
+    ],
+    "size": "39×17×177mm",
+    "capacity": null,
+    "material": "AS樹脂",
+    "assortment": "パープル×グリーン×2、ブルー×ブラウン×2、ピンク×イエロー×2",
+    "sortOrder": 21,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181211",
+    "catalog": "1812",
+    "barcode": "4965534181211",
+    "nameJa": "G&B トリオセット アソート（ホワイト5/グレー3/ペールピンク2)",
+    "nameEn": "PLASTIC TRIO SET G&B　ASSORT(WH/GRAY/PP)",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181211.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181211.jpg"
+    ],
+    "size": "ケース 160×82×30mm、はし 150×7×7mm、フォーク 135×25×15mm、スプーン 135×29×15mm",
+    "capacity": null,
+    "material": "ケース PP、はし・フォーク・スプーン PS",
+    "assortment": "ペールピンク×2、グレー×3、ホワイト×5",
+    "sortOrder": 22,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181891",
+    "catalog": "1818P",
+    "barcode": "4965534181891",
+    "nameJa": "G&B カトラリー3点セット ペールピンク",
+    "nameEn": "PLASTIC CUTLURY 3SET PINK",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181891.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181891.jpg"
+    ],
+    "size": "192×46×31mm (ケース外寸)",
+    "capacity": null,
+    "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
+    "assortment": "なし",
+    "sortOrder": 23,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181877",
+    "catalog": "1818GRY",
+    "barcode": "4965534181877",
+    "nameJa": "G&B カトラリー3点セット グレー",
+    "nameEn": "PLASTIC CUTLURY 3SET GRAY",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181877.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181877.jpg"
+    ],
+    "size": "192×46×31mm (ケース外寸)",
+    "capacity": null,
+    "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
+    "assortment": "なし",
+    "sortOrder": 24,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534181822",
+    "catalog": "1818W",
+    "barcode": "4965534181822",
+    "nameJa": "G&B カトラリー3点セット ホワイト",
+    "nameEn": "PLASTIC CUTLURY 3SET WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181822.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534181822.jpg"
+    ],
+    "size": "192×46×31mm (ケース外寸)",
+    "capacity": null,
+    "material": "はし PS、フォーク・スプーン・ケース・中子 PP",
+    "assortment": "なし",
+    "sortOrder": 25,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534109918",
+    "catalog": null,
+    "barcode": "4965534109918",
+    "nameJa": "シリコンランチベルト リボン",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534109918.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534109918.jpg"
+    ],
+    "size": "257×18mm (リボン部分除く)",
+    "capacity": null,
+    "material": "シリコーンゴム",
+    "assortment": "レッド×4、ピンク×4、ベージュ×2、ブルー×2",
+    "sortOrder": 26,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534824729",
+    "catalog": "824",
+    "barcode": "4965534824729",
+    "nameJa": "ＮＯＩＲ DERI　密封深８７０",
+    "nameEn": "PLASTIC TIGHT LUNCH BOX 870",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534824729.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534824729.jpg"
+    ],
+    "size": "135×185×61mm",
+    "capacity": "870ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 27,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534824743",
+    "catalog": "824",
+    "barcode": "4965534824743",
+    "nameJa": "ノアールデリ　密封深870　ネイビー",
+    "nameEn": "PLASTIC TIGHT LUNCH BOX 870 NAVY",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534824743.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534824743.jpg"
+    ],
+    "size": "135×185×61mm",
+    "capacity": "870ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 28,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534825726",
+    "catalog": "825",
+    "barcode": "4965534825726",
+    "nameJa": "ＮＯＩＲ DERI　はしケースセット",
+    "nameEn": "PLASTIC CHOPSTICKS CASE SET",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534825726.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534825726.jpg"
+    ],
+    "size": "ケース 190×29×13mm、はし 180×7×7mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 29,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534826723",
+    "catalog": "8267",
+    "barcode": "4965534826723",
+    "nameJa": "Days　トートバッグM",
+    "nameEn": "PLASTIC BAG M WITH PRINT WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534826723.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534826723.jpg"
+    ],
+    "size": "112×20mm (1P)",
+    "capacity": null,
+    "material": "ゴム・ポリエステル・ポリ塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 30,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534751117",
+    "catalog": "751",
+    "barcode": "4965534751117",
+    "nameJa": "丈夫な箸ケース１８",
+    "nameEn": "PLASTIC CASE FOR 18cm CHOPSTICKS",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534751117.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534751117.jpg"
+    ],
+    "size": "190×32×16mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "ホワイト×5、グリーン×2、レッド×3",
+    "sortOrder": 31,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534752114",
+    "catalog": "752",
+    "barcode": "4965534752114",
+    "nameJa": "丈夫な箸ケース２１",
+    "nameEn": "PLASTIC CASE FOR 21cm CHOPSTICKS",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534752114.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534752114.jpg"
+    ],
+    "size": "220×32×16mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "ホワイト×4、ブラック×3、ネイビー×3",
+    "sortOrder": 32,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534753111",
+    "catalog": "753",
+    "barcode": "4965534753111",
+    "nameJa": "丈夫なカトラリーケース１９",
+    "nameEn": "PLASTIC CUTLERY CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534753111.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534753111.jpg"
+    ],
+    "size": "200×55×25mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "ホワイト×5、グリーン×2、レッド×3",
+    "sortOrder": 33,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158817",
+    "catalog": "1588",
+    "barcode": "4965534158817",
+    "nameJa": "ボヌールはしケースセット(アソート WH：5 RED：5→ WH：3 RED：4 GRAY：3)",
+    "nameEn": "PLASTIC CHOPSTICKS CASE SET BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158817.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158817.jpg"
+    ],
+    "size": "ケース 192×30×15mm、はし 180×7×7mm",
+    "capacity": null,
+    "material": "本体 PE、フタ・はし PS",
+    "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
+    "sortOrder": 34,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158596",
+    "catalog": "1585R",
+    "barcode": "4965534158596",
+    "nameJa": "ボヌールマグカップ　レッド",
+    "nameEn": "PLASTIC MUG RED BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158596.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158596.jpg"
+    ],
+    "size": "81×103×85mm",
+    "capacity": "300ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 35,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158794",
+    "catalog": "1587R",
+    "barcode": "4965534158794",
+    "nameJa": "ボヌールスープマグ　レッド",
+    "nameEn": "PLASTIC SOUP MUG RED BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158794.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158794.jpg"
+    ],
+    "size": "107×130×65mm",
+    "capacity": "400ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 36,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159395",
+    "catalog": "1593R",
+    "barcode": "4965534159395",
+    "nameJa": "ボヌールNEWランチポットM ﾚｯﾄﾞ",
+    "nameEn": "PLASTIC LUNCH POT M RED BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159395.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159395.jpg"
+    ],
+    "size": "99×81×52mm",
+    "capacity": "150ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 37,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159890",
+    "catalog": "1598R",
+    "barcode": "4965534159890",
+    "nameJa": "ボヌール ランチスクエア L レッド",
+    "nameEn": "PLASTIC LUNCH POT SQUARE L RED BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159890.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159890.jpg"
+    ],
+    "size": "136×77×55mm",
+    "capacity": "250ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 38,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159692",
+    "catalog": "1596R",
+    "barcode": "4965534159692",
+    "nameJa": "ボヌール ランチスクエア LL レッド",
+    "nameEn": "PLASTIC LUNCH POT SQUARE LL RED BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159692.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159692.jpg"
+    ],
+    "size": "90×161×65mm",
+    "capacity": "440ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 39,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534106092",
+    "catalog": "1060R",
+    "barcode": "4965534106092",
+    "nameJa": "ボヌール　ランチスクエア　３L レッド",
+    "nameEn": "PLASTIC LUNCH SQUARE 3L RED",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534106092.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534106092.jpg"
+    ],
+    "size": "185×110×56mm",
+    "capacity": "500ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 40,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534106078",
+    "catalog": "1060BK",
+    "barcode": "4965534106078",
+    "nameJa": "ボヌール　ランチスクエア　３L ダークグレー",
+    "nameEn": "PLASTIC LUNCH SQUARE 3L DARK GRAY",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534106078.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534106078.jpg"
+    ],
+    "size": "185×110×56mm",
+    "capacity": "500ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 41,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158312",
+    "catalog": "1583",
+    "barcode": "4965534158312",
+    "nameJa": "ボヌールミニカップＳ２Ｐ",
+    "nameEn": "PLASTIC MINI CUP S 2P BONHEUR",
+    "countryOrigin": "VIETNAM",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158312.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158312.jpg"
+    ],
+    "size": "62×55×34mm (1P)",
+    "capacity": "48ml(1P)",
+    "material": "PP",
+    "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
+    "sortOrder": 42,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158411",
+    "catalog": "1584",
+    "barcode": "4965534158411",
+    "nameJa": "ボヌールミニカップＳＳ３Ｐ",
+    "nameEn": "PLASTIC MINI CUP SS 3P BONHEUR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158411.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158411.jpg"
+    ],
+    "size": "45×40×28mm (1P)",
+    "capacity": "18ml(1P)",
+    "material": "PP",
+    "assortment": "ホワイト×3、レッド×4、ダークグレー×3",
+    "sortOrder": 43,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534158619",
+    "catalog": "1586",
+    "barcode": "4965534158619",
+    "nameJa": "ボヌール  マグキャップ",
+    "nameEn": "SILICONE BONHEUR MUG CAP",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158619.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534158619.jpg"
+    ],
+    "size": "103×96×10mm",
+    "capacity": null,
+    "material": "シリコーンゴム",
+    "assortment": "ベージュ×4、レッド×6",
+    "sortOrder": 44,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159999",
+    "catalog": "1599R",
+    "barcode": "4965534159999",
+    "nameJa": "ボヌール　ケース付スプーン レッド",
+    "nameEn": "PLASTIC SPOON WITH CASE RED",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159999.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159999.jpg"
+    ],
+    "size": "ケース 68×51×25mm、スプーン 163×36×15mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 45,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159975",
+    "catalog": "1599DG",
+    "barcode": "4965534159975",
+    "nameJa": "ボヌール　ケース付スプーン ダークグレー",
+    "nameEn": "PLASTIC SPOON WITH CASE DARK GRAY",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159975.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159975.jpg"
+    ],
+    "size": "ケース 68×51×25mm、スプーン 163×36×15mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 46,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353014",
+    "catalog": "35301",
+    "barcode": "4965534353014",
+    "nameJa": "ネスタ仕切り付きランチボックス フラフィ",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353014.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353014.jpg"
+    ],
+    "size": "144×106×45mm",
+    "capacity": "480ml",
+    "material": "本体・仕切り PP、フタ PE",
+    "assortment": "犬×2、猫×2、鳥×2、花×2",
+    "sortOrder": 47,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534356312",
+    "catalog": "3563",
+    "barcode": "4965534356312",
+    "nameJa": "おにぎりランチボックス アソート",
+    "nameEn": "PLASTIC RICE BALL LUNCH BOX ASSORT",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356312.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356312.jpg"
+    ],
+    "size": "181×98×50mm",
+    "capacity": "480ml",
+    "material": "本体・中子 PP、フタ ポリエチレン",
+    "assortment": "グレージュ×6、グリーン×4",
+    "sortOrder": 48,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350013",
+    "catalog": "3500",
+    "barcode": "4965534350013",
+    "nameJa": "家事をへらす保存食器 L アソート",
+    "nameEn": "PLASTIC FOOD CONTAINER L ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350013.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350013.jpg"
+    ],
+    "size": "153×150×42mm",
+    "capacity": "490ml",
+    "material": "PP",
+    "assortment": "ホワイト×5、ネイビー×3",
+    "sortOrder": 49,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350129",
+    "catalog": "3501",
+    "barcode": "4965534350129",
+    "nameJa": "家事をへらす保存食器 M アソート",
+    "nameEn": "PLASTIC FOOD CONTAINER M ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350129.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350129.jpg"
+    ],
+    "size": "125×121×56mm",
+    "capacity": "440ml",
+    "material": "PP",
+    "assortment": "ホワイト×6、ライトブルー×4",
+    "sortOrder": 50,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350211",
+    "catalog": "3502",
+    "barcode": "4965534350211",
+    "nameJa": "家事をへらす保存食器 S アソート",
+    "nameEn": "PLASTIC FOOD CONTAINER S ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350211.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350211.jpg"
+    ],
+    "size": "103×99×56mm",
+    "capacity": "280ml",
+    "material": "PP",
+    "assortment": "ホワイト×6、グレー×4",
+    "sortOrder": 51,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350310",
+    "catalog": "3503",
+    "barcode": "4965534350310",
+    "nameJa": "家事をへらす保存食器 SS アソート",
+    "nameEn": "PLASTIC FOOD CONTAINER SS ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350310.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350310.jpg"
+    ],
+    "size": "84×80×56mm",
+    "capacity": "170ml",
+    "material": "PP",
+    "assortment": "ホワイト×6、ターコイズブルー×4",
+    "sortOrder": 52,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352512",
+    "catalog": "3525",
+    "barcode": "4965534352512",
+    "nameJa": "保温保冷タンブラー TH アソート",
+    "nameEn": "PLASTIC TUMBLER ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352512-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352512-1.jpg"
+    ],
+    "size": "φ80×108mm",
+    "capacity": "320ml",
+    "material": "PP",
+    "assortment": "ベージュ×2、ブルーグレー×2、ダークグレー×2",
+    "sortOrder": 53,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534115025",
+    "catalog": "1150",
+    "barcode": "4965534115025",
+    "nameJa": "チェリーノマグ アニマル",
+    "nameEn": "PLASTIC MUG CUP",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534115025.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534115025.jpg"
+    ],
+    "size": "81×105×89mm",
+    "capacity": "360ml",
+    "material": "PP",
+    "assortment": "恐竜×2、アヒル×2、ペンギン×2、ハムスター×2",
+    "sortOrder": 54,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351041",
+    "catalog": "3510BL",
+    "barcode": "4965534351041",
+    "nameJa": "ジョルノ　マグカップ あじさいブルー",
+    "nameEn": "PLASTIC MUG CUP 320ml BLUE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351041-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351041-1.jpg"
+    ],
+    "size": "106×80×95mm",
+    "capacity": "320ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 55,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351096",
+    "catalog": "3510PK",
+    "barcode": "4965534351096",
+    "nameJa": "ジョルノ　マグカップ さくらピンク",
+    "nameEn": "PLASTIC MUG CUP 320ml PINK",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351096-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351096-1.jpg"
+    ],
+    "size": "106×80×95mm",
+    "capacity": "320ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 56,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534355315",
+    "catalog": "3553",
+    "barcode": "4965534355315",
+    "nameJa": "プレーンマグ アソート",
+    "nameEn": "PLASTIC MUG ASSORT",
+    "countryOrigin": "JAPAN",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355315.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355315.jpg"
+    ],
+    "size": "115×80×87mm",
+    "capacity": "360ml",
+    "material": "PP",
+    "assortment": "ブルーグレー×5、ライトグレー×5",
+    "sortOrder": 57,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352215",
+    "catalog": "3522",
+    "barcode": "4965534352215",
+    "nameJa": "すくいやすい食器 M",
+    "nameEn": "PLASTIC PLATE M",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352215.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352215.jpg"
+    ],
+    "size": "161×130×53mm",
+    "capacity": "470ml",
+    "material": "PP",
+    "assortment": "ベージュ×6、ブルーグレー×4",
+    "sortOrder": 58,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352116",
+    "catalog": "3521",
+    "barcode": "4965534352116",
+    "nameJa": "すくいやすい食器 S",
+    "nameEn": "PLASTIC PLATE S",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352116.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352116.jpg"
+    ],
+    "size": "121×105×50mm",
+    "capacity": "240ml",
+    "material": "PP",
+    "assortment": "ベージュ×6、ブルーグレー×4",
+    "sortOrder": 59,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352611",
+    "catalog": "3526",
+    "barcode": "4965534352611",
+    "nameJa": "食パン皿 アソート",
+    "nameEn": "PLASTIC PLATE FOR TOAST ASST",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352611.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352611.jpg"
+    ],
+    "size": "251×171×20mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "ベージュ×6、ネイビー×4",
+    "sortOrder": 60,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534325028",
+    "catalog": "3250",
+    "barcode": "4965534325028",
+    "nameJa": "粉ミルクスプーン",
+    "nameEn": "PLASTIC POWDERED MILK SPOON",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534325028.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534325028.jpg"
+    ],
+    "size": "100ml用 176×40×28mm、50ml用 180×26×21mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "グレー×6、アイボリー×4",
+    "sortOrder": 61,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534333412",
+    "catalog": "33341",
+    "barcode": "4965534333412",
+    "nameJa": "しぼれるパウチスタンド",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534333412.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534333412.jpg"
+    ],
+    "size": "174×45×29mm",
+    "capacity": null,
+    "material": "本体 PS、滑り止め 熱可塑性エラストマー",
+    "assortment": "グレー×6、ライトブルー×4",
+    "sortOrder": 62,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534355711",
+    "catalog": "35571",
+    "barcode": "4965534355711",
+    "nameJa": "バイカラーコップ300 ポップ",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355711.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355711.jpg"
+    ],
+    "size": "φ75×90mm",
+    "capacity": "300ml",
+    "material": "AS樹脂",
+    "assortment": "クリアブルー×クリアイエロー×4、クリアピンク×クリアブルー×4",
+    "sortOrder": 63,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534355728",
+    "catalog": "3557",
+    "barcode": "4965534355728",
+    "nameJa": "バイカラーコップ300 シンプル",
+    "nameEn": "PLASTIC CUP 300 SIMPLE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355728.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355728.jpg"
+    ],
+    "size": "φ75×90mm",
+    "capacity": "300ml",
+    "material": "AS樹脂",
+    "assortment": "クリア×クリアブラウン×3、クリア×クリアブルー×3、クリア×クリアグリーン×2",
+    "sortOrder": 64,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353915",
+    "catalog": "35391",
+    "barcode": "4965534353915",
+    "nameJa": "キフレ グラス　M クリア",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353915.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353915.jpg"
+    ],
+    "size": "φ86×100mm",
+    "capacity": "370ml",
+    "material": "AS樹脂",
+    "assortment": "なし",
+    "sortOrder": 65,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353939",
+    "catalog": "35393",
+    "barcode": "4965534353939",
+    "nameJa": "キフレグラスM アンバー",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353939.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353939.jpg"
+    ],
+    "size": "φ86×100mm",
+    "capacity": "370ml",
+    "material": "AS樹脂",
+    "assortment": "なし",
+    "sortOrder": 66,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353946",
+    "catalog": "35394",
+    "barcode": "4965534353946",
+    "nameJa": "キフレグラスM ブルーグレー",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353946.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353946.jpg"
+    ],
+    "size": "φ86×100mm",
+    "capacity": "370ml",
+    "material": "AS樹脂",
+    "assortment": "なし",
+    "sortOrder": 67,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354028",
+    "catalog": "35402",
+    "barcode": "4965534354028",
+    "nameJa": "キフレ グラス　L カラー",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354028.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354028.jpg"
+    ],
+    "size": "φ82×130mm",
+    "capacity": "410ml",
+    "material": "AS樹脂",
+    "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
+    "sortOrder": 68,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353922",
+    "catalog": "35392",
+    "barcode": "4965534353922",
+    "nameJa": "キフレ グラス　M カラー",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353922.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353922.jpg"
+    ],
+    "size": "φ86×100mm",
+    "capacity": "370ml",
+    "material": "AS樹脂",
+    "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
+    "sortOrder": 69,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354127",
+    "catalog": "35412",
+    "barcode": "4965534354127",
+    "nameJa": "キフレ マグ カラー",
+    "nameEn": "PLASTIC MUG CUP COLOR",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354127.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354127.jpg"
+    ],
+    "size": "86×112×100mm",
+    "capacity": "430ml",
+    "material": "AS樹脂",
+    "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
+    "sortOrder": 70,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353724",
+    "catalog": "35372",
+    "barcode": "4965534353724",
+    "nameJa": "キフレ ボウル　S カラー",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353724.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353724.jpg"
+    ],
+    "size": "φ105×51mm",
+    "capacity": "240ml",
+    "material": "AS樹脂",
+    "assortment": "イエロー×2、グリーン×2、ブルー×2、ピンク×2",
+    "sortOrder": 71,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534156219",
+    "catalog": "1562",
+    "barcode": "4965534156219",
+    "nameJa": "ＰＳタンブラーＬ　ホワイト",
+    "nameEn": "PLASTIC TUMBLER L WHITE",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534156219.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534156219.jpg"
+    ],
+    "size": "φ82×131mm",
+    "capacity": "410ml",
+    "material": "PS",
+    "assortment": "ホワイト×5、ブラック×5",
+    "sortOrder": 72,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354516",
+    "catalog": "3545",
+    "barcode": "4965534354516",
+    "nameJa": "クレール ボウル110 クリア",
+    "nameEn": "PLASTIC BOWL110",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354516.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354516.jpg"
+    ],
+    "size": "φ110×57mm",
+    "capacity": "400ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 73,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354714",
+    "catalog": "3547",
+    "barcode": "4965534354714",
+    "nameJa": "クレールグラス Ｌ クリア",
+    "nameEn": "",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354714.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354714.jpg"
+    ],
+    "size": "φ78×114mm",
+    "capacity": "330ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 74,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354912",
+    "catalog": "3549",
+    "barcode": "4965534354912",
+    "nameJa": "クレールグラス トール クリア",
+    "nameEn": "PLASTIC GLASS TALL",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354912.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354912.jpg"
+    ],
+    "size": "67×67×141mm",
+    "capacity": "230ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 75,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354417",
+    "catalog": "3544",
+    "barcode": "4965534354417",
+    "nameJa": "割れないシンプルマグ",
+    "nameEn": "PLASTIC SIMPLE MUG  280ml",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354417.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354417.jpg"
+    ],
+    "size": "78×108×83mm",
+    "capacity": "280ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 76,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354318",
+    "catalog": ".3543",
+    "barcode": "4965534354318",
+    "nameJa": "割れないワイングラス",
+    "nameEn": "PET WINE GLASS",
+    "countryOrigin": "MLAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354318.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354318.jpg"
+    ],
+    "size": "φ76×159mm",
+    "capacity": "260ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 77,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534354219",
+    "catalog": "3542",
+    "barcode": "4965534354219",
+    "nameJa": "割れないシャンパングラス",
+    "nameEn": "",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354219.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534354219.jpg"
+    ],
+    "size": "φ55×192mm",
+    "capacity": "100ml",
+    "material": "PET(ECOZEN)",
+    "assortment": "なし",
+    "sortOrder": 78,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534159012",
+    "catalog": "1590DB",
+    "barcode": "4965534159012",
+    "nameJa": "ダブルタンブラーデザインBREATH",
+    "nameEn": "PLASTIC DOUBLE TUMBLER DESIGN - BREATH",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159012.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534159012.jpg"
+    ],
+    "size": "85×80×123mm",
+    "capacity": "320ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "ベージュ×2、ブルーグレー×2、ブラック×2",
+    "sortOrder": 79,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350617",
+    "catalog": "3506",
+    "barcode": "4965534350617",
+    "nameJa": "ブリエ　タンブラー アソート",
+    "nameEn": "PLASTIC TUMBLER ASSORT",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350617.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534350617.jpg"
+    ],
+    "size": "φ80×110mm",
+    "capacity": "360ml",
+    "material": "PP",
+    "assortment": "グレー×5、ブルー×5",
+    "sortOrder": 80,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534356213",
+    "catalog": "3562",
+    "barcode": "4965534356213",
+    "nameJa": "ブリエ 小鉢 アソート",
+    "nameEn": "PLASTIC SMALL BOWL ASSORT",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356213.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356213.jpg"
+    ],
+    "size": "φ81×70mm",
+    "capacity": "240ml",
+    "material": "PP",
+    "assortment": "クリアグリーン×5、クリアネイビー×5",
+    "sortOrder": 81,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534350624",
+    "catalog": "3506",
+    "barcode": "4965534350624",
+    "nameJa": "ブリエ タンブラー ホワイト",
+    "nameEn": "",
+    "countryOrigin": "JAPAN",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 82,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534356114",
+    "catalog": "3561",
+    "barcode": "4965534356114",
+    "nameJa": "ブリエ 茶碗 アソート",
+    "nameEn": "PLASTIC RICE BOWL ASSORT",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356114.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356114.jpg"
+    ],
+    "size": "φ115×61mm",
+    "capacity": "320ml",
+    "material": "PP",
+    "assortment": "クリアグリーン×5、クリアネイビー×5",
+    "sortOrder": 83,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534356015",
+    "catalog": "3560",
+    "barcode": "4965534356015",
+    "nameJa": "ブリエ 丼ぶり小 アソート",
+    "nameEn": "PLASTIC BOWL S ASSORT",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356015.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356015.jpg"
+    ],
+    "size": "φ132×72mm",
+    "capacity": "570ml",
+    "material": "PP",
+    "assortment": "クリアグリーン×4、クリアネイビー×4",
+    "sortOrder": 84,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534355919",
+    "catalog": "3559",
+    "barcode": "4965534355919",
+    "nameJa": "ブリエ 浅鉢 アソート",
+    "nameEn": "PLASTIC SHALLOW BOWL ASSORT",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355919.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534355919.jpg"
+    ],
+    "size": "φ129×50mm",
+    "capacity": "430ml",
+    "material": "PP",
+    "assortment": "クリアグリーン×5、クリアネイビー×5",
+    "sortOrder": 85,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351751",
+    "catalog": "3517",
+    "barcode": "4965534351751",
+    "nameJa": "ドリンクボトル350　フラワー",
+    "nameEn": "PLASTIC DRINK BOTTLE350",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351751.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351751.jpg"
+    ],
+    "size": "φ65×142mm",
+    "capacity": "380ml",
+    "material": "本体 PET(ECOZEN)、フタ・中フタ PP",
+    "assortment": "四連×3、フレーム×3",
+    "sortOrder": 86,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351768",
+    "catalog": "3517",
+    "barcode": "4965534351768",
+    "nameJa": "ドリンクボトル350 pattern アソート",
+    "nameEn": "PLASTIC DRINK BOTTLE 350 pattern",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351768.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351768.jpg"
+    ],
+    "size": "φ65×142mm",
+    "capacity": "380ml",
+    "material": "本体 PET(ECOZEN)、フタ・中フタ PP",
+    "assortment": "英字×2、チューリップ×2、うさぎ×2",
+    "sortOrder": 87,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351812",
+    "catalog": "3518",
+    "barcode": "4965534351812",
+    "nameJa": "ドリンクボトル150 SP付 hungry",
+    "nameEn": "PET DRINK BOTTLE 150 HUNGRY",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351812.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351812.jpg"
+    ],
+    "size": "φ46×134mm",
+    "capacity": "165ml",
+    "material": "本体 PET(ECOZEN)、フタ(内側) ABS樹脂、フタ(外側) AS樹脂",
+    "assortment": "鳥×2、恐竜×2、動物×2",
+    "sortOrder": 88,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351829",
+    "catalog": "3518",
+    "barcode": "4965534351829",
+    "nameJa": "ドリンクボトル150 SP付 sea",
+    "nameEn": "PET DRINK BOTTLE 150 SEA",
+    "countryOrigin": "MALAYSIA",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351829.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351829.jpg"
+    ],
+    "size": "φ46×134mm",
+    "capacity": "165ml",
+    "material": "本体 PET(ECOZEN)、フタ(内側) ABS樹脂、フタ(外側) AS樹脂",
+    "assortment": "オレンジ×2、イエロー×2、ブルー×2",
+    "sortOrder": 89,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534356411",
+    "catalog": "3564",
+    "barcode": "4965534356411",
+    "nameJa": "ドリンクボトル500 プレーン",
+    "nameEn": "PLASTIC DRINK BOTTLE 500ml",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356411.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534356411.jpg"
+    ],
+    "size": "φ65×197mm",
+    "capacity": "530ml",
+    "material": "本体 AS樹脂、フタ・中フタ PP",
+    "assortment": "なし",
+    "sortOrder": 90,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534335218",
+    "catalog": "3352",
+    "barcode": "4965534335218",
+    "nameJa": "ハンドル付きボトルカバー 500 アニマル",
+    "nameEn": "POLYESTER BOTTLE COVER 500 ANIMAL",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335218.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335218.jpg"
+    ],
+    "size": "φ65×270mm",
+    "capacity": null,
+    "material": "本体 合成ゴム・ポリエステル、ジョイント PP",
+    "assortment": "ブラック×5、アイボリー×4、ライトグリーン×3",
+    "sortOrder": 91,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534335010",
+    "catalog": "3350",
+    "barcode": "4965534335010",
+    "nameJa": "カラビナ付 ボトルカバー150 petit",
+    "nameEn": "SYNTHETIC RUBBER DRINK COVER",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335010-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335010-1.jpg"
+    ],
+    "size": "φ50×155mm",
+    "capacity": null,
+    "material": "本体 合成ゴム・ポリエステル・PP、カラビナ アルミ合金",
+    "assortment": "グレー×4、ブルー×4、アイボリー×4",
+    "sortOrder": 92,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534859004",
+    "catalog": "859",
+    "barcode": "4965534859004",
+    "nameJa": "保冷剤レギュラー３Ｐ",
+    "nameEn": "COOLING GELL 3P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534859004.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534859004.jpg"
+    ],
+    "size": "68×120mm (1P)",
+    "capacity": null,
+    "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
+    "assortment": "なし",
+    "sortOrder": 93,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534860000",
+    "catalog": "860",
+    "barcode": "4965534860000",
+    "nameJa": "保冷剤ロング３Ｐ",
+    "nameEn": "COOLING GELL LONG 3P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534860000.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534860000.jpg"
+    ],
+    "size": "55×150mm (1P)",
+    "capacity": null,
+    "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
+    "assortment": "なし",
+    "sortOrder": 94,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534864008",
+    "catalog": "864",
+    "barcode": "4965534864008",
+    "nameJa": "保冷剤大　1Ｐ",
+    "nameEn": "CELLULOSE ICING PAT L 1P",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534864008.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534864008.jpg"
+    ],
+    "size": "130×110mm",
+    "capacity": null,
+    "material": "内容物 カルボキシメチルセルロース、外装 ナイロンポリエチレン",
+    "assortment": "なし",
+    "sortOrder": 95,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534152815",
+    "catalog": "1528",
+    "barcode": "4965534152815",
+    "nameJa": "本格温泉たまご器",
+    "nameEn": "PLASTIC SOFT EGG COOKER",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534152815.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534152815.jpg"
+    ],
+    "size": "126×97×100mm",
+    "capacity": null,
+    "material": "本体・フタ・底スノコ PP、底栓 ナイロン",
+    "assortment": "なし",
+    "sortOrder": 96,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534104517",
+    "catalog": "1045",
+    "barcode": "4965534104517",
+    "nameJa": "SIKIRI おかずカップ収納ケース",
+    "nameEn": "PLASTIC FOOD CUP CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534104517.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534104517.jpg"
+    ],
+    "size": "170×165×46mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 97,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534520713",
+    "catalog": "520W",
+    "barcode": "4965534520713",
+    "nameJa": "ミリオンパックL型ホワイト",
+    "nameEn": "PLASTIC FOOD STORAGE-1700ml W",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534520713-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534520713-1.jpg"
+    ],
+    "size": "170×238×62mm",
+    "capacity": "1.7L",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 98,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534522717",
+    "catalog": "522W",
+    "barcode": "4965534522717",
+    "nameJa": "ミリオンパック浅型　ホワイト",
+    "nameEn": "PLASTIC SHALLOW FOOD STORAGE W",
+    "countryOrigin": "Ｊ色変",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534522717.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534522717.jpg"
+    ],
+    "size": "135×185×61mm",
+    "capacity": "870ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 99,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534522748",
+    "catalog": "522B",
+    "barcode": "4965534522748",
+    "nameJa": "ミリオンパック浅型　ブルー",
+    "nameEn": "PLASTIC SHALLOW FOOD STORAGE B",
+    "countryOrigin": "Ｊ色変",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534522748.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534522748.jpg"
+    ],
+    "size": "135×185×61mm",
+    "capacity": "870ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 100,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534523714",
+    "catalog": "523W",
+    "barcode": "4965534523714",
+    "nameJa": "ミリオンパックミニ2P W",
+    "nameEn": "PLASTIC FOOD STORAGE MINI 2P W",
+    "countryOrigin": "Ｊ色変",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534523714.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534523714.jpg"
+    ],
+    "size": "100×150×86mm (1P)",
+    "capacity": "380ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 101,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351614",
+    "catalog": "3516",
+    "barcode": "4965534351614",
+    "nameJa": "ミリオンパックS2P　320",
+    "nameEn": "PLASTIC FOOD PACK S2P　320",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351614.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351614.jpg"
+    ],
+    "size": "117×80×52mm (1P)",
+    "capacity": "320ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 102,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534526036",
+    "catalog": "526",
+    "barcode": "4965534526036",
+    "nameJa": "ミリオンパックミニミニ３Ｐ",
+    "nameEn": "PLASTIC FOOD STORAGE MINIMINI 3P",
+    "countryOrigin": "Ｊ色変",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534526036.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534526036.jpg"
+    ],
+    "size": "69×98×144mm (1P)",
+    "capacity": "200ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 103,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534517003",
+    "catalog": "517",
+    "barcode": "4965534517003",
+    "nameJa": "ミリオンパックミニミニ4P",
+    "nameEn": "PLASTIC FOOD STORAGE MINIMINI 4P",
+    "countryOrigin": "Ｊ色変",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534517003.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534517003.jpg"
+    ],
+    "size": "64×89×104mm (1P)",
+    "capacity": "80ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 104,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534154024",
+    "catalog": "1540",
+    "barcode": "4965534154024",
+    "nameJa": "WHITY PACK 1600",
+    "nameEn": "PLASTIC FOOD STORAGE PACK 1600",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154024.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154024.jpg"
+    ],
+    "size": "238×138×80mm",
+    "capacity": "1.6L",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 105,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534154123",
+    "catalog": "1541",
+    "barcode": "4965534154123",
+    "nameJa": "WHITY PACK 800",
+    "nameEn": "PLASTIC FOOD STORAGE PACK 800",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154123.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154123.jpg"
+    ],
+    "size": "238×138×40mm",
+    "capacity": "800ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 106,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534154222",
+    "catalog": "1542",
+    "barcode": "4965534154222",
+    "nameJa": "WHITY PACK 700",
+    "nameEn": "PLASTIC FOOD STORAGE PACK 700",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154222.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154222.jpg"
+    ],
+    "size": "164×92×79mm",
+    "capacity": "700ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 107,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534154321",
+    "catalog": "1543",
+    "barcode": "4965534154321",
+    "nameJa": "WHITY PACK 350",
+    "nameEn": "PLASTIC FOOD STORAGE PACK 350",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154321.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534154321.jpg"
+    ],
+    "size": "164×92×80mm",
+    "capacity": "350ml",
+    "material": "本体 PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 108,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534212762",
+    "catalog": "212G",
+    "barcode": "4965534212762",
+    "nameJa": "フレッシュロック浅　グリーン",
+    "nameEn": "PLASTIC FOOD CONTAINER SHALLOW -GREEN",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534212762-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534212762-1.jpg"
+    ],
+    "size": "138×110×50mm",
+    "capacity": "340ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 109,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534214766",
+    "catalog": "214G",
+    "barcode": "4965534214766",
+    "nameJa": "フレッシュロック正方形　グリーン",
+    "nameEn": "PLASTIC FOOD CONTAINER SQUARE -GREEN",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534214766-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534214766-1.jpg"
+    ],
+    "size": "137×137×60mm",
+    "capacity": "600ml",
+    "material": "本体・フタ PP、パッキン シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 110,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351331",
+    "catalog": "3513",
+    "barcode": "4965534351331",
+    "nameJa": "ビストロシェフ 角中600 ブラウン",
+    "nameEn": "PLASTIC MICROWAVABLE FOOD CONTAINER SQUARE M 600  BROWN",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351331.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351331.jpg"
+    ],
+    "size": "128×190×54mm",
+    "capacity": "600ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 111,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534351539",
+    "catalog": "3515",
+    "barcode": "4965534351539",
+    "nameJa": "ビストロシェフ 角ミニ2P200 ブラウン",
+    "nameEn": "PLASTIC MICROWAVABLE FOOD CONTAINER SQUARE MINI 2P 200  BROWN",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351539.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534351539.jpg"
+    ],
+    "size": "94×145×38mm (1P)",
+    "capacity": "200ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 112,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353120",
+    "catalog": "3531",
+    "barcode": "4965534353120",
+    "nameJa": "角型パック S3P 300",
+    "nameEn": "PLASTIC MICROWAVE SAFE FOOD CONTAINER  S 3P 300ML",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353120.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353120.jpg"
+    ],
+    "size": "130×89×53mm (1P)",
+    "capacity": "300ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 113,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353427",
+    "catalog": "3534",
+    "barcode": "4965534353427",
+    "nameJa": "角型ロングパック 950",
+    "nameEn": "PLASTIC MICROWAVE SAFE FOOD CONTAINER LONG 950 ML",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353427.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353427.jpg"
+    ],
+    "size": "217×122×57mm",
+    "capacity": "950ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 114,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353526",
+    "catalog": "3535",
+    "barcode": "4965534353526",
+    "nameJa": "ごはん大盛り一膳パック2P",
+    "nameEn": "PLASTIC FOOD CONTAINER FOR RICE 2P 400ml",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353526.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353526.jpg"
+    ],
+    "size": "131×131×54mm (1P)",
+    "capacity": "400ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 115,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534353625",
+    "catalog": "3536",
+    "barcode": "4965534353625",
+    "nameJa": "ごはん一膳パック3P",
+    "nameEn": "PLASTIC FOOD CONTAINER FOR RICE 3P 250ml",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353625.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534353625.jpg"
+    ],
+    "size": "100×107×55mm (1P)",
+    "capacity": "250ml",
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 116,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352925",
+    "catalog": "3529",
+    "barcode": "4965534352925",
+    "nameJa": "ワンプッシュピッチャー1000 ホワイト",
+    "nameEn": "PLASTIC ONE PUSH PITCHER 1000 WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352925.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352925.jpg"
+    ],
+    "size": "92×92×207mm",
+    "capacity": "1L",
+    "material": "本体・フラップ PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 117,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352932",
+    "catalog": "3529",
+    "barcode": "4965534352932",
+    "nameJa": "ワンプッシュピッチャー1000 グレージュ",
+    "nameEn": "PLASTIC ONE PUSH PITCHER 1000 GRAYGE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352932.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352932.jpg"
+    ],
+    "size": "92×92×207mm",
+    "capacity": "1L",
+    "material": "本体・フラップ PP、フタ PE",
+    "assortment": "なし",
+    "sortOrder": 118,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534772334",
+    "catalog": "772",
+    "barcode": "4965534772334",
+    "nameJa": "ワンプッシュしょう油さし大 ASST",
+    "nameEn": "PLASTIC ONE PUCH SAUCE JUG L 140ml ASST",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534772334.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534772334.jpg"
+    ],
+    "size": "φ63×94mm",
+    "capacity": "140ml",
+    "material": "本体 PET、フタ シリコーンゴム",
+    "assortment": "ブラック×3、ホワイト×3",
+    "sortOrder": 119,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4955934529006",
+    "catalog": "529",
+    "barcode": "4955934529006",
+    "nameJa": "システムシュガーポット ホワイト",
+    "nameEn": "PLASTIC SYSTEM SUGER POT　WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 120,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965634529747",
+    "catalog": "529",
+    "barcode": "4965634529747",
+    "nameJa": "システムシュガーポット ブルー",
+    "nameEn": "PLASTIC SYSTEM SUGER POT　BLUE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 121,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534529730",
+    "catalog": "529",
+    "barcode": "4965534529730",
+    "nameJa": "システムシュガーポット　ピンク",
+    "nameEn": "PLASTIC SYSTEM SUGER POT　PINK",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534529730.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534529730.jpg"
+    ],
+    "size": "160×89×95mm",
+    "capacity": "650ml",
+    "material": "本体・フタ PS、取手・スプーン PP",
+    "assortment": "なし",
+    "sortOrder": 122,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534253000",
+    "catalog": "253",
+    "barcode": "4965534253000",
+    "nameJa": "立つしゃもじ",
+    "nameEn": "PLASTIC RICE SERVER",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534253000-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534253000-1.jpg"
+    ],
+    "size": "202×65×28mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 123,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4966534182676",
+    "catalog": null,
+    "barcode": "4966534182676",
+    "nameJa": "シリアルスプーン",
+    "nameEn": "",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 124,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352819",
+    "catalog": "3528",
+    "barcode": "4965534352819",
+    "nameJa": "まな板すっきりボウル",
+    "nameEn": "PLASTIC KITCHEN BOWL FROM CUTTING BOARD",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352819.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352819.jpg"
+    ],
+    "size": "145×145×70mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "ホワイト×6、ブラック×4",
+    "sortOrder": 125,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352420",
+    "catalog": "35242",
+    "barcode": "4965534352420",
+    "nameJa": "冷凍庫用スタンド2P",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352420.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352420.jpg"
+    ],
+    "size": "130×80×130mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 126,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534715713",
+    "catalog": "715",
+    "barcode": "4965534715713",
+    "nameJa": "レンジでおもちふっくら",
+    "nameEn": "PLASTIC TRAY FOR MICRO WAVE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534715713.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534715713.jpg"
+    ],
+    "size": "φ250×5mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 127,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534902779",
+    "catalog": "902",
+    "barcode": "4965534902779",
+    "nameJa": "パニエカトラリー グレージュ",
+    "nameEn": "PLASTIC CUTLERY CONTAINER GREIGE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534902779.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534902779.jpg"
+    ],
+    "size": "240×95×50mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 128,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534910712",
+    "catalog": "910",
+    "barcode": "4965534910712",
+    "nameJa": "ブランやわらか吸盤スリムポケット",
+    "nameEn": "PLASTIC SOFT SLIM POCKET",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534910712.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534910712.jpg"
+    ],
+    "size": "57×120×67mm",
+    "capacity": null,
+    "material": "本体 PE、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 129,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534340229",
+    "catalog": null,
+    "barcode": "4965534340229",
+    "nameJa": "ギフト用 (RIBS Sy 7L2P ホワイト",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340229.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340229.jpg"
+    ],
+    "size": "300×200×320mm (1P、取手除く)",
+    "capacity": null,
+    "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
+    "assortment": "なし",
+    "sortOrder": 130,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534340328",
+    "catalog": null,
+    "barcode": "4965534340328",
+    "nameJa": "ギフト用 保温光パッグM2P ホワイト",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340328.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340328.jpg"
+    ],
+    "size": "260×170×280mm (1P、取手除く)",
+    "capacity": null,
+    "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
+    "assortment": "なし",
+    "sortOrder": 131,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534340427",
+    "catalog": null,
+    "barcode": "4965534340427",
+    "nameJa": "ギフト用 保温光パッグS2P ホワイト",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340427.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534340427.jpg"
+    ],
+    "size": "210×110×280mm (1P、取手除く)",
+    "capacity": null,
+    "material": "外側 PP、内側 アルミニウム箔、粘着面 アクリル",
+    "assortment": "なし",
+    "sortOrder": 132,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534334716",
+    "catalog": "3347",
+    "barcode": "4965534334716",
+    "nameJa": "バブルディスペンサー300ml クリアカラー",
+    "nameEn": "PLASTIC BUBBLE PUMP 300ml CLEAR",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/01/4965534334716-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/01/4965534334716-1.jpg"
+    ],
+    "size": "φ77×173mm",
+    "capacity": null,
+    "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス・ガラス・PE",
+    "assortment": "なし",
+    "sortOrder": 133,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534334914",
+    "catalog": "3349",
+    "barcode": "4965534334914",
+    "nameJa": "携帯用泡ポンプ 30ml",
+    "nameEn": "",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534334914-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534334914-1.jpg"
+    ],
+    "size": "φ35×108mm",
+    "capacity": "30ml",
+    "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス",
+    "assortment": "なし",
+    "sortOrder": 134,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534130523",
+    "catalog": "1305",
+    "barcode": "4965534130523",
+    "nameJa": "携帯用泡ポンプ 50ml",
+    "nameEn": "",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534130523-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534130523-1.jpg"
+    ],
+    "size": "φ35×130mm",
+    "capacity": "50ml",
+    "material": "本体 PET、ストロー PE、ヘッド PP・ステンレス",
+    "assortment": "なし",
+    "sortOrder": 135,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534310116",
+    "catalog": "310",
+    "barcode": "4965534310116",
+    "nameJa": "抗菌歯ブラシキャップ4P",
+    "nameEn": "PLASTIC TOOTH BRUSH CAP 4P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534310116.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534310116.jpg"
+    ],
+    "size": "28×36×17mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 136,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534163910",
+    "catalog": "1639",
+    "barcode": "4965534163910",
+    "nameJa": "抗菌歯ブラシキャップ　ネコ4P",
+    "nameEn": "PLASTIC THEETH BRUSH CASE CAT 4P",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534163910.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534163910.jpg"
+    ],
+    "size": "顔 39×18×29mm（1P）、シルエット 40×18×31mm（1P）",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 137,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534337427",
+    "catalog": "3374",
+    "barcode": "4965534337427",
+    "nameJa": "大きな歯ブラシケース",
+    "nameEn": "PLASTC TOOTHBRUSH CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534337427.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534337427.jpg"
+    ],
+    "size": "70×51×200mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 138,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534141420",
+    "catalog": "1414",
+    "barcode": "4965534141420",
+    "nameJa": "洗濯石けんケース",
+    "nameEn": "PLASTIC LAUNDRY SOAP CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534141420.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534141420.jpg"
+    ],
+    "size": "88×124×53mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 139,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534663717",
+    "catalog": "663W",
+    "barcode": "4965534663717",
+    "nameJa": "angee ロック式石けん箱 ホワイト",
+    "nameEn": "PLASTIC SOAP CASE WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534663717.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534663717.jpg"
+    ],
+    "size": "120×96×54mm",
+    "capacity": null,
+    "material": "本体・中皿 PP、フタ PS",
+    "assortment": "なし",
+    "sortOrder": 140,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534664714",
+    "catalog": "664W",
+    "barcode": "4965534664714",
+    "nameJa": "angee タテ置き石けん台 ホワイト",
+    "nameEn": "PLASTIC SOAP TRAY WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534664714-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534664714-1.jpg"
+    ],
+    "size": "119×76×56mm",
+    "capacity": null,
+    "material": "本体 PP、底フタ PE",
+    "assortment": "なし",
+    "sortOrder": 141,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534352703",
+    "catalog": "3527",
+    "barcode": "4965534352703",
+    "nameJa": "Q-BAN 吸盤用補助板2P",
+    "nameEn": "POLYURETHANE SUCTION CUP 2P",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352703.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534352703.jpg"
+    ],
+    "size": "φ65 (1P)",
+    "capacity": null,
+    "material": "ポリウレタン、PET",
+    "assortment": "なし",
+    "sortOrder": 142,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534657600",
+    "catalog": "657",
+    "barcode": "4965534657600",
+    "nameJa": "溝つき吸盤2P",
+    "nameEn": "RUBBER SUCTION 2P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534657600.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534657600.jpg"
+    ],
+    "size": "φ57×22mm (1P)",
+    "capacity": null,
+    "material": "塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 143,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534659604",
+    "catalog": "659",
+    "barcode": "4965534659604",
+    "nameJa": "溝つき吸盤ミニ 6P",
+    "nameEn": "RUBBER SUCTION MINI 6P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534659604.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534659604.jpg"
+    ],
+    "size": "40×43×18mm (1P)",
+    "capacity": null,
+    "material": "塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 144,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534646116",
+    "catalog": "646CW",
+    "barcode": "4965534646116",
+    "nameJa": "Q-BAN　タオルハンガー クールホワイト",
+    "nameEn": "PLASTIC  TOWEL HANGER w/SUCTION COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534646116-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534646116-1.jpg"
+    ],
+    "size": "100×170×75mm",
+    "capacity": null,
+    "material": "本体 PP、球 PS、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 145,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534649117",
+    "catalog": "649CW",
+    "barcode": "4965534649117",
+    "nameJa": "Q-BAN　２way石けん皿 クールホワイト",
+    "nameEn": "PLASTIC  2 WAY SOAP RACK w/SUCTION COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534649117-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534649117-1.jpg"
+    ],
+    "size": "100×130×40mm",
+    "capacity": null,
+    "material": "本体 PP、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 146,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534650113",
+    "catalog": "650CW",
+    "barcode": "4965534650113",
+    "nameJa": "Q-BAN　ワイドラック クールホワイト",
+    "nameEn": "PLASTIC  WIDE RACK  w/SUCTION COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534650113.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534650113.jpg"
+    ],
+    "size": "216×105×48mm",
+    "capacity": null,
+    "material": "本体 PP、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 147,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534651110",
+    "catalog": "651CW",
+    "barcode": "4965534651110",
+    "nameJa": "Q-BAN　キッチンポケット クールホワイト",
+    "nameEn": "PLASTIC  KITCHEN POCKET w/SUCTION COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534651110.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534651110.jpg"
+    ],
+    "size": "145×70×109mm",
+    "capacity": null,
+    "material": "本体 PP、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 148,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534652117",
+    "catalog": "652CW",
+    "barcode": "4965534652117",
+    "nameJa": "Q-BAN　石けん長持ちラック クールホワイト",
+    "nameEn": "PLASTIC SOAP RACK  w/SUCTION COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534652117-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534652117-1.jpg"
+    ],
+    "size": "144×116×55mm",
+    "capacity": null,
+    "material": "本体 PP、輪ゴム ポリウレタン、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 149,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534122528",
+    "catalog": "1225CW",
+    "barcode": "4965534122528",
+    "nameJa": "Q-BAN　スポンジラック　フック付 クールホワイト",
+    "nameEn": "PLASTIC SPONGE RACK w/SUCTION & RUBBER BAND-Q-BAN COOL WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534122528.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534122528.jpg"
+    ],
+    "size": "187×75×88mm",
+    "capacity": null,
+    "material": "本体・フック PP、吸盤 塩化ビニル樹脂",
+    "assortment": "なし",
+    "sortOrder": 150,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534386609",
+    "catalog": "386C",
+    "barcode": "4965534386609",
+    "nameJa": "オプティスタンド　クリア",
+    "nameEn": "PLASTIC UTILITY ORGANIZER C",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534386609.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534386609.jpg"
+    ],
+    "size": "100×78×87mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 151,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534949712",
+    "catalog": "949",
+    "barcode": "4965534949712",
+    "nameJa": "ワンプッシュ小物ケース",
+    "nameEn": "PLASTIC ONE PUSH CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534949712.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534949712.jpg"
+    ],
+    "size": "96×103×53mm",
+    "capacity": null,
+    "material": "本体・底フタ PP、ヒンジ部分 シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 152,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534950718",
+    "catalog": "950",
+    "barcode": "4965534950718",
+    "nameJa": "ワンプッシュフラップ",
+    "nameEn": "PLASTIC ONE PUSH LID",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534950718.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534950718.jpg"
+    ],
+    "size": "82×120×11mm",
+    "capacity": null,
+    "material": "本体 PP、ヒンジ部分 シリコーンゴム、粘着テープ アクリル・ウレタン系",
+    "assortment": "なし",
+    "sortOrder": 153,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534951715",
+    "catalog": "951",
+    "barcode": "4965534951715",
+    "nameJa": "ワンプッシュフラップ　ミニ",
+    "nameEn": "PLASTIC ONE PUSH LID MINI",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534951715.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534951715.jpg"
+    ],
+    "size": "62×90×9mm",
+    "capacity": null,
+    "material": "本体 PP、ヒンジ部分 シリコーンゴム、粘着テープ アクリル・ウレタン系",
+    "assortment": "なし",
+    "sortOrder": 154,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534952729",
+    "catalog": "952",
+    "barcode": "4965534952729",
+    "nameJa": "ワンプッシュウェットティッシュケース ホワイト",
+    "nameEn": "PLASTIC WET TISSUE CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534952729.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534952729.jpg"
+    ],
+    "size": "105×170×61mm",
+    "capacity": null,
+    "material": "本体・底フタ PP、ヒンジ部分 シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 155,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534134316",
+    "catalog": "1343",
+    "barcode": "4965534134316",
+    "nameJa": "ワンプッシュ小物ケース ボトル",
+    "nameEn": "PLASTIC ONE PUSH BOTTLE CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534134316.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534134316.jpg"
+    ],
+    "size": "73×76×93mm",
+    "capacity": null,
+    "material": "本体 PP、ヒンジ部分 シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 156,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534133616",
+    "catalog": "1336",
+    "barcode": "4965534133616",
+    "nameJa": "ワンプッシュ小物ケース ツイン",
+    "nameEn": "PLASTIC ONE PUSH ACESARY TWIN CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534133616.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534133616.jpg"
+    ],
+    "size": "96×143×32mm",
+    "capacity": null,
+    "material": "本体 PP、ヒンジ部分 シリコーンゴム",
+    "assortment": "なし",
+    "sortOrder": 157,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534338127",
+    "catalog": "338",
+    "barcode": "4965534338127",
+    "nameJa": "トイレ用コーナーポット",
+    "nameEn": "PLASTIC TOILET CORNER DUSTBIN",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534338127.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534338127.jpg"
+    ],
+    "size": "109×109×180mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 158,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534339124",
+    "catalog": "339",
+    "barcode": "4965534339124",
+    "nameJa": "トイレ用ブラシケース ホワイト",
+    "nameEn": "PLASTIC TOILET BRUSH CASE WHITE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534339124.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534339124.jpg"
+    ],
+    "size": "109×109×180mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 159,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534225007",
+    "catalog": "225",
+    "barcode": "4965534225007",
+    "nameJa": "コーナーラック",
+    "nameEn": "PLASTIC CORNER RACK W/4 PUSHPINS",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 160,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534226004",
+    "catalog": "226",
+    "barcode": "4965534226004",
+    "nameJa": "クイックラック",
+    "nameEn": "PLASTIC RECTANGLE CORNER RACK W/4 PUSHPINS",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": null,
+    "images": [],
+    "size": null,
+    "capacity": null,
+    "material": null,
+    "assortment": null,
+    "sortOrder": 161,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534142724",
+    "catalog": "142",
+    "barcode": "4965534142724",
+    "nameJa": "洗濯ジーンズハンガー",
+    "nameEn": "PLASTIC JEANS HANGER",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534142724.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534142724.jpg"
+    ],
+    "size": "388×221×35mm",
+    "capacity": null,
+    "material": "本体 PP、バネ 鉄",
+    "assortment": "なし",
+    "sortOrder": 162,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534222723",
+    "catalog": "222",
+    "barcode": "4965534222723",
+    "nameJa": "ランドリーハンガー５Ｐ",
+    "nameEn": "PLASTIC LAUNDRY HANGERS 5PCS",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534222723.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534222723.jpg"
+    ],
+    "size": "411×202×23mm (1P)",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 163,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534231114",
+    "catalog": "231",
+    "barcode": "4965534231114",
+    "nameJa": "スーツハンガー ペールカラー",
+    "nameEn": "PLASTIC SUIT HANGER",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534231114.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534231114.jpg"
+    ],
+    "size": "400×56×258mm",
+    "capacity": null,
+    "material": "本体 PP、フック 鉄、ストップバー PS",
+    "assortment": "ベージュ×5、ブルーグレー×5",
+    "sortOrder": 164,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534335928",
+    "catalog": "3359",
+    "barcode": "4965534335928",
+    "nameJa": "スラックスハンガー　(WH）",
+    "nameEn": "PS SLACKS HANGER WH",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335928.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335928.jpg"
+    ],
+    "size": "300×27×155mm",
+    "capacity": null,
+    "material": "本体・クリップ PS、フック・バー・バネ 鉄",
+    "assortment": "なし",
+    "sortOrder": 165,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534335942",
+    "catalog": "3359",
+    "barcode": "4965534335942",
+    "nameJa": "スラックスハンガー BL",
+    "nameEn": "PLASTIC SLACKS HANGER",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335942.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335942.jpg"
+    ],
+    "size": "300×27×155mm",
+    "capacity": null,
+    "material": "本体・クリップ PS、フック・バー・バネ 鉄",
+    "assortment": "なし",
+    "sortOrder": 166,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534335911",
+    "catalog": "33591",
+    "barcode": "4965534335911",
+    "nameJa": "スラックスハンガー BE",
+    "nameEn": "",
+    "countryOrigin": null,
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335911.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534335911.jpg"
+    ],
+    "size": "300×27×155mm",
+    "capacity": null,
+    "material": "本体・クリップ PS、フック・バー・バネ 鉄",
+    "assortment": "なし",
+    "sortOrder": 167,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534140416",
+    "catalog": "1404",
+    "barcode": "4965534140416",
+    "nameJa": "ハンカチスタンド",
+    "nameEn": "PLASTIC HAND TOWEL STAND",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534140416.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534140416.jpg"
+    ],
+    "size": "190×81×81mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 168,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534118804",
+    "catalog": "1188",
+    "barcode": "4965534118804",
+    "nameJa": "タイツクリップ 3P",
+    "nameEn": "PLASTIC TIGHTS CLIP 3P",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534118804.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534118804.jpg"
+    ],
+    "size": "66×35×80mm (1P)",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 169,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534133517",
+    "catalog": "1335",
+    "barcode": "4965534133517",
+    "nameJa": "ピルカッターケース",
+    "nameEn": "PLASTIC PILL CUTTER CASE",
+    "countryOrigin": "中國",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534133517.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534133517.jpg"
+    ],
+    "size": "82×40×16mm",
+    "capacity": null,
+    "material": "本体 ABS樹脂、カッター ステンレス",
+    "assortment": "なし",
+    "sortOrder": 170,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534148115",
+    "catalog": "148",
+    "barcode": "4965534148115",
+    "nameJa": "お薬一週間ボックス",
+    "nameEn": "PLASTIC MEDICAL BOX ONE WEEK",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534148115.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534148115.jpg"
+    ],
+    "size": "90×162×83mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 171,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534296007",
+    "catalog": "296",
+    "barcode": "4965534296007",
+    "nameJa": "携帯ピルケース　７(セブン)",
+    "nameEn": "PLASTIC  PORTABLE PILL CASE 7",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534296007.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534296007.jpg"
+    ],
+    "size": "41×76×86mm (1P)",
+    "capacity": null,
+    "material": "本体 PP、トレー PS",
+    "assortment": "なし",
+    "sortOrder": 172,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534304009",
+    "catalog": "304",
+    "barcode": "4965534304009",
+    "nameJa": "7デイズピルケース",
+    "nameEn": "PLASTIC 7DAYS PILL CASE",
+    "countryOrigin": "J→C->J",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534304009-1.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534304009-1.jpg"
+    ],
+    "size": "85×179×20mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 173,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534305006",
+    "catalog": "305",
+    "barcode": "4965534305006",
+    "nameJa": "3タイプピルケース",
+    "nameEn": "PLASTIC 3 TYPE PILL CASE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534305006.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534305006.jpg"
+    ],
+    "size": "85×179×20mm",
+    "capacity": null,
+    "material": "PP",
+    "assortment": "なし",
+    "sortOrder": 174,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534328319",
+    "catalog": "3283",
+    "barcode": "4965534328319",
+    "nameJa": "お薬チューブスタンド",
+    "nameEn": "PLASTIC MEDICINE TUBE STAND",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534328319.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534328319.jpg"
+    ],
+    "size": "77×84×60mm",
+    "capacity": null,
+    "material": "本体 PS、底フタ PE",
+    "assortment": "クリア×ホワイト×4、ホワイト×グレー×4",
+    "sortOrder": 175,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534322218",
+    "catalog": "3222",
+    "barcode": "4965534322218",
+    "nameJa": "お薬ぱっちん！ アソート",
+    "nameEn": "PLASTIC HOLE PUNCHER FOR MEDICINE",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534322218.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534322218.jpg"
+    ],
+    "size": "38×80×50mm",
+    "capacity": null,
+    "material": "本体 PS、バネ ポリアセタール樹脂",
+    "assortment": "クリア×5、ブルー×5",
+    "sortOrder": 176,
+    "status": "available"
+  },
+  {
+    "id": "yamada-4965534337915",
+    "catalog": "3379",
+    "barcode": "4965534337915",
+    "nameJa": "コンタクト収納スタンド",
+    "nameEn": "PLASTIC STAND",
+    "countryOrigin": "日本",
+    "retailPriceTwd": 22,
+    "imageUrl": "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534337915.jpg",
+    "images": [
+      "https://www.yamadakagaku.co.jp/wp-content/uploads/2026/03/4965534337915.jpg"
+    ],
+    "size": "68×71×123mm",
+    "capacity": null,
+    "material": "PS",
+    "assortment": "なし",
+    "sortOrder": 177,
+    "status": "available"
+  }
+]

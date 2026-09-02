@@ -86,6 +86,38 @@ export const products = mysqlTable("products", {
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
 
+// 山田化學 /ag 專頁商品。批發價與箱規只透過管理員 API 回傳，
+// 公開頁只取得商品資訊與 retailPriceTwd。
+export const agProducts = mysqlTable("agProducts", {
+  id: int("id").autoincrement().primaryKey(),
+  barcode: varchar("barcode", { length: 20 }).notNull().unique(),
+  catalog: varchar("catalog", { length: 50 }),
+  itemNo: varchar("itemNo", { length: 50 }),
+  nameJa: varchar("nameJa", { length: 255 }).notNull(),
+  nameEn: varchar("nameEn", { length: 255 }),
+  countryOrigin: varchar("countryOrigin", { length: 60 }),
+  innerPack: int("innerPack"),
+  piecesPerCarton: int("piecesPerCarton"),
+  wholesaleFobJpy: decimal("wholesaleFobJpy", { precision: 10, scale: 2 }),
+  cubicMeters: decimal("cubicMeters", { precision: 10, scale: 3 }),
+  grossWeightKg: decimal("grossWeightKg", { precision: 10, scale: 2 }),
+  retailPriceTwd: int("retailPriceTwd").default(22).notNull(),
+  imageUrl: text("imageUrl"),
+  images: json("images").$type<string[]>(),
+  size: varchar("size", { length: 120 }),
+  capacity: varchar("capacity", { length: 120 }),
+  material: text("material"),
+  assortment: text("assortment"),
+  status: mysqlEnum("status", ["available", "discontinued"]).default("available").notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  sourceFile: varchar("sourceFile", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AgProduct = typeof agProducts.$inferSelect;
+export type InsertAgProduct = typeof agProducts.$inferInsert;
+
 // Japan procurement trips table
 export const trips = mysqlTable("trips", {
   id: int("id").autoincrement().primaryKey(),

@@ -4,7 +4,7 @@ import { trpc } from "../lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { SiteHeader } from "@/components/SiteHeader";
 import { toast } from "sonner";
-import { Package, ClipboardList, Users, BarChart3, Pencil, Trash2, Search, Plus, X, ShieldCheck, Upload } from "lucide-react";
+import { Package, ClipboardList, Users, BarChart3, Pencil, Trash2, Search, Plus, X, ShieldCheck, Upload, FileSpreadsheet } from "lucide-react";
 
 const A = trpc as any;
 
@@ -68,6 +68,7 @@ export default function AdminManage() {
 
   const TABS = [
     { k: "products", label: "商品管理", icon: Package },
+    { k: "ag", label: "AG 報價商品", icon: FileSpreadsheet },
     { k: "orders", label: "訂單管理", icon: ClipboardList },
     { k: "users", label: "會員管理", icon: Users },
     { k: "report", label: "銷售報表", icon: BarChart3 },
@@ -97,6 +98,7 @@ export default function AdminManage() {
           })}
         </div>
         {tab === "products" && <ProductsTab />}
+        {tab === "ag" && <AgProductsTab />}
         {tab === "orders" && <OrdersTab />}
         {tab === "users" && <UsersTab meId={user.id} />}
         {tab === "report" && <ReportTab />}
@@ -106,7 +108,7 @@ export default function AdminManage() {
 }
 
 function ProductsTab() {
-  const { data: products = [], isLoading, refetch } = trpc.products.list.useQuery();
+  const { data: products = [], isLoading, refetch } = A.admin.products.useQuery(undefined, { retry: false });
   const { data: categories = [] } = trpc.categories.list.useQuery();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<any>(null);
@@ -191,6 +193,201 @@ function ProductsTab() {
       )}
 
       {editing && <EditModal product={editing} categories={categories} onClose={() => setEditing(null)} onSave={saveEdit} saving={updateMut.isPending || stockMut.isPending} />}
+    </div>
+  );
+}
+
+type AgImportRow = {
+  barcode: string;
+  catalog?: string | null;
+  itemNo?: string | null;
+  nameJa: string;
+  nameEn?: string | null;
+  countryOrigin?: string | null;
+  innerPack?: number | null;
+  piecesPerCarton?: number | null;
+  wholesaleFobJpy?: string | null;
+  cubicMeters?: string | null;
+  grossWeightKg?: string | null;
+  retailPriceTwd: number;
+  imageUrl?: string | null;
+  images?: string[] | null;
+  size?: string | null;
+  capacity?: string | null;
+  material?: string | null;
+  assortment?: string | null;
+  status: "available" | "discontinued";
+  sortOrder: number;
+};
+
+const valueOrNull = (value: unknown) => {
+  if (value == null || String(value).trim() === "") return null;
+  return String(value).trim();
+};
+
+const numberOrNull = (value: unknown) => {
+  if (value == null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+
+function normalizedQuoteRow(row: Record<string, unknown>) {
+  return Object.fromEntries(Object.entries(row).map(([key, value]) => [key.trim().replace(/\s+/g, " "), value]));
+}
+
+function AgProductsTab() {
+  const { data: products = [], isLoading, error, refetch } = A.admin.agProducts.useQuery(undefined, { retry: false });
+  const importMutation = A.admin.importAgProducts.useMutation({
+    onSuccess: (result: any) => {
+      toast.success(`已匯入 ${result.imported} 筆 AG 商品`);
+      refetch();
+    },
+    onError: (e: any) => toast.error(e.message || "匯入失敗"),
+  });
+  const [preview, setPreview] = useState<AgImportRow[]>([]);
+  const [sourceFile, setSourceFile] = useState("");
+  const [reading, setReading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function parseQuotation(file: File) {
+    setReading(true);
+    try {
+      const XLSX = await import("xlsx");
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array", cellDates: false });
+      const sheet = workbook.Sheets.QUOTE || workbook.Sheets[workbook.SheetNames[0]];
+      if (!sheet) throw new Error("找不到 QUOTE 工作表");
+
+      const metadataResponse = await fetch("/ag-products.json");
+      const metadataRows = metadataResponse.ok ? await metadataResponse.json() : [];
+      const metadata = new Map((metadataRows as any[]).map((item) => [String(item.barcode), item]));
+      const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null, raw: true });
+      const rows = rawRows.map((raw, index) => {
+        const row = normalizedQuoteRow(raw);
+        const barcode = String(row.BARCODE ?? "").replace(/\D/g, "");
+        const fob = numberOrNull(row["F.O.B."]);
+        const meta: any = metadata.get(barcode) || {};
+        return {
+          barcode,
+          catalog: valueOrNull(row.CATALOG),
+          itemNo: valueOrNull(row["ITEM NO."]),
+          nameJa: String(row["商品名"] || row.DESCRIPTION || "").trim(),
+          nameEn: valueOrNull(row.DESCRIPTION),
+          countryOrigin: valueOrNull(row["COUNTRY OF ORIGIN"]),
+          innerPack: numberOrNull(row.INNER),
+          piecesPerCarton: numberOrNull(row["PCS /CTN"] ?? row["PCS/CTN"]),
+          wholesaleFobJpy: fob == null ? null : fob.toFixed(2),
+          cubicMeters: numberOrNull(row.M3)?.toFixed(3) ?? null,
+          grossWeightKg: numberOrNull(row.GW)?.toFixed(2) ?? null,
+          retailPriceTwd: 22,
+          imageUrl: meta.imageUrl || null,
+          images: meta.images || null,
+          size: meta.size || null,
+          capacity: meta.capacity || null,
+          material: meta.material || null,
+          assortment: meta.assortment || null,
+          status: fob == null ? "discontinued" as const : "available" as const,
+          sortOrder: index,
+        } satisfies AgImportRow;
+      }).filter((row) => /^\d{8,14}$/.test(row.barcode) && row.nameJa);
+
+      if (!rows.length) throw new Error("報價單內沒有可辨識的商品資料");
+      setPreview(rows);
+      setSourceFile(file.name);
+      toast.success(`已讀取 ${rows.length} 筆，請確認後再匯入`);
+    } catch (e: any) {
+      setPreview([]);
+      setSourceFile("");
+      toast.error(e.message || "無法讀取報價單");
+    } finally {
+      setReading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  const activeCount = preview.filter((row) => row.status === "available").length;
+  const discontinuedCount = preview.length - activeCount;
+  const fobValues = preview.map((row) => Number(row.wholesaleFobJpy)).filter(Number.isFinite);
+  const savedProducts = (products as any[]) || [];
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border border-[#0ABAB5]/20 bg-[#F2FFFD] p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-bold">山田化學報價單</h2>
+            <p className="mt-1 text-sm text-gray-600">前台固定顯示 NT$22；F.O.B.、箱規與重量只保存在管理員後台。</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={reading}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0ABAB5] px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+          >
+            <FileSpreadsheet className="h-4 w-4" /> {reading ? "讀取中…" : "選擇報價單"}
+          </button>
+          <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) parseQuotation(file);
+          }} />
+        </div>
+      </div>
+
+      {preview.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-amber-900">
+              <div className="font-bold">待匯入：{sourceFile}</div>
+              <div className="mt-1">販售中 {activeCount} 筆・廢番 {discontinuedCount} 筆・F.O.B. ¥{Math.min(...fobValues)}–¥{Math.max(...fobValues)}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => importMutation.mutate({ sourceFile, rows: preview })}
+              disabled={importMutation.isPending}
+              className="rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
+            >
+              {importMutation.isPending ? "匯入中…" : "確認匯入後台"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {error ? (
+        <div className="py-8 text-center text-gray-400">後台資料表尚未就緒，請先完成網站部署。</div>
+      ) : isLoading ? (
+        <div className="py-8 text-center text-gray-400">載入中…</div>
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-500">
+                <tr>
+                  <th className="p-3 text-left font-medium">商品</th>
+                  <th className="p-3 text-left font-medium">條碼</th>
+                  <th className="p-3 text-right font-medium">前台定價</th>
+                  <th className="p-3 text-right font-medium">F.O.B.</th>
+                  <th className="p-3 text-right font-medium">內裝 / 箱入</th>
+                  <th className="p-3 text-center font-medium">狀態</th>
+                </tr>
+              </thead>
+              <tbody>
+                {savedProducts.length === 0 ? (
+                  <tr><td colSpan={6} className="p-8 text-center text-gray-400">尚未匯入 AG 報價單</td></tr>
+                ) : savedProducts.map((product) => (
+                  <tr key={product.id} className="border-t border-gray-100">
+                    <td className="p-3"><div className="font-medium">{product.nameJa}</div><div className="text-xs text-gray-400">{product.catalog || "—"}</div></td>
+                    <td className="p-3 text-gray-600">{product.barcode}</td>
+                    <td className="p-3 text-right font-bold text-[#E26D5C]">NT${product.retailPriceTwd}</td>
+                    <td className="p-3 text-right">{product.wholesaleFobJpy == null ? "—" : `¥${Number(product.wholesaleFobJpy).toLocaleString()}`}</td>
+                    <td className="p-3 text-right">{product.innerPack ?? "—"} / {product.piecesPerCarton ?? "—"}</td>
+                    <td className="p-3 text-center"><span className={"rounded-full px-2 py-1 text-xs " + (product.status === "available" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500")}>{product.status === "available" ? "販售中" : "廢番"}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -405,7 +602,7 @@ function UsersTab({ meId }: any) {
 function ReportTab() {
   const { data: today } = A.admin.todayRevenue.useQuery(undefined, { retry: false });
   const { data: month } = A.admin.monthRevenue.useQuery(undefined, { retry: false });
-  const { data: products = [] } = trpc.products.list.useQuery();
+  const { data: products = [] } = A.admin.products.useQuery(undefined, { retry: false });
   const { data: orders = [] } = A.admin.orders.useQuery(undefined, { retry: false });
   const card = (label: string, value: any, sub?: string) => (
     <div className="bg-white rounded-xl border border-gray-200 p-5">

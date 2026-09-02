@@ -12,6 +12,7 @@ export function MobileMenu() {
   const menuItems = [
     { href: '/', label: t('nav.home') || 'ホーム' },
     { href: '/products', label: t('products.allProducts') || 'すべての商品' },
+    { href: '/ag', label: '山田化學 NT$22' },
     {
       href: '/cart',
       label: `${t('nav.cart') || 'カート'}${itemCount > 0 ? ` (${itemCount})` : ''}`,
@@ -19,7 +20,7 @@ export function MobileMenu() {
   ];
 
   return (
-    <div className="relative md:hidden">
+    <div className="relative">
       {/* 漢堡按鈕 */}
       <button
         type="button"

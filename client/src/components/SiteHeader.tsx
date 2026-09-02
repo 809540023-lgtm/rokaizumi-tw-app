@@ -79,7 +79,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
         </Link>
 
         <form
-          className="flex-1 max-w-2xl hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2"
+          className="hidden max-w-2xl flex-1 items-center rounded-full bg-gray-100 px-4 py-2 lg:flex"
           onSubmit={(e) => {
             e.preventDefault();
             if (onSearchSubmit) onSearchSubmit();
@@ -94,10 +94,16 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           />
         </form>
 
-        <nav className="ml-auto hidden items-center gap-2 md:flex">
+        <nav className="ml-auto hidden items-center gap-2 lg:flex">
           <div>
             <LanguageSwitcher />
           </div>
+          <Link
+            href="/ag"
+            className="flex items-center gap-1.5 rounded-lg bg-[#0ABAB5]/10 px-3 py-2 text-sm font-bold text-[#087F7B]"
+          >
+            22元商品
+          </Link>
           <Link
             href="/daiko"
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#E26D5C]/10 text-[#E26D5C] text-sm font-bold"
@@ -158,7 +164,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
             )}
           </Link>
         </nav>
-        <div className="ml-auto flex items-center gap-1 md:hidden">
+        <div className="ml-auto flex items-center gap-1 lg:hidden">
           <button
             type="button"
             onClick={cycleLanguage}

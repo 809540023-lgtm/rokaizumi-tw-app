@@ -1,7 +1,9 @@
 import { eq, desc, and, gte, lt, lte, avg, sql, or, like } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
-import { categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type Announcement, type ApiLog, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog, type Order, type Product, type Review, type Trip, type TripVideo } from '../drizzle/schema';
+import fs from 'node:fs';
+import path from 'node:path';
+import { agProducts, categories, products, trips, tripVideos, users, cartItems, orders, orderItems, reviews, wishlists, suppliers, purchases, announcements, apiKeys, apiLogs, type AgProduct, type Announcement, type ApiLog, type InsertAgProduct, type InsertCategory, type InsertProduct, type InsertTrip, type InsertTripVideo, type InsertCartItem, type InsertOrder, type InsertOrderItem, type InsertReview, type InsertWishlist, type InsertSupplier, type InsertPurchase, type InsertAnnouncement, type InsertApiKey, type InsertApiLog, type Order, type Product, type Review, type Trip, type TripVideo } from '../drizzle/schema';
 import { ENV } from './_core/env';
 import {
   initializeFallbackDB,
@@ -23,15 +25,124 @@ export type ProductListItem = Pick<
   Product,
   | 'id'
   | 'name'
+  | 'nameJa'
+  | 'nameEn'
+  | 'origin'
   | 'description'
   | 'price'
   | 'categoryId'
   | 'imageUrl'
   | 'images'
   | 'status'
+  | 'specifications'
   | 'stock'
   | 'lowStockThreshold'
 >;
+
+const publicProductColumns = {
+  id: products.id,
+  name: products.name,
+  nameJa: products.nameJa,
+  nameEn: products.nameEn,
+  origin: products.origin,
+  description: products.description,
+  price: products.price,
+  categoryId: products.categoryId,
+  imageUrl: products.imageUrl,
+  images: products.images,
+  status: products.status,
+  specifications: products.specifications,
+  stock: products.stock,
+  lowStockThreshold: products.lowStockThreshold,
+};
+
+function toPublicProduct(product: Record<string, any>): ProductListItem {
+  return {
+    id: product.id,
+    name: product.name,
+    nameJa: product.nameJa ?? null,
+    nameEn: product.nameEn ?? null,
+    origin: product.origin ?? null,
+    description: product.description ?? null,
+    price: product.price,
+    categoryId: product.categoryId,
+    imageUrl: product.imageUrl ?? null,
+    images: product.images ?? null,
+    status: product.status,
+    specifications: product.specifications ?? null,
+    stock: product.stock,
+    lowStockThreshold: product.lowStockThreshold,
+  };
+}
+
+export type PublicAgProduct = Pick<
+  AgProduct,
+  | 'id'
+  | 'barcode'
+  | 'catalog'
+  | 'nameJa'
+  | 'nameEn'
+  | 'countryOrigin'
+  | 'retailPriceTwd'
+  | 'imageUrl'
+  | 'images'
+  | 'size'
+  | 'capacity'
+  | 'material'
+  | 'assortment'
+  | 'status'
+  | 'sortOrder'
+>;
+
+const publicAgProductColumns = {
+  id: agProducts.id,
+  barcode: agProducts.barcode,
+  catalog: agProducts.catalog,
+  nameJa: agProducts.nameJa,
+  nameEn: agProducts.nameEn,
+  countryOrigin: agProducts.countryOrigin,
+  retailPriceTwd: agProducts.retailPriceTwd,
+  imageUrl: agProducts.imageUrl,
+  images: agProducts.images,
+  size: agProducts.size,
+  capacity: agProducts.capacity,
+  material: agProducts.material,
+  assortment: agProducts.assortment,
+  status: agProducts.status,
+  sortOrder: agProducts.sortOrder,
+};
+
+function getFallbackAgProducts(): PublicAgProduct[] {
+  const file = [
+    'dist/public/ag-products.json',
+    'client/public/ag-products.json',
+    'server/public/ag-products.json',
+  ]
+    .map(candidate => path.resolve(process.cwd(), candidate))
+    .find(candidate => fs.existsSync(candidate));
+
+  if (!file) return [];
+  const rows = JSON.parse(fs.readFileSync(file, 'utf8')) as Array<Record<string, any>>;
+  return rows
+    .filter(row => row.status === 'available')
+    .map((row, index) => ({
+      id: index + 1,
+      barcode: String(row.barcode),
+      catalog: row.catalog ?? null,
+      nameJa: String(row.nameJa),
+      nameEn: row.nameEn ?? null,
+      countryOrigin: row.countryOrigin ?? null,
+      retailPriceTwd: Number(row.retailPriceTwd) || 22,
+      imageUrl: row.imageUrl ?? null,
+      images: Array.isArray(row.images) ? row.images : null,
+      size: row.size ?? null,
+      capacity: row.capacity ?? null,
+      material: row.material ?? null,
+      assortment: row.assortment ?? null,
+      status: 'available',
+      sortOrder: Number(row.sortOrder) || index,
+    }));
+}
 
 export type CategoryListItem = Pick<typeof categories.$inferSelect, 'id' | 'name'>;
 
@@ -145,26 +256,78 @@ export async function createCategory(data: InsertCategory) {
 // ========== Products ==========
 export async function getAllProducts(): Promise<ProductListItem[]> {
   return withFallback<ProductListItem[]>(
-    () => db.select().from(products).orderBy(desc(products.createdAt)),
-    () => getFallbackProducts()
+    () => db.select(publicProductColumns).from(products).orderBy(desc(products.createdAt)),
+    async () => (await getFallbackProducts()).map(toPublicProduct)
   );
 }
 
-export async function getProductById(id: number) {
+export async function getProductById(id: number): Promise<ProductListItem | null> {
   return await withFallback(
     async () => {
-      const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+      const result = await db.select(publicProductColumns).from(products).where(eq(products.id, id)).limit(1);
       return result[0] || null;
     },
-    () => getFallbackProductById(id)
+    async () => {
+      const product = await getFallbackProductById(id);
+      return product ? toPublicProduct(product) : null;
+    }
   );
 }
 
 export async function getProductsByCategory(categoryId: number) {
   return await withFallback(
-    () => db.select().from(products).where(eq(products.categoryId, categoryId)).orderBy(desc(products.createdAt)),
-    () => getFallbackProductsByCategory(categoryId)
+    () => db.select(publicProductColumns).from(products).where(eq(products.categoryId, categoryId)).orderBy(desc(products.createdAt)),
+    async () => (await getFallbackProductsByCategory(categoryId)).map(toPublicProduct)
   );
+}
+
+/** 完整商品資料只供管理員路由使用。 */
+export async function getAllProductsForAdmin(): Promise<Product[]> {
+  return withFallback<Product[]>(
+    () => db.select().from(products).orderBy(desc(products.createdAt)),
+    async () => (await getFallbackProducts()) as unknown as Product[]
+  );
+}
+
+export async function getProductByIdForAdmin(id: number): Promise<Product | null> {
+  return await withFallback(
+    async () => {
+      const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+      return result[0] || null;
+    },
+    async () => (await getFallbackProductById(id)) as unknown as Product | null
+  );
+}
+
+export async function getPublicAgProducts(): Promise<PublicAgProduct[]> {
+  return withFallback(
+    () => db
+      .select(publicAgProductColumns)
+      .from(agProducts)
+      .where(eq(agProducts.status, 'available'))
+      .orderBy(agProducts.sortOrder, agProducts.id),
+    async () => getFallbackAgProducts()
+  );
+}
+
+export async function getAdminAgProducts(): Promise<AgProduct[]> {
+  return db.select().from(agProducts).orderBy(agProducts.sortOrder, agProducts.id);
+}
+
+export async function importAgProducts(rows: InsertAgProduct[]): Promise<{ imported: number }> {
+  if (!isDbConnected) throw new Error('資料庫目前不可用，無法匯入報價單');
+
+  await db.transaction(async (tx: any) => {
+    for (const row of rows) {
+      const { barcode, createdAt: _createdAt, updatedAt: _updatedAt, ...updateValues } = row as any;
+      await tx
+        .insert(agProducts)
+        .values({ ...row, barcode })
+        .onDuplicateKeyUpdate({ set: updateValues });
+    }
+  });
+
+  return { imported: rows.length };
 }
 
 export async function createProduct(data: InsertProduct) {
@@ -212,11 +375,11 @@ export async function searchProducts(query: string) {
   return await withFallback(
     () =>
       db
-        .select()
+        .select(publicProductColumns)
         .from(products)
         .where(or(like(products.name, searchTerm), like(products.description, searchTerm)))
         .orderBy(desc(products.createdAt)),
-    () => searchFallbackProducts(query)
+    async () => (await searchFallbackProducts(query)).map(toPublicProduct)
   );
 }
 

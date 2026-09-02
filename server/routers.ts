@@ -16,6 +16,29 @@ const checkoutItemInput = z.object({
   quantity: z.number().int().min(1).max(99),
 });
 
+const agProductImportRow = z.object({
+  barcode: z.string().regex(/^\d{8,14}$/),
+  catalog: z.string().nullable().optional(),
+  itemNo: z.string().nullable().optional(),
+  nameJa: z.string().min(1).max(255),
+  nameEn: z.string().max(255).nullable().optional(),
+  countryOrigin: z.string().max(60).nullable().optional(),
+  innerPack: z.number().int().nonnegative().nullable().optional(),
+  piecesPerCarton: z.number().int().nonnegative().nullable().optional(),
+  wholesaleFobJpy: z.string().nullable().optional(),
+  cubicMeters: z.string().nullable().optional(),
+  grossWeightKg: z.string().nullable().optional(),
+  retailPriceTwd: z.number().int().nonnegative().default(22),
+  imageUrl: z.string().nullable().optional(),
+  images: z.array(z.string()).max(5).nullable().optional(),
+  size: z.string().max(120).nullable().optional(),
+  capacity: z.string().max(120).nullable().optional(),
+  material: z.string().nullable().optional(),
+  assortment: z.string().nullable().optional(),
+  status: z.enum(['available', 'discontinued']).default('available'),
+  sortOrder: z.number().int().nonnegative().default(0),
+});
+
 type CheckoutItemInput = z.infer<typeof checkoutItemInput>;
 
 async function resolveOrderItems(items: CheckoutItemInput[]) {
@@ -193,6 +216,11 @@ export const appRouter = router({
         if (!isAdmin) throw new Error('Unauthorized');
         return db.deleteTrip(input.id);
       }),
+  }),
+
+  // /ag 公開商品只回傳定價與公開規格，不含 F.O.B. 批發價或箱規。
+  agProducts: router({
+    list: publicProcedure.query(() => db.getPublicAgProducts()),
   }),
 
   // Trip Videos API
@@ -574,16 +602,27 @@ export const appRouter = router({
       }),
 
     // Products Management
-    products: protectedProcedure
+    products: adminProcedure
       .query(async () => {
-        return await db.getAllProducts();
+        return await db.getAllProductsForAdmin();
       }),
 
-    productById: protectedProcedure
+    productById: adminProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
-        return await db.getProductById(input.id);
+        return await db.getProductByIdForAdmin(input.id);
       }),
+
+    agProducts: adminProcedure.query(() => db.getAdminAgProducts()),
+
+    importAgProducts: adminProcedure
+      .input(z.object({
+        sourceFile: z.string().min(1).max(255),
+        rows: z.array(agProductImportRow).min(1).max(500),
+      }))
+      .mutation(({ input }) => db.importAgProducts(
+        input.rows.map(row => ({ ...row, sourceFile: input.sourceFile }))
+      )),
 
     deleteProduct: protectedProcedure
       .input(z.object({ id: z.number() }))
