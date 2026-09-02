@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
+import { LINE_ADD_FRIEND_URL } from '@/lib/line';
 import { guides } from './Guides';
 
 export default function GuideDetail() {
@@ -87,7 +88,7 @@ export default function GuideDetail() {
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <a
-              href="https://line.me/R/ti/p/@rokaizumi"
+              href={LINE_ADD_FRIEND_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-[#0ABAB5] hover:bg-[#089B96] text-white px-8 py-3.5 rounded-xl font-bold transition-colors"

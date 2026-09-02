@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BadgeInfo, ChevronLeft, ChevronRight, ExternalLink, Globe2, PackageSearch, Search, X } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { buildAgLineInquiryUrl } from "@/lib/line";
 import { trpc } from "@/lib/trpc";
 
 type AgProduct = {
@@ -187,7 +188,7 @@ export default function Ag() {
                           官方資訊
                         </button>
                       <a
-                        href="https://line.me/R/ti/p/@rokaizumi"
+                        href={buildAgLineInquiryUrl(product)}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#0ABAB5] px-2 py-2 text-xs font-bold text-white hover:bg-[#089B96]"
@@ -352,7 +353,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
                 開啟山田化學官網 <ExternalLink className="h-4 w-4" />
               </a>
               <a
-                href="https://line.me/R/ti/p/@rokaizumi"
+                href={buildAgLineInquiryUrl(product)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0ABAB5] px-4 py-3 text-sm font-bold text-white hover:bg-[#089B96]"

@@ -5,6 +5,7 @@ import { trpc } from '../lib/trpc';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
+import { LINE_ADD_FRIEND_URL, LINE_OFFICIAL_ACCOUNT_ID } from '@/lib/line';
 
 const bullets = [
   { icon: '💰', title: '批發折扣', desc: '訂購量越大、折扣越多，最高再省 22%' },
@@ -160,7 +161,14 @@ export default function B2B() {
             <h2 className="text-3xl font-bold mb-2">填寫採購需求，1 個工作天內回覆</h2>
             <p className="text-gray-600">
               或直接加 LINE 客服：
-              <a href="https://line.me/R/ti/p/@rokaizumi" className="text-[#0ABAB5] font-bold">@rokaizumi</a>
+              <a
+                href={LINE_ADD_FRIEND_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#0ABAB5] font-bold"
+              >
+                {LINE_OFFICIAL_ACCOUNT_ID}
+              </a>
             </p>
           </div>
 

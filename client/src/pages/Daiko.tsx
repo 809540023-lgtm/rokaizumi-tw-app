@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Link as LinkIcon, Package, ExternalLink } from "lucide-react";
+import { LINE_ADD_FRIEND_URL } from "@/lib/line";
 
 // 國際運費級距（日圓）— 預估值，請依實際物流費率調整
 const SHIPPING: Record<
@@ -208,7 +209,7 @@ export default function Daiko() {
             </div>
 
             <a
-              href="https://line.me/R/ti/p/@rokaizumi"
+              href={LINE_ADD_FRIEND_URL}
               target="_blank"
               rel="noreferrer"
               className="mt-4 w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#06C755] text-white font-bold text-sm"
