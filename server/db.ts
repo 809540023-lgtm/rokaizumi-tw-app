@@ -301,11 +301,14 @@ export async function getProductByIdForAdmin(id: number): Promise<Product | null
 
 export async function getPublicAgProducts(): Promise<PublicAgProduct[]> {
   return withFallback(
-    () => db
-      .select(publicAgProductColumns)
-      .from(agProducts)
-      .where(eq(agProducts.status, 'available'))
-      .orderBy(agProducts.sortOrder, agProducts.id),
+    async () => {
+      const rows = await db
+        .select(publicAgProductColumns)
+        .from(agProducts)
+        .where(eq(agProducts.status, 'available'))
+        .orderBy(agProducts.sortOrder, agProducts.id);
+      return rows.length ? rows : getFallbackAgProducts();
+    },
     async () => getFallbackAgProducts()
   );
 }
