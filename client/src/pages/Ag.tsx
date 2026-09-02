@@ -261,7 +261,16 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
     ["包裝尺寸", product.officialPackageSize],
     ["外箱尺寸", product.officialCaseSize],
   ].filter(([, value]) => value);
-  const officialUrl = product.officialSourceUrl || "https://www.yamadakagaku.co.jp/products/";
+  const introduction = [
+    `「${product.nameJa}」是山田化學的生活用品。`,
+    product.size ? `商品尺寸為 ${product.size}。` : null,
+    product.capacity ? `容量為 ${product.capacity}。` : null,
+    product.material ? `材質為 ${product.material}。` : null,
+    product.assortment ? `顏色／組合：${product.assortment}。` : null,
+    product.countryOrigin ? `產地為 ${product.countryOrigin}。` : null,
+  ]
+    .filter(Boolean)
+    .join("");
 
   return (
     <div
@@ -328,6 +337,11 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
               <span className="ml-3 text-2xl font-black text-[#E26D5C]">NT$22</span>
             </div>
 
+            <section className="mt-5 rounded-xl border border-[#0ABAB5]/15 bg-[#F2FFFD] p-4">
+              <h3 className="font-bold text-[#087F7B]">商品介紹</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-700">{introduction}</p>
+            </section>
+
             <dl className="mt-5 divide-y divide-gray-100 border-y border-gray-100 text-sm">
               {specs.map(([label, value]) => (
                 <div key={label} className="grid grid-cols-[7rem_1fr] gap-3 py-2.5">
@@ -343,15 +357,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
               </p>
             )}
 
-            <div className="mt-6 grid gap-2 sm:grid-cols-2">
-              <a
-                href={officialUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50"
-              >
-                開啟山田化學官網 <ExternalLink className="h-4 w-4" />
-              </a>
+            <div className="mt-6">
               <a
                 href={LINE_ADD_FRIEND_URL}
                 target="_blank"
