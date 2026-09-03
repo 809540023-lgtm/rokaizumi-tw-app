@@ -43,7 +43,7 @@ interface SiteHeaderProps {
 export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }: SiteHeaderProps) {
   const [local, setLocal] = useState(searchQuery);
   const { user, logout } = useAuth();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { itemCount } = useCart();
   const value = onSearchChange ? searchQuery : local;
   const setValue = (v: string) => {
@@ -74,7 +74,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           <Heart className="w-7 h-7 text-[#E26D5C] fill-[#E26D5C]" />
           <div className="leading-tight">
             <div className="font-bold text-lg">ろかいずみ</div>
-            <div className="text-xs text-gray-500">日本介護用品專賣</div>
+            <div className="text-xs text-gray-500">{t("header.subtitle")}</div>
           </div>
         </Link>
 
@@ -89,7 +89,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="搜尋商品..."
+            placeholder={t("header.searchPlaceholder")}
             className="bg-transparent flex-1 outline-none text-sm"
           />
         </form>
@@ -102,19 +102,19 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
             href="/ag"
             className="flex items-center gap-1.5 rounded-lg bg-[#0ABAB5]/10 px-3 py-2 text-sm font-bold text-[#087F7B]"
           >
-            22元商品
+            {t("header.agProducts")}
           </Link>
           <Link
             href="/daiko"
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#E26D5C]/10 text-[#E26D5C] text-sm font-bold"
           >
-            代購
+            {t("header.daiko")}
           </Link>
           <Link
             href="/b2b"
             className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E26D5C] text-[#E26D5C] text-sm font-bold"
           >
-            <Building2 className="w-4 h-4" /> 企業合作
+            <Building2 className="w-4 h-4" /> {t("header.b2b")}
           </Link>
 
           {user ? (
@@ -124,7 +124,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
                   href="/manage"
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5]/10 text-[#0ABAB5] text-sm font-bold"
                 >
-                  後台
+                  {t("header.admin")}
                 </Link>
               )}
               <Link
@@ -139,7 +139,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold"
               >
-                <LogOut className="w-4 h-4" /> 登出
+                <LogOut className="w-4 h-4" /> {t("header.logout")}
               </button>
             </>
           ) : (
@@ -147,16 +147,16 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
               href="/login"
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-bold"
             >
-              <LogIn className="w-4 h-4" /> 登入
+              <LogIn className="w-4 h-4" /> {t("nav.login")}
             </Link>
           )}
 
           <Link
             href="/cart"
             className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5] text-white text-sm font-bold"
-            aria-label={`購物車，${itemCount} 件商品`}
+            aria-label={`${t("nav.cart")}，${itemCount} ${t("products.items")}`}
           >
-            <ShoppingCart className="w-4 h-4" /> 購物車
+            <ShoppingCart className="w-4 h-4" /> {t("nav.cart")}
             {itemCount > 0 && (
               <span className="min-w-5 rounded-full bg-white px-1.5 py-0.5 text-center text-xs leading-none text-[#089B96]">
                 {itemCount > 99 ? '99+' : itemCount}
@@ -178,7 +178,7 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           <Link
             href="/cart"
             className="relative rounded-lg p-2 text-[#089B96] hover:bg-[#0ABAB5]/10"
-            aria-label={`購物車，${itemCount} 件商品`}
+            aria-label={`${t("nav.cart")}，${itemCount} ${t("products.items")}`}
           >
             <ShoppingCart className="h-5 w-5" />
             {itemCount > 0 && (

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { BadgeInfo, ChevronLeft, ChevronRight, ExternalLink, Globe2, PackageSearch, Search, X } from "lucide-react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { LINE_ADD_FRIEND_URL } from "@/lib/line";
 import { trpc } from "@/lib/trpc";
 
@@ -30,8 +31,10 @@ type AgProduct = {
 };
 
 const PAGE_SIZE = 24;
+type AgLanguage = "zh" | "cn" | "ja" | "en";
 
 export default function Ag() {
+  const { language, t } = useLanguage();
   const [staticProducts, setStaticProducts] = useState<AgProduct[]>([]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -101,13 +104,13 @@ export default function Ag() {
           <div className="container mx-auto max-w-6xl px-4 py-12 sm:py-16">
             <div className="max-w-3xl">
               <span className="inline-flex rounded-full bg-[#0ABAB5]/10 px-3 py-1 text-sm font-bold text-[#087F7B]">
-                山田化學生活選品
+                {t("ag.badge")}
               </span>
               <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-5xl">
-                實用日本生活小物，<span className="text-[#E26D5C]">單件 NT$22</span>
+                {t("ag.titlePrefix")}<span className="text-[#E26D5C]">{t("ag.fixedPrice")}</span>
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600 sm:text-lg">
-                本頁商品採固定售價，已停售品項不會顯示。可用商品名稱、型號或條碼快速搜尋。
+                {t("ag.subtitle")}
               </p>
             </div>
           </div>
@@ -117,16 +120,16 @@ export default function Ag() {
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <label className="flex w-full max-w-xl items-center rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
               <Search className="mr-3 h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
-              <span className="sr-only">搜尋山田化學商品</span>
+              <span className="sr-only">{t("ag.searchLabel")}</span>
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="搜尋名稱、型號或條碼"
+                placeholder={t("ag.searchPlaceholder")}
                 className="w-full bg-transparent text-sm outline-none"
               />
             </label>
             <p className="text-sm text-gray-500" aria-live="polite">
-              共 {filtered.length} 件商品
+              {t("ag.countPrefix")} {filtered.length} {t("ag.countSuffix")}
             </p>
           </div>
 
@@ -138,7 +141,7 @@ export default function Ag() {
                     type="button"
                     onClick={() => setSelectedProduct(product)}
                     className="group relative aspect-square bg-gray-50 text-left"
-                    aria-label={`查看 ${product.nameJa} 官方商品資訊`}
+                    aria-label={`${t("ag.viewOfficial")}：${product.nameJa}`}
                   >
                     {product.imageUrl ? (
                       <img
@@ -150,19 +153,19 @@ export default function Ag() {
                     ) : (
                       <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-300">
                         <PackageSearch className="h-10 w-10" aria-hidden="true" />
-                        <span className="text-xs">圖片整理中</span>
+                        <span className="text-xs">{t("ag.imagePending")}</span>
                       </div>
                     )}
                     <span className="absolute left-2 top-2 rounded-full bg-[#E26D5C] px-2.5 py-1 text-xs font-black text-white shadow-sm">
                       NT$22
                     </span>
                     <span className="absolute inset-x-3 bottom-3 translate-y-2 rounded-lg bg-gray-900/80 px-3 py-2 text-center text-xs font-bold text-white opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
-                      查看官方資料
+                      {t("ag.viewOfficial")}
                     </span>
                   </button>
                   <div className="flex flex-1 flex-col p-3 sm:p-4">
                     <div className="mb-1 text-[11px] font-bold tracking-wide text-[#087F7B]">
-                      {product.catalog ? `型號 ${product.catalog}` : `JAN ${product.barcode}`}
+                      {product.catalog ? `${t("ag.model")} ${product.catalog}` : `JAN ${product.barcode}`}
                     </div>
                     <h2 className="line-clamp-2 min-h-10 text-sm font-bold leading-5 sm:text-base">
                       {product.nameJa}
@@ -173,12 +176,12 @@ export default function Ag() {
                     <div className="mt-auto pt-4">
                       <div className="mb-3 flex items-end justify-between gap-2">
                       <div>
-                        <div className="text-xs text-gray-400">定價</div>
+                        <div className="text-xs text-gray-400">{t("ag.listPrice")}</div>
                         <div className="text-xl font-black text-[#E26D5C]">NT$22</div>
                       </div>
                         {product.officialMatched && (
                           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#087F7B]">
-                            <BadgeInfo className="h-3.5 w-3.5" /> 官網資料
+                            <BadgeInfo className="h-3.5 w-3.5" /> {t("ag.officialData")}
                           </span>
                         )}
                       </div>
@@ -188,16 +191,16 @@ export default function Ag() {
                           onClick={() => setSelectedProduct(product)}
                           className="rounded-lg border border-[#0ABAB5] px-2 py-2 text-xs font-bold text-[#087F7B] hover:bg-[#0ABAB5]/5"
                         >
-                          官方資訊
+                          {t("ag.officialInfo")}
                         </button>
                       <a
                         href={LINE_ADD_FRIEND_URL}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#0ABAB5] px-2 py-2 text-xs font-bold text-white hover:bg-[#089B96]"
-                        aria-label={`透過 LINE 詢問 ${product.nameJa}`}
+                        aria-label={`${t("ag.lineInquiry")}：${product.nameJa}`}
                       >
-                        LINE 詢問 <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t("ag.lineInquiry")} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                       </a>
                       </div>
                     </div>
@@ -208,19 +211,19 @@ export default function Ag() {
           ) : (
             <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-gray-500">
               <PackageSearch className="mx-auto mb-3 h-10 w-10 text-gray-300" aria-hidden="true" />
-              {products.length ? "找不到符合條件的商品。" : "商品資料載入中，請稍候。"}
+              {products.length ? t("ag.noResults") : t("ag.loading")}
             </div>
           )}
 
           {pageCount > 1 && (
-            <nav className="mt-8 flex items-center justify-center gap-3" aria-label="商品分頁">
+            <nav className="mt-8 flex items-center justify-center gap-3" aria-label={t("ag.pagination")}>
               <button
                 type="button"
                 onClick={() => setPage((value) => Math.max(1, value - 1))}
                 disabled={page === 1}
                 className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <ChevronLeft className="h-4 w-4" /> 上一頁
+                <ChevronLeft className="h-4 w-4" /> {t("ag.previous")}
               </button>
               <span className="min-w-20 text-center text-sm text-gray-500">
                 {page} / {pageCount}
@@ -231,7 +234,7 @@ export default function Ag() {
                 disabled={page === pageCount}
                 className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
               >
-                下一頁 <ChevronRight className="h-4 w-4" />
+                {t("ag.next")} <ChevronRight className="h-4 w-4" />
               </button>
             </nav>
           )}
@@ -241,6 +244,8 @@ export default function Ag() {
         <OfficialProductModal
           key={selectedProduct.id}
           product={selectedProduct}
+          language={language}
+          t={t}
           onClose={() => setSelectedProduct(null)}
         />
       )}
@@ -249,31 +254,32 @@ export default function Ag() {
   );
 }
 
-function OfficialProductModal({ product, onClose }: { product: AgProduct; onClose: () => void }) {
+function OfficialProductModal({
+  product,
+  language,
+  t,
+  onClose,
+}: {
+  product: AgProduct;
+  language: AgLanguage;
+  t: (key: string) => string;
+  onClose: () => void;
+}) {
   const images = (product.images?.length ? product.images : product.imageUrl ? [product.imageUrl] : []).filter(Boolean) as string[];
   const [activeImage, setActiveImage] = useState(0);
   const specs = [
-    ["官方品番", product.officialProductNumber ? `No.${product.officialProductNumber}` : product.catalog],
-    ["JAN 條碼", product.barcode],
-    ["商品尺寸", product.size],
-    ["容量", product.capacity],
-    ["材質", product.material],
-    ["顏色／組合", product.assortment],
-    ["產地", product.countryOrigin],
-    ["官網包裝數量", product.officialQuantity],
-    ["包裝尺寸", product.officialPackageSize],
-    ["外箱尺寸", product.officialCaseSize],
+    [t("ag.spec.officialNumber"), product.officialProductNumber ? `No.${product.officialProductNumber}` : product.catalog],
+    [t("ag.spec.jan"), product.barcode],
+    [t("ag.spec.size"), product.size],
+    [t("ag.spec.capacity"), product.capacity],
+    [t("ag.spec.material"), product.material],
+    [t("ag.spec.assortment"), product.assortment],
+    [t("ag.spec.origin"), product.countryOrigin],
+    [t("ag.spec.quantity"), product.officialQuantity],
+    [t("ag.spec.packageSize"), product.officialPackageSize],
+    [t("ag.spec.caseSize"), product.officialCaseSize],
   ].filter(([, value]) => value);
-  const introduction = [
-    `「${product.nameJa}」是山田化學的生活用品。`,
-    product.size ? `商品尺寸為 ${product.size}。` : null,
-    product.capacity ? `容量為 ${product.capacity}。` : null,
-    product.material ? `材質為 ${product.material}。` : null,
-    product.assortment ? `顏色／組合：${product.assortment}。` : null,
-    product.countryOrigin ? `產地為 ${product.countryOrigin}。` : null,
-  ]
-    .filter(Boolean)
-    .join("");
+  const introduction = buildProductIntroduction(product, language);
 
   return (
     <div
@@ -290,7 +296,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
           type="button"
           onClick={onClose}
           className="absolute right-3 top-3 z-10 rounded-full bg-white/95 p-2 text-gray-500 shadow hover:text-gray-900"
-          aria-label="關閉官方商品資訊"
+          aria-label={t("ag.close")}
         >
           <X className="h-5 w-5" />
         </button>
@@ -298,7 +304,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
         <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
           <div className="bg-[#F6F7F7] p-5 sm:p-8">
             <div className="mb-4 flex items-center gap-2 text-xs font-bold tracking-wide text-[#087F7B]">
-              <Globe2 className="h-4 w-4" /> 山田化學官方商品資料
+              <Globe2 className="h-4 w-4" /> {t("ag.officialProductData")}
             </div>
             <div className="aspect-square overflow-hidden rounded-xl bg-white">
               {images.length ? (
@@ -306,7 +312,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-300">
                   <PackageSearch className="h-12 w-12" />
-                  <span className="text-sm">官網目前沒有對應圖片</span>
+                  <span className="text-sm">{t("ag.noOfficialImage")}</span>
                 </div>
               )}
             </div>
@@ -328,7 +334,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
 
           <div className="p-5 sm:p-8">
             <p className="text-sm font-bold text-[#087F7B]">
-              {product.officialProductNumber ? `No.${product.officialProductNumber}` : product.catalog || "山田化學"}
+              {product.officialProductNumber ? `No.${product.officialProductNumber}` : product.catalog || t("ag.brand")}
             </p>
             <h2 id="ag-official-product-title" className="mt-2 pr-10 text-2xl font-black leading-tight">
               {product.nameJa}
@@ -336,12 +342,12 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
             {product.nameEn && <p className="mt-2 text-sm text-gray-500">{product.nameEn}</p>}
 
             <div className="mt-5 rounded-xl bg-[#FFF4EE] px-4 py-3">
-              <span className="text-sm text-gray-500">本站定價</span>
+              <span className="text-sm text-gray-500">{t("ag.sitePrice")}</span>
               <span className="ml-3 text-2xl font-black text-[#E26D5C]">NT$22</span>
             </div>
 
             <section className="mt-5 rounded-xl border border-[#0ABAB5]/15 bg-[#F2FFFD] p-4">
-              <h3 className="font-bold text-[#087F7B]">商品介紹</h3>
+              <h3 className="font-bold text-[#087F7B]">{t("ag.introduction")}</h3>
               <p className="mt-2 text-sm leading-6 text-gray-700">{introduction}</p>
             </section>
 
@@ -356,7 +362,7 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
 
             {!product.officialMatched && (
               <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
-                這件商品尚未在目前的官方目錄中對到完整規格，請至官網以 JAN 條碼查詢。
+                {t("ag.unmatched")}
               </p>
             )}
 
@@ -367,15 +373,69 @@ function OfficialProductModal({ product, onClose }: { product: AgProduct; onClos
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0ABAB5] px-4 py-3 text-sm font-bold text-white hover:bg-[#089B96]"
               >
-                LINE 詢問此商品 <ExternalLink className="h-4 w-4" />
+                {t("ag.lineInquiryProduct")} <ExternalLink className="h-4 w-4" />
               </a>
             </div>
             <p className="mt-3 text-xs leading-5 text-gray-400">
-              商品規格整理自山田化學官方目錄；最新內容仍以原廠網站為準。本站不顯示原廠批發報價。
+              {t("ag.disclaimer")}
             </p>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function buildProductIntroduction(product: AgProduct, language: AgLanguage) {
+  const productName = language === "en" ? product.nameEn || product.nameJa : product.nameJa;
+
+  if (language === "en") {
+    return [
+      `“${productName}” is a Yamada Kagaku everyday product.`,
+      product.size ? ` Size: ${product.size}.` : null,
+      product.capacity ? ` Capacity: ${product.capacity}.` : null,
+      product.material ? ` Material: ${product.material}.` : null,
+      product.assortment ? ` Color / assortment: ${product.assortment}.` : null,
+      product.countryOrigin ? ` Country of origin: ${product.countryOrigin}.` : null,
+    ]
+      .filter(Boolean)
+      .join("");
+  }
+
+  if (language === "ja") {
+    return [
+      `「${productName}」は山田化学の生活用品です。`,
+      product.size ? `商品サイズ：${product.size}。` : null,
+      product.capacity ? `容量：${product.capacity}。` : null,
+      product.material ? `材質：${product.material}。` : null,
+      product.assortment ? `カラー／組合せ：${product.assortment}。` : null,
+      product.countryOrigin ? `原産国：${product.countryOrigin}。` : null,
+    ]
+      .filter(Boolean)
+      .join("");
+  }
+
+  if (language === "cn") {
+    return [
+      `「${productName}」是山田化学的生活用品。`,
+      product.size ? `商品尺寸为 ${product.size}。` : null,
+      product.capacity ? `容量为 ${product.capacity}。` : null,
+      product.material ? `材质为 ${product.material}。` : null,
+      product.assortment ? `颜色／组合：${product.assortment}。` : null,
+      product.countryOrigin ? `产地为 ${product.countryOrigin}。` : null,
+    ]
+      .filter(Boolean)
+      .join("");
+  }
+
+  return [
+    `「${productName}」是山田化學的生活用品。`,
+    product.size ? `商品尺寸為 ${product.size}。` : null,
+    product.capacity ? `容量為 ${product.capacity}。` : null,
+    product.material ? `材質為 ${product.material}。` : null,
+    product.assortment ? `顏色／組合：${product.assortment}。` : null,
+    product.countryOrigin ? `產地為 ${product.countryOrigin}。` : null,
+  ]
+    .filter(Boolean)
+    .join("");
 }
