@@ -15,6 +15,17 @@ const HYAKUEN_URL = 'https://hyakuen-wholesale.onrender.com/';
 export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Props) {
   return (
     <section className="relative bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] overflow-hidden">
+      {/* 山田化學百元批發入口 */}
+      <Link
+        href="/ag"
+        title="山田百元批發 — 山田化學商品目錄"
+        className="group hidden lg:flex absolute z-30 right-[27.5%] top-[22%] -translate-y-1/2 flex-col items-center justify-center text-center w-36 h-36 rounded-full bg-white shadow-2xl ring-4 ring-[#9EDFDA] hover:scale-105 transition-transform duration-200"
+      >
+        <span className="text-[11px] font-bold text-[#087F7B] leading-none">山田化學</span>
+        <span className="text-2xl font-extrabold text-[#0ABAB5] leading-tight mt-0.5">百元批發</span>
+        <span className="mt-1 text-[10px] text-gray-500 leading-tight px-2">710 品項</span>
+        <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-[#0ABAB5] px-2 py-0.5 rounded-full group-hover:bg-[#089B96]">前往目錄 →</span>
+      </Link>
       {/* 姊妹站入口：日本媽媽省省購（即時拼團直購） */}
       <a
         href="https://nihon-mama-savebuy.onrender.com/"
@@ -57,12 +68,26 @@ export function HeroSection({ searchQuery, onSearchChange, onSearchSubmit }: Pro
             <p className="text-sm sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-xl">
               1,600 種以上日本嚴選商品，從大阪直送台灣家門口。免關稅、7 天到貨、3 年保固，全中文客服協助選品。
             </p>
+        {/* 手機版山田化學百元批發入口 */}
+        <Link
+          href="/ag"
+          className="lg:hidden mt-5 flex items-center gap-2.5 sm:gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#9EDFDA] shadow-md px-3 sm:px-4 py-2.5 sm:py-3 active:scale-[0.98] transition-transform"
+        >
+          <span className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#E7FAF8] ring-1 ring-[#9EDFDA] shrink-0 leading-none">
+            <span className="text-[8px] font-bold text-[#087F7B]">山田化學</span>
+            <span className="text-[13px] font-extrabold text-[#0ABAB5]">百元批發</span>
+          </span>
+          <span className="flex-1 min-w-0 text-left leading-tight">
+            <span className="block text-[13px] sm:text-sm font-bold text-gray-800">山田百元批發・商品目錄</span>
+            <span className="block text-[11px] sm:text-xs text-gray-500">710 品項，單件 NT$22 →</span>
+          </span>
+        </Link>
         {/* 手機版姊妹站入口（桌機改用右側圓形 logo） */}
         <a
           href="https://nihon-mama-savebuy.onrender.com/"
           target="_blank"
           rel="noreferrer"
-          className="lg:hidden mt-5 flex items-center gap-2.5 sm:gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#E6C9A0] shadow-md px-3 sm:px-4 py-2.5 sm:py-3 active:scale-[0.98] transition-transform"
+          className="lg:hidden mt-3 flex items-center gap-2.5 sm:gap-3 w-full max-w-md rounded-2xl bg-white ring-2 ring-[#E6C9A0] shadow-md px-3 sm:px-4 py-2.5 sm:py-3 active:scale-[0.98] transition-transform"
         >
           <span className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FBF1E4] ring-1 ring-[#E6C9A0] shrink-0 leading-none">
             <span className="text-[8px] font-bold text-[#B8895A]">日本媽媽</span>
