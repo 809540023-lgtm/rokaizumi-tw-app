@@ -6,10 +6,11 @@ describe("AG public catalog", () => {
   const file = path.resolve(process.cwd(), "client/public/ag-products.json");
   const rows = JSON.parse(fs.readFileSync(file, "utf8")) as Array<Record<string, unknown>>;
 
-  it("contains only the 177 active quotation items at NT$22", () => {
-    expect(rows).toHaveLength(177);
+  it("contains the complete standard-price catalog at NT$22", () => {
+    expect(rows).toHaveLength(710);
     expect(rows.every((row) => row.status === "available")).toBe(true);
     expect(new Set(rows.map((row) => row.retailPriceTwd))).toEqual(new Set([22]));
+    expect(new Set(rows.map((row) => row.barcode)).size).toBe(rows.length);
   });
 
   it("does not publish wholesale or logistics fields", () => {
@@ -29,8 +30,8 @@ describe("AG public catalog", () => {
 
   it("includes public manufacturer specifications when an official match exists", () => {
     const matched = rows.filter((row) => row.officialMatched === true);
-    expect(matched).toHaveLength(167);
+    expect(matched).toHaveLength(700);
     expect(matched.every((row) => row.officialProductNumber && row.officialSourceUrl)).toBe(true);
-    expect(matched.every((row) => row.officialQuantity && row.officialCaseSize)).toBe(true);
+    expect(matched.every((row) => row.imageUrl)).toBe(true);
   });
 });

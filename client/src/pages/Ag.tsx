@@ -42,7 +42,7 @@ export default function Ag() {
   });
 
   useEffect(() => {
-    fetch("/ag-products.json?v=20260902-official-specs")
+    fetch("/ag-products.json?v=20260903-complete-catalog")
       .then((response) => {
         if (!response.ok) throw new Error("商品資料載入失敗");
         return response.json();
@@ -53,11 +53,14 @@ export default function Ag() {
 
   const products = useMemo(() => {
     if (!databaseProducts?.length) return staticProducts;
-    const staticByBarcode = new Map(staticProducts.map((product) => [product.barcode, product]));
-    return databaseProducts.map((product) => ({
-      ...staticByBarcode.get(product.barcode),
+    const databaseByBarcode = new Map(databaseProducts.map((product) => [product.barcode, product]));
+    const staticBarcodes = new Set(staticProducts.map((product) => product.barcode));
+    const mergedStaticProducts = staticProducts.map((product) => ({
       ...product,
-    })) as AgProduct[];
+      ...databaseByBarcode.get(product.barcode),
+    }));
+    const databaseOnlyProducts = databaseProducts.filter((product) => !staticBarcodes.has(product.barcode));
+    return [...mergedStaticProducts, ...databaseOnlyProducts] as AgProduct[];
   }, [databaseProducts, staticProducts]);
   const filtered = useMemo(() => {
     const keyword = query.trim().toLocaleLowerCase();
