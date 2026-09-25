@@ -1,6 +1,7 @@
 import { Router } from "express";
 import mysql from "mysql2/promise";
 import { randomUUID } from "node:crypto";
+import nodemailer from "nodemailer";
 import { sdk } from "./_core/sdk";
 
 const router = Router();
@@ -35,32 +36,80 @@ function database() {
   return pool;
 }
 
-async function notifyNewOrder(order: { id: string; name: string; email: string; phone: string; street: string; suburb: string; state: string; postcode: string; items: number[]; note: string; market?: "AU" | "TW" }) {
+type CandleOrder = {
+  id: string; name: string; email: string; phone: string; street: string;
+  suburb: string; state: string; postcode: string; items: number[]; note: string; market?: "AU" | "TW";
+};
+
+const notifyAddress = () => process.env.CANDLE_ORDER_NOTIFY_EMAIL || "info@rokaizumi-tw.jp";
+const senderAddress = () => process.env.EMAIL_FROM || process.env.SMTP_USER || "ROKA IZUMI <orders@rokaizumi-tw.jp>";
+
+// 用既有信箱寄信（Gmail 應用程式密碼、ForwardEmail 等）。三個都設了才會啟用。
+function smtpConfig() {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass) return null;
+  const port = Number(process.env.SMTP_PORT || 587);
+  return { host, port, secure: process.env.SMTP_SECURE === "true" || port === 465, auth: { user, pass } };
+}
+
+let smtpTransport: ReturnType<typeof nodemailer.createTransport> | undefined;
+function notificationChannelReady() {
+  return Boolean(smtpConfig()) || Boolean(process.env.RESEND_API_KEY?.startsWith("re_"));
+}
+
+function orderNotificationSubject(order: CandleOrder) {
+  return `新蠟燭訂單 ${order.id}｜ROKA IZUMI`;
+}
+
+function orderNotificationText(order: CandleOrder) {
+  return [
+    `新蠟燭訂單：${order.id}`,
+    `客人：${order.name}`,
+    `Email：${order.email}`,
+    `電話：${order.phone}`,
+    `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
+    `選擇商品：${order.items.map(n => `RZ-C${String(n).padStart(3, "0")}`).join(", ")}`,
+    `備註：${order.note || "無"}`,
+    `市場與金額：${order.market === "TW" ? "台灣 NT$1,499" : "澳洲 A$99"}，尚未付款。請回覆客人付款資料。`,
+    `訂單管理：https://rokaizumi-tw.jp/${order.market === "TW" ? "candles-tw" : "candles"}/orders/`,
+  ].join("\n");
+}
+
+// SMTP 優先（可以直接用既有信箱），其次 Resend。
+async function notifyNewOrder(order: CandleOrder) {
+  const config = smtpConfig();
   const key = process.env.RESEND_API_KEY;
-  if (!key || !key.startsWith("re_")) {
-    console.error("Candle order notification is unavailable: RESEND_API_KEY is not configured");
+  if (!config && !(key && key.startsWith("re_"))) {
+    console.error("Candle order notification is unavailable: set SMTP_HOST/SMTP_USER/SMTP_PASS or RESEND_API_KEY");
     return false;
+  }
+  const subject = orderNotificationSubject(order);
+  const text = orderNotificationText(order);
+  if (config) {
+    try {
+      if (!smtpTransport) {
+        smtpTransport = nodemailer.createTransport({
+          ...config,
+          connectionTimeout: 10_000,
+          greetingTimeout: 10_000,
+          socketTimeout: 15_000,
+        });
+      }
+      await smtpTransport.sendMail({ from: senderAddress(), to: notifyAddress(), subject, text });
+      return true;
+    } catch (error) {
+      console.error("Candle order notification failed (SMTP)", error);
+      smtpTransport = undefined;
+      return false;
+    }
   }
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": `candle-order-${order.id}` },
-      body: JSON.stringify({
-        from: process.env.EMAIL_FROM || "ROKA IZUMI <orders@rokaizumi-tw.jp>",
-        to: [process.env.CANDLE_ORDER_NOTIFY_EMAIL || "info@rokaizumi-tw.jp"],
-        subject: `新蠟燭訂單 ${order.id}｜ROKA IZUMI`,
-        text: [
-          `新蠟燭訂單：${order.id}`,
-          `客人：${order.name}`,
-          `Email：${order.email}`,
-          `電話：${order.phone}`,
-          `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
-          `選擇商品：${order.items.map(n => `RZ-C${String(n).padStart(3, "0")}`).join(", ")}`,
-          `備註：${order.note || "無"}`,
-          `市場與金額：${order.market === "TW" ? "台灣 NT$1,499" : "澳洲 A$99"}，尚未付款。請回覆客人付款資料。`,
-          `訂單管理：https://rokaizumi-tw.jp/${order.market === "TW" ? "candles-tw" : "candles"}/orders/`,
-        ].join("\n"),
-      }),
+      body: JSON.stringify({ from: senderAddress(), to: [notifyAddress()], subject, text }),
       signal: AbortSignal.timeout(10_000),
     });
     if (!response.ok) {
@@ -88,7 +137,7 @@ async function recordNotification(id: string) {
 // Keep orders visible even when email is down, then send any missed alerts after
 // the mail credentials are configured. Resend's idempotency key avoids duplicates.
 async function retryPendingNotifications() {
-  if (!process.env.RESEND_API_KEY?.startsWith("re_")) return;
+  if (!notificationChannelReady()) return;
   const db = database();
   if (!db) return;
   try {
