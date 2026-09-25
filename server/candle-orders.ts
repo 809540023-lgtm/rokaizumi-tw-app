@@ -73,6 +73,42 @@ async function notifyNewOrder(order: { id: string; name: string; email: string; 
   }
 }
 
+async function recordNotification(id: string) {
+  const db = database();
+  if (!db) return;
+  await db.query("CREATE TABLE IF NOT EXISTS candle_order_notifications (order_id varchar(32) PRIMARY KEY, sent_at datetime NOT NULL)");
+  await db.execute("INSERT IGNORE INTO candle_order_notifications (order_id, sent_at) VALUES (?, UTC_TIMESTAMP())", [id]);
+}
+
+// Keep orders visible even when email is down, then send any missed alerts after
+// the mail credentials are configured. Resend's idempotency key avoids duplicates.
+async function retryPendingNotifications() {
+  if (!process.env.RESEND_API_KEY?.startsWith("re_")) return;
+  const db = database();
+  if (!db) return;
+  try {
+    await db.query("CREATE TABLE IF NOT EXISTS candle_order_notifications (order_id varchar(32) PRIMARY KEY, sent_at datetime NOT NULL)");
+    const [rows] = await db.query<mysql.RowDataPacket[]>(`SELECT o.id, o.customer_name, o.customer_email, o.customer_phone,
+      o.street_address, o.suburb, o.state, o.postcode, o.items, o.note
+      FROM candle_orders o LEFT JOIN candle_order_notifications n ON n.order_id = o.id
+      WHERE n.order_id IS NULL ORDER BY o.created_at ASC LIMIT 100`);
+    for (const row of rows) {
+      const items = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
+      const sent = await notifyNewOrder({ id: row.id, name: row.customer_name, email: row.customer_email,
+        phone: row.customer_phone, street: row.street_address, suburb: row.suburb, state: row.state,
+        postcode: row.postcode, items, note: row.note });
+      if (!sent) break;
+      await recordNotification(row.id);
+    }
+  } catch (error) {
+    console.error("Could not retry candle order notifications", error);
+  }
+}
+
+const notificationTimer = setInterval(() => void retryPendingNotifications(), 10 * 60 * 1000);
+notificationTimer.unref();
+setTimeout(() => void retryPendingNotifications(), 15_000).unref();
+
 router.post("/", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.get("content-type")?.split(";")[0] !== "application/json") return res.status(415).json({ error: "Invalid request." });
@@ -101,6 +137,9 @@ router.post("/", async (req, res) => {
     )`);
     await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, "awaiting_reply"]);
     const notificationSent = await notifyNewOrder({ id, name, email, phone, street, suburb, state, postcode, items, note });
+    if (notificationSent) {
+      try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
+    }
     return res.status(201).json({ orderNumber: id, notificationSent });
   } catch (error) {
     console.error("Could not save candle order", error);
