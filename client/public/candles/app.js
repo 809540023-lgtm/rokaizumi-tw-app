@@ -115,6 +115,7 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Please try again.');
     document.getElementById('order-reference').textContent = result.orderNumber;
+    document.getElementById('notification-warning').hidden = result.notificationSent === true;
     form.hidden = true;
     document.getElementById('order-success').hidden = false;
     document.getElementById('inquire').disabled = true;

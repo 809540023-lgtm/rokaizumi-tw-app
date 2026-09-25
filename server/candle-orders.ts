@@ -34,6 +34,45 @@ function database() {
   return pool;
 }
 
+async function notifyNewOrder(order: { id: string; name: string; email: string; phone: string; street: string; suburb: string; state: string; postcode: string; items: number[]; note: string }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !key.startsWith("re_")) {
+    console.error("Candle order notification is unavailable: RESEND_API_KEY is not configured");
+    return false;
+  }
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": `candle-order-${order.id}` },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM || "ROKA IZUMI <orders@rokaizumi-tw.jp>",
+        to: [process.env.CANDLE_ORDER_NOTIFY_EMAIL || "info@rokaizumi-tw.jp"],
+        subject: `新蠟燭訂單 ${order.id}｜ROKA IZUMI`,
+        text: [
+          `新蠟燭訂單：${order.id}`,
+          `客人：${order.name}`,
+          `Email：${order.email}`,
+          `電話：${order.phone}`,
+          `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
+          `選擇商品：${order.items.map(n => `RZ-C${String(n).padStart(3, "0")}`).join(", ")}`,
+          `備註：${order.note || "無"}`,
+          "金額：A$99，尚未付款。請回覆客人付款資料。",
+          "訂單管理：https://rokaizumi-tw.jp/candles/orders/",
+        ].join("\n"),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) {
+      console.error("Candle order notification failed", response.status, (await response.text()).slice(0, 500));
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Candle order notification failed", error);
+    return false;
+  }
+}
+
 router.post("/", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.get("content-type")?.split(";")[0] !== "application/json") return res.status(415).json({ error: "Invalid request." });
@@ -61,7 +100,8 @@ router.post("/", async (req, res) => {
       items json NOT NULL, note text NOT NULL, status varchar(32) NOT NULL
     )`);
     await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, "awaiting_reply"]);
-    return res.status(201).json({ orderNumber: id });
+    const notificationSent = await notifyNewOrder({ id, name, email, phone, street, suburb, state, postcode, items, note });
+    return res.status(201).json({ orderNumber: id, notificationSent });
   } catch (error) {
     console.error("Could not save candle order", error);
     return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });
