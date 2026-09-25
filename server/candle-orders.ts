@@ -15,7 +15,8 @@ router.get("/", async (req, res) => {
     if (user.role !== "admin") return res.status(403).json({ error: "Access denied." });
     const db = database();
     if (!db) return res.status(503).json({ error: "Orders are temporarily unavailable." });
-    const [rows] = await db.query("SELECT id, created_at, customer_name, customer_email, customer_phone, street_address, suburb, state, postcode, items, note, status FROM candle_orders ORDER BY created_at DESC LIMIT 200");
+    await ensureNotificationTable(db);
+    const [rows] = await db.query("SELECT o.id, o.created_at, o.customer_name, o.customer_email, o.customer_phone, o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.status, n.sent_at AS notified_at FROM candle_orders o LEFT JOIN candle_order_notifications n ON n.order_id = o.id ORDER BY o.created_at DESC LIMIT 200");
     return res.json({ orders: rows });
   } catch {
     return res.status(401).json({ error: "Please sign in as an administrator." });
@@ -73,10 +74,14 @@ async function notifyNewOrder(order: { id: string; name: string; email: string; 
   }
 }
 
+async function ensureNotificationTable(db: mysql.Pool) {
+  await db.query("CREATE TABLE IF NOT EXISTS candle_order_notifications (order_id varchar(32) PRIMARY KEY, sent_at datetime NOT NULL)");
+}
+
 async function recordNotification(id: string) {
   const db = database();
   if (!db) return;
-  await db.query("CREATE TABLE IF NOT EXISTS candle_order_notifications (order_id varchar(32) PRIMARY KEY, sent_at datetime NOT NULL)");
+  await ensureNotificationTable(db);
   await db.execute("INSERT IGNORE INTO candle_order_notifications (order_id, sent_at) VALUES (?, UTC_TIMESTAMP())", [id]);
 }
 
@@ -87,7 +92,7 @@ async function retryPendingNotifications() {
   const db = database();
   if (!db) return;
   try {
-    await db.query("CREATE TABLE IF NOT EXISTS candle_order_notifications (order_id varchar(32) PRIMARY KEY, sent_at datetime NOT NULL)");
+    await ensureNotificationTable(db);
     const [rows] = await db.query<mysql.RowDataPacket[]>(`SELECT o.id, o.customer_name, o.customer_email, o.customer_phone,
       o.street_address, o.suburb, o.state, o.postcode, o.items, o.note
       FROM candle_orders o LEFT JOIN candle_order_notifications n ON n.order_id = o.id
@@ -178,7 +183,8 @@ router.get("/tw", async (req, res) => {
     const db = database();
     if (!db) return res.status(503).json({ error: "暫時無法查詢訂單。" });
     await ensureTaiwanTable(db);
-    const [rows] = await db.query("SELECT id, created_at, customer_name, customer_email, customer_phone, street_address, suburb, state, postcode, items, note, status FROM candle_orders_tw ORDER BY created_at DESC LIMIT 200");
+    await ensureNotificationTable(db);
+    const [rows] = await db.query("SELECT o.id, o.created_at, o.customer_name, o.customer_email, o.customer_phone, o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.status, n.sent_at AS notified_at FROM candle_orders_tw o LEFT JOIN candle_order_notifications n ON n.order_id = o.id ORDER BY o.created_at DESC LIMIT 200");
     return res.json({ orders: rows });
   } catch {
     return res.status(401).json({ error: "請先以管理員身分登入。" });
