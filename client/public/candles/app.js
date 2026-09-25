@@ -3,7 +3,7 @@ const data = [
   [5, 'Iced Latte'], [7, 'Strawberry Shake'], [8, 'Cherry Shake'],
   [9, 'Pineapple Juice'], [10, 'Passion Fruit Drink'], [13, 'Green Jelly'],
   [14, 'Blue Jelly'], [15, 'Grey & White Flowers'], [16, 'Floral Tower 1'],
-  [17, 'Floral Tower 2'], [20, 'Christmas Snowman & Trees', 'Christmas design'],
+  [17, 'Floral Tower 2'], [20, 'Christmas Snowman & Trees', 'RZ-C026'],
   [21, 'Macaron Dessert Bowl'], [25, 'Sleeping Bear & Chocolate'],
   [27, 'Fruit & Flower Cake'], [28, 'Strawberry Cake'],
   [29, 'Knitted Mittens'], [30, 'Rose Bouquet Spheres']

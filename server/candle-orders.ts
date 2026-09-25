@@ -70,7 +70,7 @@ function orderNotificationText(order: CandleOrder) {
     `Email：${order.email}`,
     `電話：${order.phone}`,
     `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
-    `選擇商品：${order.items.map(n => `RZ-C${String(n).padStart(3, "0")}`).join(", ")}`,
+    `選擇商品：${order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")}`).join(", ")}`,
     `備註：${order.note || "無"}`,
     `市場與金額：${order.market === "TW" ? "台灣 NT$1,499" : "澳洲 A$99"}，尚未付款。請回覆客人付款資料。`,
     `訂單管理：https://rokaizumi-tw.jp/${order.market === "TW" ? "candles-tw" : "candles"}/orders/`,
