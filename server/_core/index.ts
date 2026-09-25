@@ -11,6 +11,7 @@ import { serveStatic, setupVite } from "./vite";
 import { initTelegramBot } from "./telegramBot";
 import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
+import candleOrdersRouter from "../candle-orders";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -42,6 +43,7 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use("/api/candles/orders", candleOrdersRouter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // 本站帳密登入。先前未註冊，導致 /api/auth/register 與 /api/auth/login

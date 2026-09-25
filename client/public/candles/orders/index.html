@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Candle orders | ROKA IZUMI</title><style>body{font:16px/1.5 system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;color:#33242b;background:#faf7f4}article{background:#fff;border:1px solid #ded2d0;padding:20px;margin:16px 0;overflow-wrap:anywhere}a{color:#713e55}h1{font-size:1.8rem}</style></head><body><a href="/candles/">← ROKA IZUMI</a><h1>Received candle orders</h1><p id="status">Loading…</p><div id="orders"></div><script>
+const status = document.getElementById('status');
+fetch('/api/candles/orders',{credentials:'same-origin'}).then(async response => { const data=await response.json(); if(!response.ok)throw Error(data.error||'Could not load orders.'); return data.orders; }).then(orders=>{
+status.textContent=`${orders.length} order${orders.length===1?'':'s'} received${orders.length===200?' (latest 200)':''}.`;
+const host=document.getElementById('orders');
+for(const order of orders){const card=document.createElement('article');const title=document.createElement('h2');title.textContent=order.id;card.append(title);
+const add=(label,value)=>{const p=document.createElement('p');const strong=document.createElement('strong');strong.textContent=label+': ';p.append(strong,document.createTextNode(String(value??'')));card.append(p)};
+add('Received',order.created_at);add('Customer',order.customer_name);add('Email',order.customer_email);add('Phone',order.customer_phone);add('Address',[order.street_address,order.suburb,order.state,order.postcode].join(', '));add('Designs',typeof order.items==='string'?order.items:JSON.stringify(order.items));add('Note',order.note);add('Status',order.status);host.append(card);}
+}).catch(error=>{status.textContent=error.message+' Sign in to the main website with an administrator account, then reload this page.';});
+</script></body></html>
