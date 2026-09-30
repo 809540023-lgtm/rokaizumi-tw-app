@@ -10,20 +10,35 @@ import type { Express, Request, Response } from "express";
  */
 
 async function readJsonBody(req: Request): Promise<any> {
-  if (req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
+  // express.json() 已經在前面解析過 body 時，req.body 一定存在（可能是空物件），
+  // 這裡必須直接回傳。原本的寫法在「body 是空物件」時會往下去讀 req 的資料流，
+  // 但資料流早就被 express.json() 讀完了，於是 Promise 永遠不會 resolve，
+  // 請求就這樣卡住不回應（實測 POST {} 會一直等到連線逾時）。
+  if (req.body !== undefined && req.body !== null && typeof req.body === "object") {
     return req.body;
   }
+
+  // 備援：只有當 body 完全沒有被解析過（例如路由掛在 body parser 之前）才手動讀，
+  // 並且加上逾時，確保任何情況下都不會無限等待。
   return await new Promise((resolve) => {
     let data = "";
-    req.on("data", (c) => (data += c));
-    req.on("end", () => {
+    const done = () => {
       try {
         resolve(data ? JSON.parse(data) : {});
       } catch {
         resolve({});
       }
+    };
+    const timer = setTimeout(done, 10_000);
+    req.on("data", (c) => (data += c));
+    req.on("end", () => {
+      clearTimeout(timer);
+      done();
     });
-    req.on("error", () => resolve({}));
+    req.on("error", () => {
+      clearTimeout(timer);
+      done();
+    });
   });
 }
 
