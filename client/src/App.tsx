@@ -50,6 +50,7 @@ function Router() {
       <Route path={"/admin-panel/suppliers"} component={AdminPanel} />
       <Route path={"/admin-panel/users"} component={AdminPanel} />
       <Route path={"/admin-panel/announcements"} component={AdminPanel} />
+      <Route path={"/admin-panel/api-logs"} component={AdminPanel} />
       <Route path={"/admin-panel/office"} component={AdminPanel} />
       <Route path={"/admin-panel/settings"} component={AdminPanel} />
       <Route path={"/admin-panel"} component={AdminPanel} />
