@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Search, ShoppingCart, Building2, LogIn, LogOut, User, Heart, Globe } from "lucide-react";
+import { Search, ShoppingCart, Building2, LogIn, LogOut, User, Heart, Globe, FileSpreadsheet, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
@@ -116,6 +116,24 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           >
             <Building2 className="w-4 h-4" /> {t("header.b2b")}
           </Link>
+
+          {/* 內部工具：登入後才出現（手機版在 MobileMenu 也有一份） */}
+          {user && (
+            <Link
+              href="/mom"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-bold"
+            >
+              <FileSpreadsheet className="w-4 h-4" /> 線上 Office
+            </Link>
+          )}
+          {user?.role === "admin" && (
+            <Link
+              href="/mask"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0ABAB5]/10 text-[#087F7B] text-sm font-bold"
+            >
+              <Sparkles className="w-4 h-4" /> 面膜作業
+            </Link>
+          )}
 
           {user ? (
             <>

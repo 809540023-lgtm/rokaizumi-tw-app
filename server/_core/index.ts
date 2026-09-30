@@ -12,6 +12,9 @@ import { initTelegramBot } from "./telegramBot";
 import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
 import candleOrdersRouter from "../candle-orders";
+import { registerAiRoutes } from "./ai";
+import { maskAgentRouter } from "../mask/agentRoutes";
+import { registerMaskPhotoRoute } from "../mask/photos";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -51,6 +54,14 @@ async function startServer() {
   registerLocalAuthRoutes(app);
   // OpenClaw API
   app.use("/api/openclaw", openclawRouter);
+  // 面膜作業：本機代理用的 REST API（照片同步、跑流程、查狀態）
+  app.use("/api/mask-agent", maskAgentRouter);
+  // 面膜照片：公開提供圖片給前台 <img src> 使用
+  registerMaskPhotoRoute(app);
+  // AI 選品助理（Mistral 看圖辨識）。
+  // 注意：這個函式先前從未被呼叫，導致 Selection.tsx 打的
+  // /api/ai/product-draft 會落到 SPA fallback 回傳 HTML，功能其實是壞的。
+  registerAiRoutes(app);
   // tRPC API
   app.use(
     "/api/trpc",

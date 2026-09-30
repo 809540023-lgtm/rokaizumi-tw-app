@@ -1,4 +1,15 @@
-import { date, int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, json, boolean } from "drizzle-orm/mysql-core";
+import { date, int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, json, boolean, customType } from "drizzle-orm/mysql-core";
+
+/**
+ * 圖片二進位欄位。
+ *
+ * 為什麼不是存 base64 進 TEXT？base64 會讓體積多 33%，而且 TEXT 上限只有 64KB。
+ * LONGBLOB + mysql2 的原生 Buffer 是最直接的做法；TiDB 的 max_allowed_packet
+ * 是 64MB，單張商品圖（壓縮後 < 200KB）綽綽有餘。
+ */
+const longblob = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType: () => "longblob",
+});
 
 /**
  * Core user table backing auth flow.
@@ -406,3 +417,148 @@ export const officeDocumentVersions = mysqlTable("office_document_versions", {
 
 export type OfficeDocumentVersionRow = typeof officeDocumentVersions.$inferSelect;
 export type InsertOfficeDocumentVersion = typeof officeDocumentVersions.$inferInsert;
+
+/* ==================================================================
+ * 面膜批發自動化（日本大阪難波 → 台灣）
+ *
+ * 流程：Google 雲端照片 → AI 辨識 → 法遵檢核 → 文案 → 定價 → 上架成正式商品
+ *
+ * 為什麼獨立成 masks 而不是直接塞進 products？
+ *   products 是前台在賣的商品（1619 筆），欄位是「已經決定要賣」的樣子。
+ *   masks 是「還在處理中」的工作檔：AI 辨識結果、法遵報告、成本推估都會一直變，
+ *   而且可能有多張照片與多次執行紀錄。等定案後才寫進 products 並記下 productId。
+ * ================================================================== */
+
+export const masks = mysqlTable("masks", {
+  /** 前端 / 本機代理產生的 uuid，用來做幂等上傳 */
+  id: varchar("id", { length: 40 }).primaryKey(),
+  sku: varchar("sku", { length: 40 }).notNull().unique(),
+  status: mysqlEnum("status", [
+    "draft",
+    "analyzed",
+    "compliance_blocked",
+    "ready",
+    "published",
+    "archived",
+  ])
+    .notNull()
+    .default("draft"),
+
+  // 商品基本資料（多數由 AI 從照片讀出，可人工覆寫）
+  brand: varchar("brand", { length: 120 }),
+  nameZh: varchar("nameZh", { length: 255 }).notNull().default("（待 AI 辨識命名）"),
+  nameJa: varchar("nameJa", { length: 255 }),
+  series: varchar("series", { length: 120 }),
+  barcode: varchar("barcode", { length: 20 }),
+  volumeMl: int("volumeMl"),
+  sheetsPerPack: int("sheetsPerPack"),
+  piecesPerBox: int("piecesPerBox"),
+  shelfLifeMonths: int("shelfLifeMonths"),
+
+  // 進貨條件
+  supplierJpy: int("supplierJpy"),
+  moq: int("moq").default(12),
+  supplierName: varchar("supplierName", { length: 120 }),
+  /** 可上架庫存，上架時會寫進 products.stock */
+  stock: int("stock").default(30),
+
+  // 法規
+  regulatoryType: mysqlEnum("regulatoryType", ["general", "specific_purpose"])
+    .notNull()
+    .default("general"),
+  registrationNo: varchar("registrationNo", { length: 80 }),
+  /**
+   * 中文標示第 6 項：製造日期或批號。
+   * 這個只能在收貨時逐批抄，AI 讀照片不可靠，所以獨立成欄位讓人工填。
+   */
+  manufactureDate: varchar("manufactureDate", { length: 60 }),
+  /**
+   * 中文標示第 8 項：在台進口商名稱、地址、電話。
+   * 通常整批商品都一樣，填一次就可以重複套用。
+   */
+  importerInfo: varchar("importerInfo", { length: 255 }),
+
+  // AI 辨識與產出（整包存 JSON，欄位還在演進時不用一直改資料表）
+  attributes: json("attributes").$type<Record<string, unknown>>(),
+  ingredients: json("ingredients").$type<string[]>(),
+  websiteCopy: json("websiteCopy").$type<Record<string, unknown>>(),
+  wholesaleCopy: json("wholesaleCopy").$type<Record<string, unknown>>(),
+  costBreakdown: json("costBreakdown").$type<Record<string, unknown>>(),
+
+  // 定價（台灣端）
+  unitCostTwd: decimal("unitCostTwd", { precision: 10, scale: 2 }),
+  wholesaleTwd: int("wholesaleTwd"),
+  retailTwd: int("retailTwd"),
+  grossMarginPct: decimal("grossMarginPct", { precision: 6, scale: 2 }),
+
+  // 法遵
+  complianceStatus: mysqlEnum("complianceStatus", ["pending", "pass", "warn", "blocked"])
+    .notNull()
+    .default("pending"),
+  complianceReport: json("complianceReport").$type<Record<string, unknown>>(),
+
+  /** 上架後對應的 products.id */
+  productId: int("productId"),
+
+  /** 來源：Google 雲端資料夾與檔名，方便回溯這批照片從哪來 */
+  sourceFolder: varchar("sourceFolder", { length: 255 }),
+  sourceFiles: json("sourceFiles").$type<string[]>(),
+  note: text("note"),
+
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MaskRow = typeof masks.$inferSelect;
+export type InsertMask = typeof masks.$inferInsert;
+
+/** 面膜照片（二進位直接存資料庫，沒有 S3 也能運作） */
+export const maskPhotos = mysqlTable("maskPhotos", {
+  id: int("id").autoincrement().primaryKey(),
+  maskId: varchar("maskId", { length: 40 }).notNull(),
+  role: mysqlEnum("role", ["front", "back", "box", "texture", "detail"]).notNull().default("front"),
+  mimeType: varchar("mimeType", { length: 40 }).notNull().default("image/jpeg"),
+  data: longblob("data").notNull(),
+  byteSize: int("byteSize").notNull().default(0),
+  width: int("width"),
+  height: int("height"),
+  /** 來源檔名（雲端上的檔名），重複上傳時用來判斷是否同一張 */
+  sourceFile: varchar("sourceFile", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MaskPhotoRow = typeof maskPhotos.$inferSelect;
+
+/** 每個階段的執行紀錄，出問題時可回溯是哪一步、第幾次嘗試失敗 */
+export const maskRuns = mysqlTable("maskRuns", {
+  id: int("id").autoincrement().primaryKey(),
+  maskId: varchar("maskId", { length: 40 }),
+  stage: varchar("stage", { length: 40 }).notNull(),
+  status: mysqlEnum("status", ["success", "failed", "skipped"]).notNull(),
+  attempt: int("attempt").notNull().default(1),
+  input: json("input").$type<unknown>(),
+  output: json("output").$type<unknown>(),
+  error: text("error"),
+  durationMs: int("durationMs"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MaskRunRow = typeof maskRuns.$inferSelect;
+
+/** 階段待辦提醒（取貨、集貨、報關、出貨、法遵月檢…） */
+export const maskTasks = mysqlTable("maskTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  workflowKey: varchar("workflowKey", { length: 60 }),
+  title: varchar("title", { length: 200 }).notNull(),
+  detail: text("detail"),
+  owner: varchar("owner", { length: 60 }),
+  dueAt: timestamp("dueAt"),
+  status: mysqlEnum("status", ["pending", "notified", "done", "skipped"]).notNull().default("pending"),
+  /** 同一個時間點的工作只會有一筆，重複同步不會灌爆 */
+  dedupeKey: varchar("dedupeKey", { length: 160 }).unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MaskTaskRow = typeof maskTasks.$inferSelect;

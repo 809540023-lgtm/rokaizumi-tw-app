@@ -105,3 +105,8 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+
+# 面膜代理的本機設定（含 token，不可提交）
+tools/mask-agent/config.json
+.tmp-mask/

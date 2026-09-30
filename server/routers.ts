@@ -11,6 +11,7 @@ import { suppliers, purchases, orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { b2bInquiries, newsletter } from "./routers/extra";
 import { office } from "./routers/office";
+import { mask } from "./mask/router";
 
 const checkoutItemInput = z.object({
   productId: z.number().int().positive(),
@@ -70,6 +71,7 @@ export const appRouter = router({
   b2bInquiries,
   newsletter,
   office,
+  mask,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

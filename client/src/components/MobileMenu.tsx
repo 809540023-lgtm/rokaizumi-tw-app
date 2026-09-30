@@ -3,11 +3,13 @@ import { Menu, X } from 'lucide-react';
 import { Link } from 'wouter';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/_core/hooks/useAuth';
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
   const { itemCount } = useCart();
+  const { user } = useAuth() as any;
 
   const menuItems = [
     { href: '/', label: t('nav.home') || 'ホーム' },
@@ -17,6 +19,9 @@ export function MobileMenu() {
       href: '/cart',
       label: `${t('nav.cart') || 'カート'}${itemCount > 0 ? ` (${itemCount})` : ''}`,
     },
+    // 內部工具：登入後才會出現，避免一般訪客看到不存在的頁面
+    ...(user ? [{ href: '/mom', label: '📊 線上 Office' }] : []),
+    ...(user?.role === 'admin' ? [{ href: '/mask', label: '🧖 面膜作業' }] : []),
   ];
 
   return (
