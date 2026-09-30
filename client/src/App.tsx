@@ -33,6 +33,7 @@ const Selection = lazy(() => import("./pages/Selection"));
 const AdminManage = lazy(() => import("./pages/AdminManage"));
 const About = lazy(() => import("./pages/About"));
 const Ag = lazy(() => import("./pages/Ag"));
+const Mom = lazy(() => import("./pages/Mom"));
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -64,6 +65,8 @@ function Router() {
       <Route path={"/manage"} component={AdminManage} />
       <Route path={"/about"} component={About} />
       <Route path={"/ag"} component={Ag} />
+      <Route path={"/mom"} component={Mom} />
+      <Route path={"/office"} component={Mom} />
       <Route path={"/products/:categoryId"} component={CategoryProducts} />
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:productId"} component={ProductDetail} />

@@ -40,6 +40,11 @@ export default defineConfig({
           if (id.includes("recharts") || id.includes("d3-")) {
             return "charts-vendor";
           }
+          // 注意：這裡刻意「不」把 @univerjs/* 指定成固定 chunk。
+          // 一旦手動指定，Rollup 會讓入口 chunk 也去 import 那個 chunk，
+          // 結果首頁就被迫下載整個 Univer（實測約 2.7MB gzip）。
+          // 交給 Rollup 自然分割時，/mom 是 lazy route，
+          // Univer 只會在使用者打開線上 Office 時才下載。
         },
       },
     },

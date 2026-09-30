@@ -1,0 +1,136 @@
+/**
+ * Univer Office Kit 樣式。
+ *
+ * Univer 自己的 CSS（@univerjs/preset-*/lib/index.css）在 univer-factory.ts 匯入，
+ * 這裡只補齊「容器高度」與「疊在 Univer 之上的 UI」所需的樣式。
+ */
+
+.office-workspace {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.office-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.office-toolbar .spacer {
+  flex: 1 1 auto;
+}
+
+.office-title-input {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  min-width: 180px;
+  max-width: 320px;
+  width: 100%;
+}
+
+.office-title-input:hover {
+  border-color: #cbd5e1;
+  background: #fff;
+}
+
+.office-title-input:focus {
+  outline: none;
+  border-color: #0abab5;
+  background: #fff;
+}
+
+/* Univer 需要明確高度；用 vh 讓它在多數螢幕都夠高又不會撐破版面 */
+.office-canvas {
+  position: relative;
+  height: 72vh;
+  min-height: 460px;
+  width: 100%;
+}
+
+.office-canvas[hidden] {
+  display: none;
+}
+
+.office-canvas > div {
+  height: 100%;
+}
+
+.office-statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.office-banner {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  margin: 10px 12px 0;
+}
+
+.office-banner.info {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.office-banner.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.office-banner.warn {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.office-version-list {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.office-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #64748b;
+  font-size: 0.9rem;
+  gap: 8px;
+}
+
+.office-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #cbd5e1;
+  border-top-color: #0abab5;
+  border-radius: 50%;
+  animation: office-spin 0.7s linear infinite;
+}
+
+@keyframes office-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

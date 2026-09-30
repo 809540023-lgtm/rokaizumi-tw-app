@@ -363,3 +363,46 @@ export const apiLogs = mysqlTable("apiLogs", {
 
 export type ApiLog = typeof apiLogs.$inferSelect;
 export type InsertApiLog = typeof apiLogs.$inferInsert;
+
+/* ==================================================================
+ * Univer Office Kit — 線上表格 / 文檔
+ *
+ * 兩張表：主檔（最新內容）與版本紀錄。
+ * 內容存的是 Univer 的快照 JSON（IWorkbookData / IDocumentData），
+ * 不是渲染後的檔案，因此還原後仍可繼續編輯（公式、樣式都在）。
+ *
+ * 注意：documentId 刻意不加外鍵約束。
+ * 這裡的完整性由應用層維護（刪除主檔時同步刪版本），
+ * 避免在 TiDB 上多一個可能讓整道 CREATE TABLE 失敗的變數。
+ * ================================================================== */
+
+export const officeDocuments = mysqlTable("office_documents", {
+  /** 由伺服器產生的 uuid，前端也會先用同一個 id 做 autosave */
+  id: varchar("id", { length: 40 }).primaryKey(),
+  ownerId: int("ownerId"),
+  title: varchar("title", { length: 255 }).notNull(),
+  kind: mysqlEnum("kind", ["sheet", "doc"]).notNull(),
+  templateKey: varchar("templateKey", { length: 80 }),
+  /** 目前版本號，每次「另存版本」+1 */
+  currentVersion: int("currentVersion").notNull().default(1),
+  /** 最新內容快照 */
+  content: json("content").$type<unknown>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type OfficeDocumentRow = typeof officeDocuments.$inferSelect;
+export type InsertOfficeDocument = typeof officeDocuments.$inferInsert;
+
+export const officeDocumentVersions = mysqlTable("office_document_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  documentId: varchar("documentId", { length: 40 }).notNull(),
+  version: int("version").notNull(),
+  content: json("content").notNull().$type<unknown>(),
+  note: varchar("note", { length: 255 }),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type OfficeDocumentVersionRow = typeof officeDocumentVersions.$inferSelect;
+export type InsertOfficeDocumentVersion = typeof officeDocumentVersions.$inferInsert;

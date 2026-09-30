@@ -10,6 +10,7 @@ import { ENV } from "./_core/env";
 import { suppliers, purchases, orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { b2bInquiries, newsletter } from "./routers/extra";
+import { office } from "./routers/office";
 
 const checkoutItemInput = z.object({
   productId: z.number().int().positive(),
@@ -68,6 +69,7 @@ export const appRouter = router({
   system: systemRouter,
   b2bInquiries,
   newsletter,
+  office,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
