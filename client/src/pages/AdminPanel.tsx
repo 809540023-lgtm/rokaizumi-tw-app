@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Users,
   Megaphone,
+  FileSpreadsheet,
 } from 'lucide-react';
 import OrderManagement from './OrderManagement';
 import ProductManagement from './ProductManagement';
@@ -25,6 +26,7 @@ import UserManagement from './UserManagement';
 import AnnouncementManagement from './AnnouncementManagement';
 import ApiLogsManagement from './ApiLogsManagement';
 import KokuManagement from './KokuManagement';
+import OfficeManagement from './OfficeManagement';
 
 interface AdminMenuItem {
   id: string;
@@ -58,6 +60,8 @@ export default function AdminPanel() {
       setCurrentPage('announcements');
     } else if (location.includes('/admin-panel/api-logs')) {
       setCurrentPage('apiLogs');
+    } else if (location.includes('/admin-panel/office')) {
+      setCurrentPage('office');
     } else if (location.includes('/admin-panel/financial')) {
       setCurrentPage('financial');
     } else if (location.includes('/admin-panel/settings')) {
@@ -188,6 +192,16 @@ export default function AdminPanel() {
       },
       icon: <BarChart3 className="w-5 h-5" />,
       path: '/admin-panel/api-logs',
+    },
+    {
+      id: 'office',
+      label: {
+        zh: '📝 Office 編輯器',
+        en: '📝 Office Editor',
+        ja: '📝 Office エディタ',
+      },
+      icon: <FileSpreadsheet className="w-5 h-5" />,
+      path: '/admin-panel/office',
     },
     {
       id: 'settings',
@@ -334,6 +348,7 @@ export default function AdminPanel() {
           {currentPage === 'users' && <UserManagement />}
           {currentPage === 'announcements' && <AnnouncementManagement />}
           {currentPage === 'apiLogs' && <ApiLogsManagement />}
+          {currentPage === 'office' && <OfficeManagement />}
 
           {currentPage === 'dashboard' && (
             <div>
