@@ -41,6 +41,11 @@ type CandleOrder = {
   suburb: string; state: string; postcode: string; items: number[]; note: string; market?: "AU" | "TW";
 };
 
+const audPayment = {
+  method: "bank_transfer", currency: "AUD", amount: 99, shipping: 0,
+  bank: { accountHolder: "ろかいずみ合同会社", bsb: "774-001", accountNumber: "250413129", bankName: "Wise Australia Pty Ltd" },
+};
+
 const notifyAddress = () => process.env.CANDLE_ORDER_NOTIFY_EMAIL || "info@rokaizumi-tw.jp";
 const senderAddress = () => process.env.EMAIL_FROM || process.env.SMTP_USER || "ROKA IZUMI <orders@rokaizumi-tw.jp>";
 
@@ -72,7 +77,9 @@ function orderNotificationText(order: CandleOrder) {
     `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
     `選擇商品：${order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")}`).join(", ")}`,
     `備註：${order.note || "無"}`,
-    `市場與金額：${order.market === "TW" ? "台灣 NT$1,499" : "澳洲 A$99"}，尚未付款。請回覆客人付款資料。`,
+    order.market === "TW"
+      ? "市場與金額：台灣 NT$1,499，尚未付款。請回覆客人付款資料。"
+      : `市場與金額：澳洲 A$99（含運），等待銀行轉帳。客戶已在下單頁取得 Wise AUD 資料，轉帳附言：${order.id}。請核對實際入帳後再開始製作並回信確認。`,
     `訂單管理：https://rokaizumi-tw.jp/${order.market === "TW" ? "candles-tw" : "candles"}/orders/`,
   ].join("\n");
 }
@@ -188,7 +195,7 @@ router.post("/", async (req, res) => {
   const street = field(body.street, 200), suburb = field(body.suburb, 100), state = field(body.state, 100), postcode = field(body.postcode, 12);
   const note = body.note === "" || body.note === undefined ? "" : field(body.note, 1000);
   const items = body.items;
-  if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !phone || !street || !suburb || !state || !postcode || note === null || body.importConfirmed !== "on" || !Array.isArray(items) || items.length !== 5 || !items.every((n: unknown) => Number.isInteger(n) && allowed.has(n as number)) || new Set(items).size !== 5) {
+  if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !phone || !street || !suburb || !state || !["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"].includes(state.toUpperCase()) || !/^\d{4}$/.test(postcode ?? "") || note === null || body.importConfirmed !== "on" || !Array.isArray(items) || items.length !== 5 || !items.every((n: unknown) => Number.isInteger(n) && allowed.has(n as number)) || new Set(items).size !== 5) {
     return res.status(400).json({ error: "Please check your five designs and all required delivery details." });
   }
   const db = database();
@@ -202,12 +209,12 @@ router.post("/", async (req, res) => {
       state varchar(100) NOT NULL, postcode varchar(12) NOT NULL,
       items json NOT NULL, note text NOT NULL, status varchar(32) NOT NULL
     )`);
-    await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, "awaiting_reply"]);
+    await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, "awaiting_payment"]);
     const notificationSent = await notifyNewOrder({ id, name, email, phone, street, suburb, state, postcode, items, note });
     if (notificationSent) {
       try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
     }
-    return res.status(201).json({ orderNumber: id, notificationSent });
+    return res.status(201).json({ orderNumber: id, notificationSent, payment: { ...audPayment, reference: id, status: "awaiting_payment" } });
   } catch (error) {
     console.error("Could not save candle order", error);
     return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });
@@ -273,3 +280,4 @@ router.post("/tw", async (req, res) => {
 });
 
 export default router;
+

@@ -2,6 +2,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import express from "express";
 import net from "node:net";
 
+vi.mock("./_core/sdk", () => ({ sdk: { authenticateRequest: vi.fn() } }));
+
 // 假 SMTP 伺服器：只做最少的 ESMTP 對話，把 DATA 收到的信存下來驗證。
 const delivered: string[] = [];
 const smtpServer = net.createServer(socket => {
@@ -47,8 +49,9 @@ const smtpServer = net.createServer(socket => {
 });
 
 // 讓模組以為有資料庫，才走得進寄信那一段。
+const { savedOrders } = vi.hoisted(() => ({ savedOrders: [] as unknown[][] }));
 vi.mock("mysql2/promise", () => {
-  const pool = { query: async () => [[]], execute: async () => [{}, null] };
+  const pool = { query: async () => [[]], execute: async (sql: string, values: unknown[]) => { if (sql.startsWith("INSERT INTO candle_orders ")) savedOrders.push(values); return [{}, null]; } };
   return { default: { createPool: () => pool }, createPool: () => pool };
 });
 
@@ -136,6 +139,12 @@ describe("蠟燭訂單通知信", () => {
 
     expect(response.status).toBe(201);
     expect(body.notificationSent).toBe(true);
+    expect(body.payment).toEqual({
+      method: "bank_transfer", currency: "AUD", amount: 99, shipping: 0,
+      bank: { accountHolder: "ろかいずみ合同会社", bsb: "774-001", accountNumber: "250413129", bankName: "Wise Australia Pty Ltd" },
+      reference: body.orderNumber, status: "awaiting_payment",
+    });
+    expect(savedOrders[0].at(-1)).toBe("awaiting_payment");
 
     expect(delivered).toHaveLength(1);
     const mail = delivered[0];
@@ -150,9 +159,11 @@ describe("蠟燭訂單通知信", () => {
     expect(compact).toContain("1TestStreet,Sydney,NSW2000");
     expect(compact).toContain("RZ-C001,RZ-C002,RZ-C003,RZ-C005,RZ-C007");
     expect(compact).toContain("澳洲A$99");
+    expect(compact).toContain("等待銀行轉帳");
+    expect(compact).toContain(`轉帳附言：${body.orderNumber}`);
   });
 
-  it("完全沒設寄信設定時，會明確回報未寄出（目前正式站的狀況）", async () => {
+  it("寄信不可用時，訂單仍保存並回傳轉帳資料", async () => {
     delete process.env.SMTP_HOST;
     delete process.env.SMTP_USER;
     delete process.env.SMTP_PASS;
@@ -163,6 +174,20 @@ describe("蠟燭訂單通知信", () => {
 
     expect(response.status).toBe(201);
     expect(body.notificationSent).toBe(false);
+    expect(body.payment.status).toBe("awaiting_payment");
+    expect(body.payment.reference).toBe(body.orderNumber);
     expect(delivered).toHaveLength(before);
   });
+  it("拒絕非四位澳洲郵遞區號與重複商品，不會存單", async () => {
+    const count = savedOrders.length;
+    for (const invalid of [{ ...order, postcode: "200" }, { ...order, items: [1, 1, 3, 5, 7] }]) {
+      const response = await fetch(`http://127.0.0.1:${port}/api/candles/orders`, {
+        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(invalid),
+      });
+      expect(response.status).toBe(400);
+    }
+    expect(savedOrders).toHaveLength(count);
+  });
+
 });
+

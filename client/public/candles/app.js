@@ -9,6 +9,8 @@ const data = [
   [29, 'Knitted Mittens'], [30, 'Rose Bouquet Spheres']
 ];
 const selected = new Set();
+let orderPlaced = false;
+let submitting = false;
 const grid = document.getElementById('products');
 const dialog = document.getElementById('photo-dialog');
 let activePhoto = null;
@@ -48,6 +50,7 @@ for (const [n, name, customSku] of data) {
     dialog.showModal();
   });
   card.querySelector('.pick').addEventListener('click', () => {
+    if (orderPlaced || submitting) return;
     if (selected.has(n)) selected.delete(n);
     else if (selected.size < 5) selected.add(n);
     else { document.getElementById('order').scrollIntoView({ behavior: 'smooth' }); return; }
@@ -90,7 +93,7 @@ function update() {
   }
 }
 document.getElementById('inquire').addEventListener('click', () => {
-  if (selected.size !== 5) return;
+  if (selected.size !== 5 || orderPlaced || submitting) return;
   const panel = document.getElementById('order-help');
   panel.hidden = false;
   panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -98,12 +101,13 @@ document.getElementById('inquire').addEventListener('click', () => {
 });
 document.getElementById('order-form').addEventListener('submit', async event => {
   event.preventDefault();
-  if (selected.size !== 5) return;
+  if (selected.size !== 5 || orderPlaced || submitting) return;
   const form = event.currentTarget;
   const status = document.getElementById('order-status');
   const button = document.getElementById('submit-order');
   const fields = Object.fromEntries(new FormData(form));
   const payload = { ...fields, items: [...selected].sort((a, b) => a - b) };
+  submitting = true;
   status.textContent = 'Submitting your order…';
   button.disabled = true;
   try {
@@ -114,14 +118,40 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Please try again.');
+    orderPlaced = true;
     document.getElementById('order-reference').textContent = result.orderNumber;
+    document.getElementById('payment-reference').textContent = result.orderNumber;
+    const bank = result.payment.bank;
+    document.getElementById('bank-holder').textContent = bank.accountHolder;
+    document.getElementById('bank-bsb').textContent = bank.bsb;
+    document.getElementById('bank-account').textContent = bank.accountNumber;
+    document.getElementById('bank-name').textContent = bank.bankName;
+    for (const card of grid.children) card.querySelector('.pick').disabled = true;
     document.getElementById('notification-warning').hidden = result.notificationSent === true;
     form.hidden = true;
     document.getElementById('order-success').hidden = false;
     document.getElementById('inquire').disabled = true;
+    document.getElementById('inquire').textContent = 'Order placed · see payment details below';
+    document.getElementById('order-success').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('payment-heading').focus({ preventScroll: true });
     status.textContent = '';
   } catch (error) {
+    submitting = false;
     status.textContent = `Your order was not submitted. ${error.message} Please keep this page open and try again.`;
     button.disabled = false;
   }
 });
+
+
+for (const button of document.querySelectorAll('[data-copy]')) {
+  button.addEventListener('click', async () => {
+    const value = document.getElementById(button.dataset.copy).textContent;
+    const status = document.getElementById('copy-status');
+    try {
+      await navigator.clipboard.writeText(value);
+      status.textContent = 'Copied. Paste it into your banking app.';
+    } catch {
+      status.textContent = 'Please select and copy the value manually: ' + value;
+    }
+  });
+}
