@@ -1,12 +1,13 @@
 const data = [
-  [1, 'Elephant'], [2, 'Golden Retriever Pair (2 dogs)'], [3, 'Puppy in Egg'],
+  [1, 'Elephant'], [2, 'Golden Retriever Pair (2 dogs)'],
+  [20, 'Christmas Snowman & Trees', 'RZ-C026'], [21, 'Macaron Dessert Bowl'],
+  [3, 'Puppy in Egg'],
   [5, 'Iced Latte'], [7, 'Strawberry Shake'], [8, 'Cherry Shake'],
   [9, 'Pineapple Juice'], [10, 'Passion Fruit Drink'], [13, 'Green Jelly'],
   [14, 'Blue Jelly'], [15, 'Grey & White Flowers'], [16, 'Floral Tower 1'],
-  [17, 'Floral Tower 2'], [20, 'Christmas Snowman & Trees', 'RZ-C026'],
-  [21, 'Macaron Dessert Bowl'], [25, 'Sleeping Bear & Chocolate'],
+  [17, 'Floral Tower 2'], [25, 'Sleeping Bear & Chocolate'],
   [27, 'Fruit & Flower Cake'], [28, 'Strawberry Cake'],
-  [29, 'Knitted Mittens'], [30, 'Rose Bouquet Spheres']
+  [29, 'Knitted Mitten + Yarn Ball (1 of each)'], [30, 'Rose Ball (1 candle · random colour)']
 ];
 const selected = new Set();
 let orderPlaced = false;
@@ -19,7 +20,7 @@ function showScene(scene) {
   const [n, name] = activePhoto;
   const num = String(n).padStart(2, '0');
   const img = document.getElementById('dialog-image');
-  img.src = `images/${scene}-${num}.jpeg`;
+  img.src = `images/${scene}-${num}${n === 29 ? "-v2" : ""}.jpeg`;
   img.alt = `${scene === 'lit' ? 'Illustrative lit scene' : 'Clean-background illustrative image'} of ${name}`;
   document.getElementById('dialog-media').classList.toggle('studio', scene === 'studio');
   for (const button of dialog.querySelectorAll('[data-scene]'))
@@ -35,14 +36,15 @@ for (const [n, name, customSku] of data) {
   const card = document.createElement('article');
   card.className = 'card';
   card.dataset.id = String(n);
-  card.innerHTML = `<button class="photo-trigger" type="button" aria-label="Enlarge photos of ${name}"><img class="photo lit" src="images/lit-${num}.jpeg" alt="Illustrative lit scene of ${name}" loading="lazy"></button>
+  card.innerHTML = `<button class="photo-trigger" type="button" aria-label="Enlarge photos of ${name}"><img class="photo lit" src="images/lit-${num}${n === 29 ? "-v2" : ""}.jpeg" alt="Illustrative lit scene of ${name}" loading="lazy"></button>
     <div class="card-body"><div class="sku">${sku}</div><div class="name">${name}</div>
       <button class="pick" type="button" aria-pressed="false" aria-label="Select ${name}">Add to my five</button>
     </div>`;
   card.querySelector('.photo-trigger').addEventListener('click', () => {
     activePhoto = [n, name];
     document.getElementById('dialog-title').textContent = `${sku} · ${name}`;
-    document.getElementById('dialog-original').href = `images/candle-${num}.jpeg`;
+    document.getElementById('dialog-original').href = n === 29 ? 'images/studio-29-v2.jpeg' : `images/candle-${num}.jpeg`;
+    document.getElementById('dialog-original').textContent = n === 29 ? 'View unlit set illustration ↗' : 'View original photo ↗';
     const boxLink = document.getElementById('dialog-box');
     boxLink.hidden = n !== 20;
     if (n === 20) boxLink.href = 'images/box-20.jpeg';
