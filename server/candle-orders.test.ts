@@ -6,6 +6,7 @@ vi.mock("./_core/sdk", () => ({ sdk: { authenticateRequest: vi.fn() } }));
 
 // 假 SMTP 伺服器：只做最少的 ESMTP 對話，把 DATA 收到的信存下來驗證。
 const delivered: string[] = [];
+const rejectedRecipients = new Set<string>();
 const smtpServer = net.createServer(socket => {
   let buffer = "";
   let inData = false;
@@ -36,6 +37,8 @@ const smtpServer = net.createServer(socket => {
         socket.write("250-fake\r\n250 AUTH PLAIN\r\n");
       } else if (/^AUTH/i.test(line)) {
         socket.write("235 Authenticated\r\n");
+      } else if (/^RCPT TO/i.test(line) && [...rejectedRecipients].some(email => line.includes(email))) {
+        socket.write("550 Recipient temporarily rejected\r\n");
       } else if (/^MAIL FROM|^RCPT TO/i.test(line)) {
         socket.write("250 OK\r\n");
       } else if (/^QUIT/i.test(line)) {
@@ -49,9 +52,9 @@ const smtpServer = net.createServer(socket => {
 });
 
 // 讓模組以為有資料庫，才走得進寄信那一段。
-const { savedOrders } = vi.hoisted(() => ({ savedOrders: [] as unknown[][] }));
+const { savedOrders, dbWrites, pendingCustomerRows } = vi.hoisted(() => ({ savedOrders: [] as unknown[][], dbWrites: [] as {sql: string; values: unknown[]}[], pendingCustomerRows: [] as Record<string, unknown>[] }));
 vi.mock("mysql2/promise", () => {
-  const pool = { query: async () => [[]], execute: async (sql: string, values: unknown[]) => { if (sql.startsWith("INSERT INTO candle_orders ")) savedOrders.push(values); return [{}, null]; } };
+  const pool = { query: async (sql: string) => [sql.includes("INNER JOIN candle_customer_emails") ? pendingCustomerRows : []], execute: async (sql: string, values: unknown[]) => { dbWrites.push({sql, values}); if (sql.startsWith("INSERT INTO candle_orders ")) savedOrders.push(values); return [{}, null]; } };
   return { default: { createPool: () => pool }, createPool: () => pool };
 });
 
@@ -146,8 +149,9 @@ describe("蠟燭訂單通知信", () => {
     });
     expect(savedOrders[0].at(-1)).toBe("awaiting_payment");
 
-    expect(delivered).toHaveLength(1);
-    const mail = delivered[0];
+    expect(body.customerEmailSent).toBe(true);
+    expect(delivered).toHaveLength(2);
+    const mail = delivered.find(mail => mail.includes("To: owner@example.com"))!;
     const [headers, ...bodyParts] = mail.split(/\r?\n\r?\n/);
     const text = decodeQuotedPrintable(bodyParts.join("\n\n"));
     const compact = text.replace(/\s+/g, "");
@@ -161,6 +165,50 @@ describe("蠟燭訂單通知信", () => {
     expect(compact).toContain("澳洲A$99");
     expect(compact).toContain("等待銀行轉帳");
     expect(compact).toContain(`轉帳附言：${body.orderNumber}`);
+    const customerMail = delivered.find(mail => mail.includes("To: customer@example.com"))!;
+    const decoded = decodeQuotedPrintable(customerMail);
+    expect(decodeEncodedWords(customerMail)).toContain("awaiting payment");
+    for (const value of [body.orderNumber, "A$99.00", "774-001", "250413129", "ろかいずみ合同会社", "RZ-C001", "Elephant", "Golden Retriever Pair", "1 Test Street", "3 business days", "No Wise account is needed", "not a payment receipt"]) expect(decoded).toContain(value);
+    expect(customerMail).toContain("Reply-To: owner@example.com");
+    expect(customerMail).toContain("Content-Type: multipart/alternative");
+    expect(dbWrites.some(write => write.sql.startsWith("UPDATE candle_customer_emails") && write.values[0] === body.orderNumber)).toBe(true);
+  });
+
+  it("客戶信失敗不影響公司通知，補寄只寄客戶且不重寄公司", async () => {
+    rejectedRecipients.add("customer@example.com");
+    const before = delivered.length;
+    const response = await postOrder();
+    const body = await response.json();
+    expect(response.status).toBe(201);
+    expect(body.notificationSent).toBe(true);
+    expect(body.customerEmailSent).toBe(false);
+    expect(body.payment.reference).toBe(body.orderNumber);
+    expect(delivered).toHaveLength(before + 1);
+    expect(dbWrites.some(write => write.sql.startsWith("UPDATE candle_customer_emails") && write.values[0] === body.orderNumber)).toBe(false);
+    rejectedRecipients.clear();
+    pendingCustomerRows.push({ id: body.orderNumber, customer_name: order.name, customer_email: order.email,
+      customer_phone: order.phone, street_address: order.street, suburb: order.suburb, state: order.state,
+      postcode: order.postcode, items: JSON.stringify(order.items), note: order.note });
+    const { retryPendingCustomerEmails } = await import("./candle-orders");
+    await retryPendingCustomerEmails();
+    expect(delivered).toHaveLength(before + 2);
+    expect(delivered.at(-1)).toContain("To: customer@example.com");
+    expect(dbWrites.some(write => write.sql.startsWith("UPDATE candle_customer_emails") && write.values[0] === body.orderNumber)).toBe(true);
+    pendingCustomerRows.length = 0;
+  });
+
+  it("確認信正確使用特殊 SKU 與一手套一毛線球，HTML 跳脫客戶資料", async () => {
+    const before = delivered.length;
+    const response = await fetch(`http://127.0.0.1:${port}/api/candles/orders`, {
+      method: "POST", headers: {"content-type": "application/json"},
+      body: JSON.stringify({...order, name: '<img src=x onerror="bad">', items: [1, 2, 20, 29, 30]}),
+    });
+    expect(response.status).toBe(201);
+    const decoded = decodeQuotedPrintable(delivered.slice(before).find(mail => mail.includes("To: customer@example.com"))!);
+    expect(decoded).toContain("RZ-C026");
+    expect(decoded).toContain("Knitted Mitten + Yarn Ball (1 of each)");
+    expect(decoded).toContain("Rose Ball (1 candle · random colour)");
+    expect(decoded).toContain("&lt;img src=x onerror=&quot;bad&quot;&gt;");
   });
 
   it("寄信不可用時，訂單仍保存並回傳轉帳資料", async () => {
@@ -174,6 +222,7 @@ describe("蠟燭訂單通知信", () => {
 
     expect(response.status).toBe(201);
     expect(body.notificationSent).toBe(false);
+    expect(body.customerEmailSent).toBe(false);
     expect(body.payment.status).toBe("awaiting_payment");
     expect(body.payment.reference).toBe(body.orderNumber);
     expect(delivered).toHaveLength(before);

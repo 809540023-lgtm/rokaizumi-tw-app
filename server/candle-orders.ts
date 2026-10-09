@@ -85,15 +85,13 @@ function orderNotificationText(order: CandleOrder) {
 }
 
 // SMTP 優先（可以直接用既有信箱），其次 Resend。
-async function notifyNewOrder(order: CandleOrder) {
+async function sendOrderEmail(to: string, subject: string, text: string, keySuffix: string, html?: string) {
   const config = smtpConfig();
   const key = process.env.RESEND_API_KEY;
   if (!config && !(key && key.startsWith("re_"))) {
     console.error("Candle order notification is unavailable: set SMTP_HOST/SMTP_USER/SMTP_PASS or RESEND_API_KEY");
     return false;
   }
-  const subject = orderNotificationSubject(order);
-  const text = orderNotificationText(order);
   if (config) {
     try {
       if (!smtpTransport) {
@@ -104,8 +102,8 @@ async function notifyNewOrder(order: CandleOrder) {
           socketTimeout: 15_000,
         });
       }
-      await smtpTransport.sendMail({ from: senderAddress(), to: notifyAddress(), subject, text });
-      return true;
+      const result = await smtpTransport.sendMail({ from: senderAddress(), to, replyTo: notifyAddress(), subject, text, html });
+      return Boolean(result.accepted?.length) && !result.rejected?.length;
     } catch (error) {
       console.error("Candle order notification failed (SMTP)", error);
       smtpTransport = undefined;
@@ -115,8 +113,8 @@ async function notifyNewOrder(order: CandleOrder) {
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": `candle-order-${order.id}` },
-      body: JSON.stringify({ from: senderAddress(), to: [notifyAddress()], subject, text }),
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", "Idempotency-Key": `candle-order-${keySuffix}` },
+      body: JSON.stringify({ from: senderAddress(), to: [to], reply_to: notifyAddress(), subject, text, html }),
       signal: AbortSignal.timeout(10_000),
     });
     if (!response.ok) {
@@ -127,6 +125,91 @@ async function notifyNewOrder(order: CandleOrder) {
   } catch (error) {
     console.error("Candle order notification failed", error);
     return false;
+  }
+}
+
+async function notifyNewOrder(order: CandleOrder) {
+  return sendOrderEmail(notifyAddress(), orderNotificationSubject(order), orderNotificationText(order), order.id);
+}
+
+const candleNames: Record<number, string> = {
+  1: "Elephant", 2: "Golden Retriever Pair (2 dogs)", 3: "Puppy in Egg", 5: "Iced Latte",
+  7: "Strawberry Shake", 8: "Cherry Shake", 9: "Pineapple Juice", 10: "Passion Fruit Drink",
+  13: "Green Jelly", 14: "Blue Jelly", 15: "Grey & White Flowers", 16: "Floral Tower 1",
+  17: "Floral Tower 2", 20: "Christmas Snowman & Trees", 21: "Macaron Dessert Bowl",
+  25: "Sleeping Bear & Chocolate", 27: "Fruit & Flower Cake", 28: "Strawberry Cake",
+  29: "Knitted Mitten + Yarn Ball (1 of each)", 30: "Rose Ball (1 candle · random colour)",
+};
+
+export function customerConfirmationText(order: CandleOrder) {
+  const bank = audPayment.bank;
+  return [
+    `Hi ${order.name},`, "", "Thank you for choosing ROKA IZUMI handmade candles!",
+    `We have received your order ${order.id}. Your order is awaiting payment — this email is not a payment receipt.`,
+    "", "YOUR FIVE DESIGNS",
+    ...order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`),
+    "", "TOTAL: A$99.00", "Delivery to Australia is included. No additional shipping fee.",
+    "", "HOW TO PAY", "Use a local bank transfer from your Australian banking app. No Wise account is needed.",
+    "You can copy and paste the account holder, BSB, account number and transfer reference below.",
+    `Account holder: ${bank.accountHolder}`, `BSB: ${bank.bsb}`, `Account number: ${bank.accountNumber}`,
+    `Bank: ${bank.bankName}`, "Amount: A$99.00", `Transfer reference: ${order.id}`,
+    "Please include your order number as the transfer reference so we can match your payment.",
+    "", "DELIVERY DETAILS", order.name, order.street, `${order.suburb}, ${order.state} ${order.postcode}`, "Australia",
+    `Contact phone: ${order.phone}`, ...(order.note ? [`Delivery note: ${order.note}`] : []),
+    "", "WHAT HAPPENS NEXT",
+    "We will confirm receipt by email after checking that your payment has reached our account.",
+    "Production begins after payment is received. We will complete your set and provide a courier tracking number within 3 business days of receiving payment. Delivery time is additional.",
+    "", "HANDMADE COLOURS",
+    "Every candle is handmade. Colours and small details vary and cannot be identical to the photos or another set. Colours are selected at random; specific colours cannot be requested.",
+    "The Golden Retriever Pair includes two dogs and counts as one design. RZ-C029 includes one mitten and one yarn ball. RZ-C030 is one candle in a random colour.",
+    "", "Australian customs or the carrier may contact you for import clearance. Any import taxes or local charges assessed are payable by the recipient.",
+    "", "Questions or corrections to your delivery details? Reply to this email and quote your order number. Please do not place another order for the same set.",
+    "", "Thank you,", "ROKA IZUMI · Handmade in Osaka, Japan", "https://rokaizumi-tw.jp/candles/",
+  ].join("\n");
+}
+
+const escapeEmailHtml = (value: string) => value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]!));
+
+async function notifyCustomer(order: CandleOrder) {
+  const text = customerConfirmationText(order);
+  const html = `<div style="max-width:640px;margin:auto;padding:24px;font:16px/1.65 Arial,sans-serif;color:#302a29"><h1 style="font:28px Georgia,serif">ROKA IZUMI</h1><h2 style="font-size:20px">Order confirmation — awaiting payment</h2><div style="white-space:pre-wrap">${escapeEmailHtml(text).replace(/\n/g, "<br>")}</div></div>`;
+  return sendOrderEmail(order.email, `ROKA IZUMI | Order ${order.id} — awaiting payment`, text, `${order.id}-customer`, html);
+}
+
+// Only new AU orders are enrolled, so a deploy never emails historical customers.
+async function ensureCustomerEmailTable(db: mysql.Pool) {
+  await db.query("CREATE TABLE IF NOT EXISTS candle_customer_emails (order_id varchar(32) PRIMARY KEY, created_at datetime NOT NULL, sent_at datetime NULL)");
+}
+
+async function recordCustomerEmail(db: mysql.Pool, id: string) {
+  await db.execute("UPDATE candle_customer_emails SET sent_at = UTC_TIMESTAMP() WHERE order_id = ? AND sent_at IS NULL", [id]);
+}
+
+let customerRetryRunning = false;
+export async function retryPendingCustomerEmails() {
+  if (customerRetryRunning) return;
+  if (!notificationChannelReady()) return;
+  const db = database();
+  if (!db) return;
+  customerRetryRunning = true;
+  try {
+    await ensureCustomerEmailTable(db);
+    const [rows] = await db.query<mysql.RowDataPacket[]>(`SELECT o.id, o.customer_name, o.customer_email, o.customer_phone,
+      o.street_address, o.suburb, o.state, o.postcode, o.items, o.note
+      FROM candle_orders o INNER JOIN candle_customer_emails c ON c.order_id = o.id
+      WHERE c.sent_at IS NULL AND o.status = 'awaiting_payment' AND c.created_at < UTC_TIMESTAMP() - INTERVAL 2 MINUTE
+      ORDER BY c.created_at ASC LIMIT 100`);
+    for (const row of rows) {
+      const items = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
+      const sent = await notifyCustomer({ id: row.id, name: row.customer_name, email: row.customer_email,
+        phone: row.customer_phone, street: row.street_address, suburb: row.suburb, state: row.state,
+        postcode: row.postcode, items, note: row.note });
+      if (sent) await recordCustomerEmail(db, row.id);
+    }
+  } catch (error) {
+    console.error("Could not retry customer candle emails", error);
+  } finally {
+    customerRetryRunning = false;
   }
 }
 
@@ -179,9 +262,10 @@ async function retryPendingNotifications() {
   }
 }
 
-const notificationTimer = setInterval(() => void retryPendingNotifications(), 10 * 60 * 1000);
+const retryEmails = () => { void retryPendingNotifications(); void retryPendingCustomerEmails(); };
+const notificationTimer = setInterval(retryEmails, 10 * 60 * 1000);
 notificationTimer.unref();
-setTimeout(() => void retryPendingNotifications(), 15_000).unref();
+setTimeout(retryEmails, 15_000).unref();
 
 router.post("/", async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
@@ -210,11 +294,21 @@ router.post("/", async (req, res) => {
       items json NOT NULL, note text NOT NULL, status varchar(32) NOT NULL
     )`);
     await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, "awaiting_payment"]);
-    const notificationSent = await notifyNewOrder({ id, name, email, phone, street, suburb, state, postcode, items, note });
+    const order: CandleOrder = { id, name, email, phone, street, suburb, state, postcode, items, note };
+    let customerEmailQueued = false;
+    try {
+      await ensureCustomerEmailTable(db);
+      await db.execute("INSERT INTO candle_customer_emails (order_id, created_at, sent_at) VALUES (?, UTC_TIMESTAMP(), NULL)", [id]);
+      customerEmailQueued = true;
+    } catch (error) { console.error("Could not queue customer candle email", error); }
+    const [notificationSent, customerEmailSent] = await Promise.all([notifyNewOrder(order), notifyCustomer(order)]);
+    if (customerEmailSent && customerEmailQueued) {
+      try { await recordCustomerEmail(db, id); } catch (error) { console.error("Could not record customer candle email", error); }
+    }
     if (notificationSent) {
       try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
     }
-    return res.status(201).json({ orderNumber: id, notificationSent, payment: { ...audPayment, reference: id, status: "awaiting_payment" } });
+    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, payment: { ...audPayment, reference: id, status: "awaiting_payment" } });
   } catch (error) {
     console.error("Could not save candle order", error);
     return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });

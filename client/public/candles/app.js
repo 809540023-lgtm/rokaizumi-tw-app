@@ -130,6 +130,9 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     document.getElementById('bank-name').textContent = bank.bankName;
     for (const card of grid.children) card.querySelector('.pick').disabled = true;
     document.getElementById('notification-warning').hidden = result.notificationSent === true;
+    document.getElementById('customer-email-status').textContent = result.customerEmailSent === true
+      ? `Your order confirmation and payment details have been emailed to ${payload.email}. Please check your inbox and spam folder.`
+      : 'Your order is saved, but we could not email your confirmation just now. Please save the bank details and order number below. We will retry sending the email; do not submit another order.';
     form.hidden = true;
     document.getElementById('order-success').hidden = false;
     document.getElementById('inquire').disabled = true;
