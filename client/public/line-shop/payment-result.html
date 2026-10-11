@@ -35,7 +35,7 @@
         if (!r.ok) throw Error(d.error);
         box.textContent =
           d.status === "paid"
-            ? `${d.mode === "test" ? "測試付款成功（未實際扣款）" : "付款成功"}。訂單 ${d.id}，總額 NT$${d.totalTwd}。付款後3–5天內出貨，送達時間另計。`
+            ? `${d.mode === "test" ? "測試付款成功（未實際扣款）" : "付款成功"}。訂單 ${d.id}，總額 NT$${d.totalTwd}。下單後七個工作天內從日本寄出，送達時間另計。`
             : d.status === "expired"
               ? "付款期限已過，請聯絡店家。"
               : "付款確認中，請稍後重新確認。若已扣款，請勿再次付款。";

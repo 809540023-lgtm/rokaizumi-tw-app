@@ -490,7 +490,7 @@ async function preparePayment(id: string, packedWeightGrams?: unknown) {
       custom_text: {
         submit: {
           message:
-            "付款後3–5天內出貨。商品滿NT$2,000運費NT$220，滿NT$5,000免運。",
+            "下單後七個工作天內從日本寄出。商品滿NT$2,000運費NT$220，滿NT$5,000免運。",
         },
       },
     },
@@ -509,7 +509,7 @@ async function preparePayment(id: string, packedWeightGrams?: unknown) {
       "payment_ready",
       customer.email,
       `ROKA IZUMI｜請付款 ${order!.id}`,
-      `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS運費：NT$${quote.shippingTwd}（商品滿NT$2,000運費NT$220，滿NT$5,000免運）\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n付款後3–5天內出貨。`
+      `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS運費：NT$${quote.shippingTwd}（商品滿NT$2,000運費NT$220，滿NT$5,000免運）\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n下單後七個工作天內從日本寄出。`
     );
     await enqueue(
       db,
@@ -640,7 +640,7 @@ export async function lineShopWebhook(req: Request, res: Response) {
           .map(i => `${i.name} × ${i.quantity}`)
           .join(
             "\n"
-          )}\n付款後3–5天內出貨，送達時間另計。\n客服：info@rokaizumi-tw.jp`;
+          )}\n下單後七個工作天內從日本寄出，送達時間另計。\n客服：info@rokaizumi-tw.jp`;
         await enqueue(
           conn,
           order.id,
