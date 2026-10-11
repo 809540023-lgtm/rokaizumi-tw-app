@@ -14,7 +14,13 @@ export type ShopItem = {
   unitPriceTwd: number;
 };
 export class ShopInputError extends Error {}
-export const TERMS_VERSION = "2026-10-11-line-shop-v1";
+export const TERMS_VERSION = "2026-10-11-line-shop-v2";
+export const MIN_ORDER_TWD = 2000;
+export function orderShippingTwd(subtotalTwd: number) {
+  if (!Number.isSafeInteger(subtotalTwd) || subtotalTwd < MIN_ORDER_TWD)
+    throw new ShopInputError("商品小計需滿 NT$2,000（不含運費）");
+  return subtotalTwd >= 5000 ? 0 : 220;
+}
 export const EMS_SOURCE =
   "https://www.post.japanpost.jp/send/oversea/charge/list-ems/all.html";
 const tiers = [
@@ -61,7 +67,7 @@ const tiers = [
   [29000, 25800],
   [30000, 26600],
 ];
-export function shippingQuote(packedWeightGrams: unknown) {
+export function shippingQuote(packedWeightGrams: unknown, subtotalTwd: number) {
   if (
     !Number.isSafeInteger(packedWeightGrams) ||
     Number(packedWeightGrams) < 1 ||
@@ -74,7 +80,7 @@ export function shippingQuote(packedWeightGrams: unknown) {
   return {
     packedWeightGrams: Number(packedWeightGrams),
     emsJpy,
-    shippingTwd: Math.ceil(emsJpy / 2 / 5),
+    shippingTwd: orderShippingTwd(subtotalTwd),
   };
 }
 export function resolveShopItems(input: unknown, products: ShopProduct[]) {
@@ -105,8 +111,7 @@ export function resolveShopItems(input: unknown, products: ShopProduct[]) {
     (n, i) => n + i.unitPriceTwd * i.quantity,
     0
   );
-  if (!Number.isSafeInteger(subtotalTwd) || subtotalTwd < 1500)
-    throw new ShopInputError("商品小計需滿 NT$1,500（不含運費）");
+  orderShippingTwd(subtotalTwd);
   return { items, subtotalTwd };
 }
 export function validPaidSession(
@@ -122,7 +127,7 @@ export function validPaidSession(
 ) {
   return (
     Number.isSafeInteger(order.shipping) &&
-    Number(order.shipping) > 0 &&
+    Number(order.shipping) >= 0 &&
     session.payment_status === "paid" &&
     session.currency === "twd" &&
     session.amount_total === (order.subtotal + Number(order.shipping)) * 100 &&

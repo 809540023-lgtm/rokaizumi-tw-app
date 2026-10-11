@@ -2,7 +2,7 @@
 
 The independent storefront is `/line-shop/`. Customers request an order without signing in. An existing company administrator opens `/line-shop/admin.html`, confirms supply and postal eligibility, and enters the actual packed weight. Only then does the server reserve stock and create a Stripe Checkout link for the product subtotal plus the customer's half of Japan Post EMS postage.
 
-Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$1,500. Postage uses the Taiwan EMS table, divided by two and converted at JPY5/TWD1, rounded up. Estimated product weights shown in the cart do not determine the charged postage. Seeded stock represents selection limits; the administrator must verify actual supply before quoting.
+Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Seeded stock represents selection limits; the administrator must verify actual supply before quoting.
 
 ## Render environment
 

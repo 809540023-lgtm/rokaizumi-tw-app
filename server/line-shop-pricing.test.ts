@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   shippingQuote,
+  orderShippingTwd,
   resolveShopItems,
   validPaidSession,
   type ShopProduct,
@@ -11,18 +12,18 @@ const products = [
 describe("LINE shop server prices and minimum", () => {
   it("ignores a forged browser price and enforces the product subtotal", () => {
     expect(
-      resolveShopItems([{ productId: "M001", quantity: 3, price: 1 }], products)
+      resolveShopItems([{ productId: "M001", quantity: 4, price: 1 }], products)
         .subtotalTwd
-    ).toBe(1500);
+    ).toBe(2000);
     expect(() =>
       resolveShopItems([{ productId: "M001", quantity: 2 }], products)
-    ).toThrow("1,500");
+    ).toThrow("2,000");
     expect(() =>
       resolveShopItems(
-        [{ productId: "M001", quantity: 3 }],
+        [{ productId: "M001", quantity: 4 }],
         [{ ...products[0], price: 499 }]
       )
-    ).toThrow("1,500");
+    ).toThrow("2,000");
   });
   it("rejects duplicate, removed, fractional and out of stock items", () => {
     for (const items of [
@@ -37,20 +38,27 @@ describe("LINE shop server prices and minimum", () => {
       expect(() => resolveShopItems(items, products)).toThrow();
   });
 });
-describe("Taiwan EMS half share", () => {
-  it("selects the next weight tier and converts only the buyer half", () => {
-    expect(shippingQuote(500)).toEqual({
+describe("Taiwan fixed postage and free shipping", () => {
+  it("enforces the minimum and both shipping boundaries", () => {
+    expect(() => orderShippingTwd(1999)).toThrow("2,000");
+    expect(orderShippingTwd(2000)).toBe(220);
+    expect(orderShippingTwd(4999)).toBe(220);
+    expect(orderShippingTwd(5000)).toBe(0);
+    expect(orderShippingTwd(5001)).toBe(0);
+  });
+  it("records carrier cost without changing buyer postage", () => {
+    expect(shippingQuote(500, 2000)).toEqual({
       packedWeightGrams: 500,
       emsJpy: 1450,
-      shippingTwd: 145,
+      shippingTwd: 220,
     });
-    expect(shippingQuote(501).shippingTwd).toBe(160);
-    expect(shippingQuote(2000).shippingTwd).toBe(340);
-    expect(shippingQuote(30000).shippingTwd).toBe(2660);
+    expect(shippingQuote(501, 4999).shippingTwd).toBe(220);
+    expect(shippingQuote(2000, 5000).shippingTwd).toBe(0);
+    expect(shippingQuote(30000, 5000).shippingTwd).toBe(0);
   });
   it("blocks unknown, zero, fractional and excessive packed weight", () => {
     for (const w of [null, undefined, 0, -1, 1.5, 30001, "500"])
-      expect(() => shippingQuote(w)).toThrow();
+      expect(() => shippingQuote(w, 2000)).toThrow();
   });
 });
 describe("verified Stripe payment amount and mode", () => {
@@ -65,6 +73,12 @@ describe("verified Stripe payment amount and mode", () => {
   };
   it("accepts a matching full TWD payment", () =>
     expect(validPaidSession(session, order)).toBe(true));
+  it("accepts free shipping and rejects an underpayment", () => {
+    const free = { ...order, subtotal: 5000, shipping: 0 };
+    expect(validPaidSession({ ...session, amount_total: 500000 }, free)).toBe(true);
+    expect(validPaidSession({ ...session, amount_total: 499900 }, free)).toBe(false);
+    expect(validPaidSession(session, { ...order, shipping: null })).toBe(false);
+  });
   it("rejects unpaid, wrong amount, wrong currency, test and another order", () => {
     for (const overrides of [
       { payment_status: "unpaid" },

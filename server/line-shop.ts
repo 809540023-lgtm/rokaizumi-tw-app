@@ -419,7 +419,7 @@ router.post(
       req.body?.shippingAllowedConfirmed !== true
     )
       throw new ShopInputError("請先確認供貨與寄送條件");
-    const quote = shippingQuote(req.body.packedWeightGrams);
+    let quote: ReturnType<typeof shippingQuote>;
     const db = await database();
     const conn = await db.getConnection();
     let order: RowDataPacket;
@@ -432,6 +432,7 @@ router.post(
         await conn.commit();
         return res.json(summary(order));
       }
+      quote = shippingQuote(req.body.packedWeightGrams, Number(order.subtotal));
       if (order.status !== "awaiting_quote" && order.status !== "quoting")
         throw new ShopInputError("此訂單不能再次建立付款");
       if (
@@ -486,7 +487,7 @@ router.post(
             price_data: {
               currency: "twd",
               unit_amount: quote.shippingTwd * 100,
-              product_data: { name: "EMS 運費（客人負擔50%）" },
+              product_data: { name: "EMS 運費（商品滿NT$5,000免運）" },
             },
             quantity: 1,
           },
@@ -494,7 +495,7 @@ router.post(
         success_url: `${origin()}/line-shop/payment-result.html?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin()}/line-shop/payment-result.html?cancelled=1`,
         custom_text: {
-          submit: { message: "付款後3–5天內出貨。EMS運費公司與客人各付一半。" },
+          submit: { message: "付款後3–5天內出貨。商品滿NT$2,000運費NT$220，滿NT$5,000免運。" },
         },
       },
       { idempotencyKey: "line-shop-" + order!.id }
@@ -512,7 +513,7 @@ router.post(
         "payment_ready",
         customer.email,
         `ROKA IZUMI｜請付款 ${order!.id}`,
-        `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS官方料金：${quote.emsJpy}円；客人50%負擔換算台幣：NT$${quote.shippingTwd}\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n付款後3–5天內出貨。`
+        `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS運費：NT$${quote.shippingTwd}（商品滿NT$2,000運費NT$220，滿NT$5,000免運）\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n付款後3–5天內出貨。`
       );
     void drainShopMail();
     res.json(summary((await orderById(db, order!.id))!));

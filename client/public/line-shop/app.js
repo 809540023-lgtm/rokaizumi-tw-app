@@ -2,13 +2,13 @@
 const MASKS = window.PRODUCTS;
 const GROCERY = window.SUPERMARKET_PRODUCTS;
 const COSTCO = window.COSTCO_PRODUCTS;
-const P = [...MASKS, ...GROCERY, ...COSTCO];
+const P = [...COSTCO, ...GROCERY, ...MASKS];
 let currentCatalog =
-  location.hash === "#costco"
-    ? "costco"
+  location.hash === "#shop"
+    ? "shop"
     : location.hash === "#supermarket"
       ? "supermarket"
-      : "shop";
+      : "costco";
 let groceryCategory = "全部";
 const cart = new Map();
 let shippingMethod = "ems";
@@ -37,8 +37,7 @@ function saveCart() {
     localStorage.setItem(CART_KEY, JSON.stringify(Object.fromEntries(cart)));
   } catch {}
 }
-const FX = 0.2;
-const MIN_ORDER_TWD = 1500;
+const MIN_ORDER_TWD = 2000;
 const $ = id => document.getElementById(id);
 const money = n => "NT$" + Math.round(n).toLocaleString("zh-TW");
 const esc = s =>
@@ -52,53 +51,6 @@ const esc = s =>
 function price(p) {
   return p.price;
 }
-function ems(g) {
-  const tiers = [
-    [500, 1450],
-    [600, 1600],
-    [700, 1750],
-    [800, 1900],
-    [900, 2050],
-    [1000, 2200],
-    [1250, 2500],
-    [1500, 2800],
-    [1750, 3100],
-    [2000, 3400],
-    [2500, 3900],
-    [3000, 4400],
-    [3500, 4900],
-    [4000, 5400],
-    [4500, 5900],
-    [5000, 6400],
-    [5500, 6900],
-    [6000, 7400],
-    [7000, 8200],
-    [8000, 9000],
-    [9000, 9800],
-    [10000, 10600],
-    [11000, 11400],
-    [12000, 12200],
-    [13000, 13000],
-    [14000, 13800],
-    [15000, 14600],
-    [16000, 15400],
-    [17000, 16200],
-    [18000, 17000],
-    [19000, 17800],
-    [20000, 18600],
-    [21000, 19400],
-    [22000, 20200],
-    [23000, 21000],
-    [24000, 21800],
-    [25000, 22600],
-    [26000, 23400],
-    [27000, 24200],
-    [28000, 25000],
-    [29000, 25800],
-    [30000, 26600],
-  ];
-  return tiers.find(t => g <= t[0])?.[1] ?? null;
-}
 function totals() {
   let count = 0,
     subtotal = 0,
@@ -111,9 +63,7 @@ function totals() {
     if (q && p.weight === null) weightUnknown = true;
     else weight += q * p.weight;
   }
-  const shippingJPY = weightUnknown ? null : count ? ems(weight) : 0;
-  const shipping =
-    shippingJPY === null ? null : count ? Math.ceil((shippingJPY * FX) / 2) : 0;
+  const shipping = count ? (subtotal >= 5000 ? 0 : 220) : 0;
   return {
     count,
     subtotal,
@@ -131,8 +81,8 @@ function showTab(tab) {
     history.replaceState(
       null,
       "",
-      tab === "costco"
-        ? "#costco"
+      tab === "shop"
+        ? "#shop"
         : tab === "supermarket"
           ? "#supermarket"
           : location.pathname + location.search
@@ -221,10 +171,10 @@ function renderCostco() {
   ).join("");
 }
 function sumHtml(t) {
-  return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>EMS 客人負擔50%（試算）</span><strong>${t.weightUnknown ? "重量待實秤" : t.shipping === null ? "超出試算範圍" : money(t.shipping)}</strong></div><p class="muted">${t.weightUnknown ? "商品重量待實秤，運費及總額待報價。" : `預估整單${t.weight}g（含包材100g）。重量尚未實秤；EMS官方料金由公司與客人各付一半，按日幣÷5換算台幣。`}</p><div class="sumrow total"><span>預估總額</span><span>${t.total === null ? "待報價" : money(t.total)}</span></div></div>`;
+  return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>EMS 運費${t.subtotal >= 5000 ? "（免運）" : ""}</span><strong>${money(t.shipping)}</strong></div><p class="muted">商品滿 NT$2,000 可下單，運費 NT$220；商品滿 NT$5,000 免運（門檻不含運費）。</p><div class="sumrow total"><span>總額</span><span>${money(t.total)}</span></div></div>`;
 }
 function shippingOptions(t) {
-  return `<div class="shipping-options"><strong>日本郵政 EMS｜公司與客人各付一半</strong><p class="muted">按含包材的整單重量對照官方料金表，再收取50%。目前僅供試算，實際重量待確認。付款後3–5天內出貨，送達時間另計。</p></div>`;
+  return `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">商品 NT$2,000～4,999 運費 NT$220。店家確認供貨與寄送條件後寄送刷卡連結，付款後3–5天內出貨。</p></div>`;
 }
 function renderCart() {
   const t = totals();
@@ -243,10 +193,10 @@ function renderCart() {
             `<div class="row">${p.image ? `<img referrerpolicy="no-referrer" src="${p.image}" alt="${esc(p.name)}">` : `<div class="row-pending" aria-label="商品照片準備中">${p.id}</div>`}<div class="row-content"><h3>${esc(p.name)}</h3><p class="muted">${esc(p.spec)} · ${money(price(p))}/${p.catalog !== "mask" && p.catalog ? "件" : "包"}</p><button class="textbtn" data-remove="${p.id}">移除</button></div><div class="quantity"><button data-step="-1" data-id="${p.id}" aria-label="減少${esc(p.name)}數量">−</button><span>${cart.get(p.id)}</span><button data-step="1" data-id="${p.id}" aria-label="增加${esc(p.name)}數量">＋</button></div></div>`
         )
         .join("") +
-      (t.weightUnknown ? "" : shippingOptions(t)) +
+      shippingOptions(t) +
       sumHtml(t) +
-      `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "確認運費並下單"}</button><p class="muted">最低訂購商品小計 NT$1,500（不含運費，面膜、超市與好市多可合併計算）。確認供貨及含包材重量後寄送刷卡連結。</p>`
-    : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費試算。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
+      `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "確認運費並下單"}</button><p class="muted">最低訂購商品小計 NT$2,000（不含運費，面膜、超市與好市多可合併計算）。確認供貨及含包材重量後寄送刷卡連結。</p>`
+    : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
 function priceEvidence(p) {
   if (p.catalog === "costco")
@@ -271,14 +221,14 @@ function detail(id) {
 }
 function checkout() {
   const t = totals();
-  if (t.subtotal < 1500) return;
+  if (t.subtotal < MIN_ORDER_TWD) return;
   const c = window.SHOP_CONFIG;
   if (!c?.enabled) {
     toast("刷卡設定尚未完成，暫未開放下單");
     return;
   }
   $("checkoutbody").innerHTML =
-    `<p>免會員下單。店家確認供貨與含包材重量後，會寄送 EMS 運費及 Stripe 刷卡連結。現在不扣款。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：待確認（EMS 官方料金50%）。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。運費確認後再付款。</label><button class="btn" type="submit">送出訂單・等待運費確認</button></form>`;
+    `<p>免會員下單。店家確認供貨與寄送條件後，會寄送 Stripe 刷卡連結。現在不扣款。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>（滿 NT$5,000 免運）。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。運費確認後再付款。</label><button class="btn" type="submit">送出訂單・等待運費確認</button></form>`;
   $("checkout").showModal();
 }
 let orderToken = null;
@@ -322,7 +272,7 @@ document.addEventListener("submit", async e => {
 });
 function showOrder(d) {
   $("checkoutbody").innerHTML =
-    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "運費已確認，請刷卡付款" : d.status === "expired" ? "付款期限已過" : "訂單已收到，等待運費確認"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；EMS 運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "確認整單重量後通知總額。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>付款後3–5天內出貨。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
+    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "運費已確認，請刷卡付款" : d.status === "expired" ? "付款期限已過" : "訂單已收到，等待運費確認"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；EMS 運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "確認供貨後通知付款總額。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>付款後3–5天內出貨。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
   if (!$("checkout").open) $("checkout").showModal();
 }
 async function refreshOrder() {
@@ -386,10 +336,10 @@ renderCart();
 showTab(currentCatalog);
 window.addEventListener("hashchange", () =>
   showTab(
-    location.hash === "#costco"
-      ? "costco"
+    location.hash === "#shop"
+      ? "shop"
       : location.hash === "#supermarket"
         ? "supermarket"
-        : "shop"
+        : "costco"
   )
 );
