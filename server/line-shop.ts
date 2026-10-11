@@ -13,6 +13,7 @@ import {
   ShopInputError,
   resolveShopItems,
   shippingQuote,
+  orderShippingTwd,
   validPaidSession,
   TERMS_VERSION,
   type ShopItem,
@@ -282,13 +283,22 @@ router.post(
       throw new ShopInputError("請重新整理並確認購物說明");
     const customer = customerInput(req.body.customer);
     const db = await database();
-    const resolved = resolveShopItems(req.body.items, await catalog(db));
-    const fingerprint = hash(
-      JSON.stringify({ resolved, customer, mode: live() ? "live" : "test" })
-    );
     const [existing] = await db.execute<RowDataPacket[]>(
       "SELECT * FROM line_shop_orders WHERE request_key=?",
       [req.body.idempotencyKey]
+    );
+    const products = existing[0]
+      ? parsed<ShopItem[]>(existing[0].items_json).map(i => ({
+          id: i.productId,
+          name: i.name,
+          price: i.unitPriceTwd,
+          stock: i.quantity,
+          catalog: "existing",
+        }))
+      : await catalog(db);
+    const resolved = resolveShopItems(req.body.items, products);
+    const fingerprint = hash(
+      JSON.stringify({ resolved, customer, mode: live() ? "live" : "test" })
     );
     if (existing[0]) {
       if (
@@ -296,7 +306,7 @@ router.post(
         existing[0].token_hash !== hash(req.body.token)
       )
         return res.status(409).json({ error: "提交識別碼已使用，請重新整理" });
-      return res.json(summary(existing[0]));
+      return res.json(await preparePayment(existing[0].id));
     }
     // Render appends the source address; use its last proxy entry only.
     const sourceIp = process.env.RENDER
@@ -337,26 +347,6 @@ router.post(
           live() ? "live" : "test",
         ]
       );
-      const url = `${origin()}/line-shop/?order=${id}&token=${req.body.token}`;
-      const text = `訂單編號：${id}\n商品小計：NT$${resolved.subtotalTwd}\n${resolved.items.map(i => `${i.name} × ${i.quantity}`).join("\n")}\n尚未付款。店家確認整單重量、供貨及寄送條件後，會提供 EMS 50% 運費及 Stripe 付款連結。\n訂單查詢：${url}`;
-      if (live()) {
-        await enqueue(
-          conn,
-          id,
-          "request_customer",
-          customer.email!,
-          `ROKA IZUMI｜待確認運費 ${id}`,
-          text
-        );
-        await enqueue(
-          conn,
-          id,
-          "request_merchant",
-          process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
-          `ROKA IZUMI｜新訂單待報價 ${id}`,
-          `請確認供貨、寄送條件及整單含包材重量。\n${text}\n\n${merchantCustomerDetails(customer)}\n管理：${origin()}/line-shop/admin.html`
-        );
-      }
       await conn.commit();
     } catch (e) {
       await conn.rollback();
@@ -364,8 +354,7 @@ router.post(
     } finally {
       conn.release();
     }
-    void drainShopMail();
-    res.status(201).json(summary((await orderById(db, id))!));
+    res.status(201).json(await preparePayment(id));
   })
 );
 router.get(
@@ -409,6 +398,138 @@ router.get(
     });
   })
 );
+async function preparePayment(id: string, packedWeightGrams?: unknown) {
+  let quote: {
+    shippingTwd: number;
+    emsJpy: number | null;
+    packedWeightGrams: number | null;
+  };
+  const db = await database();
+  const conn = await db.getConnection();
+  let order: RowDataPacket;
+  try {
+    await conn.beginTransaction();
+    order = (await orderById(conn, id, true))!;
+    if (!order || order.mode !== (live() ? "live" : "test"))
+      throw new ShopInputError("找不到相同模式的訂單");
+    if (
+      ["pending", "paid", "expired"].includes(order.status) &&
+      order.session_id
+    ) {
+      await conn.commit();
+      return summary(order);
+    }
+    quote =
+      packedWeightGrams === undefined
+        ? {
+            shippingTwd: orderShippingTwd(Number(order.subtotal)),
+            emsJpy: order.ems_jpy ?? null,
+            packedWeightGrams: order.weight_grams ?? null,
+          }
+        : shippingQuote(packedWeightGrams, Number(order.subtotal));
+    if (order.status !== "awaiting_quote" && order.status !== "quoting")
+      throw new ShopInputError("此訂單不能再次建立付款");
+    if (
+      order.status === "quoting" &&
+      order.weight_grams !== quote.packedWeightGrams
+    )
+      throw new ShopInputError("此訂單已保留原報價，請沿用原重量重試");
+    if (!order.reserved) {
+      for (const item of parsed<ShopItem[]>(order.items_json).sort((a, b) =>
+        a.productId.localeCompare(b.productId)
+      )) {
+        const [r] = await conn.execute<mysql.ResultSetHeader>(
+          "UPDATE line_shop_products SET stock=stock-? WHERE id=? AND active=TRUE AND stock>=?",
+          [item.quantity, item.productId, item.quantity]
+        );
+        if (!r.affectedRows) throw new ShopInputError(`${item.name} 庫存不足`);
+      }
+    }
+    await conn.execute(
+      "UPDATE line_shop_orders SET shipping=?,ems_jpy=?,weight_grams=?,reserved=TRUE,status='quoting' WHERE id=?",
+      [quote.shippingTwd, quote.emsJpy, quote.packedWeightGrams, order.id]
+    );
+    await conn.commit();
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
+  // A timeout retains the same order and idempotency key. Retry the identical quote.
+  const stripe = new Stripe(key());
+  const customer = parsed<any>(order!.customer_json);
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      payment_method_types: ["card"],
+      locale: "zh-TW",
+      customer_email: customer.email,
+      client_reference_id: order!.id,
+      metadata: { line_shop_order: order!.id },
+      line_items: [
+        ...parsed<ShopItem[]>(order!.items_json).map(i => ({
+          price_data: {
+            currency: "twd",
+            unit_amount: i.unitPriceTwd * 100,
+            product_data: { name: i.name },
+          },
+          quantity: i.quantity,
+        })),
+        {
+          price_data: {
+            currency: "twd",
+            unit_amount: quote.shippingTwd * 100,
+            product_data: { name: "EMS 運費（商品滿NT$5,000免運）" },
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${origin()}/line-shop/payment-result.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin()}/line-shop/payment-result.html?cancelled=1`,
+      custom_text: {
+        submit: {
+          message:
+            "付款後3–5天內出貨。商品滿NT$2,000運費NT$220，滿NT$5,000免運。",
+        },
+      },
+    },
+    { idempotencyKey: "line-shop-" + order!.id }
+  );
+  if (!session.url || session.livemode !== live())
+    throw new Error("Unexpected Stripe session");
+  await db.execute(
+    "UPDATE line_shop_orders SET session_id=?,checkout_url=?,status='pending' WHERE id=? AND status='quoting'",
+    [session.id, session.url, order!.id]
+  );
+  if (live()) {
+    await enqueue(
+      db,
+      order!.id,
+      "payment_ready",
+      customer.email,
+      `ROKA IZUMI｜請付款 ${order!.id}`,
+      `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS運費：NT$${quote.shippingTwd}（商品滿NT$2,000運費NT$220，滿NT$5,000免運）\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n付款後3–5天內出貨。`
+    );
+    await enqueue(
+      db,
+      order!.id,
+      "request_merchant",
+      process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
+      `ROKA IZUMI｜新訂單待付款 ${order!.id}`,
+      `訂單：${order!.id}\n尚未付款\n商品小計：NT$${order!.subtotal}\n運費：NT$${quote.shippingTwd}\n總額：NT$${order!.subtotal + quote.shippingTwd}\n${parsed<
+        ShopItem[]
+      >(order!.items_json)
+        .map(i => `${i.productId} ${i.name} × ${i.quantity}`)
+        .join(
+          "\n"
+        )}\n\n${merchantCustomerDetails(customer)}\n付款完成後會另寄通知。`
+    );
+  }
+  void drainShopMail();
+  return summary((await orderById(db, order!.id))!);
+}
+
 router.post(
   "/admin/orders/:id/quote",
   handled(async (req, res) => {
@@ -419,104 +540,9 @@ router.post(
       req.body?.shippingAllowedConfirmed !== true
     )
       throw new ShopInputError("請先確認供貨與寄送條件");
-    let quote: ReturnType<typeof shippingQuote>;
-    const db = await database();
-    const conn = await db.getConnection();
-    let order: RowDataPacket;
-    try {
-      await conn.beginTransaction();
-      order = (await orderById(conn, String(req.params.id), true))!;
-      if (!order || order.mode !== (live() ? "live" : "test"))
-        throw new ShopInputError("找不到相同模式的訂單");
-      if (order.status === "pending" && order.session_id) {
-        await conn.commit();
-        return res.json(summary(order));
-      }
-      quote = shippingQuote(req.body.packedWeightGrams, Number(order.subtotal));
-      if (order.status !== "awaiting_quote" && order.status !== "quoting")
-        throw new ShopInputError("此訂單不能再次建立付款");
-      if (
-        order.status === "quoting" &&
-        order.weight_grams !== quote.packedWeightGrams
-      )
-        throw new ShopInputError("此訂單已保留原報價，請沿用原重量重試");
-      if (!order.reserved) {
-        for (const item of parsed<ShopItem[]>(order.items_json).sort((a, b) =>
-          a.productId.localeCompare(b.productId)
-        )) {
-          const [r] = await conn.execute<mysql.ResultSetHeader>(
-            "UPDATE line_shop_products SET stock=stock-? WHERE id=? AND active=TRUE AND stock>=?",
-            [item.quantity, item.productId, item.quantity]
-          );
-          if (!r.affectedRows)
-            throw new ShopInputError(`${item.name} 庫存不足`);
-        }
-      }
-      await conn.execute(
-        "UPDATE line_shop_orders SET shipping=?,ems_jpy=?,weight_grams=?,reserved=TRUE,status='quoting' WHERE id=?",
-        [quote.shippingTwd, quote.emsJpy, quote.packedWeightGrams, order.id]
-      );
-      await conn.commit();
-    } catch (e) {
-      await conn.rollback();
-      throw e;
-    } finally {
-      conn.release();
-    }
-    // A timeout retains the same order and idempotency key. Retry the identical quote.
-    const stripe = new Stripe(key());
-    const customer = parsed<any>(order!.customer_json);
-    const session = await stripe.checkout.sessions.create(
-      {
-        mode: "payment",
-        payment_method_types: ["card"],
-        locale: "zh-TW",
-        customer_email: customer.email,
-        client_reference_id: order!.id,
-        metadata: { line_shop_order: order!.id },
-        line_items: [
-          ...parsed<ShopItem[]>(order!.items_json).map(i => ({
-            price_data: {
-              currency: "twd",
-              unit_amount: i.unitPriceTwd * 100,
-              product_data: { name: i.name },
-            },
-            quantity: i.quantity,
-          })),
-          {
-            price_data: {
-              currency: "twd",
-              unit_amount: quote.shippingTwd * 100,
-              product_data: { name: "EMS 運費（商品滿NT$5,000免運）" },
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${origin()}/line-shop/payment-result.html?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin()}/line-shop/payment-result.html?cancelled=1`,
-        custom_text: {
-          submit: { message: "付款後3–5天內出貨。商品滿NT$2,000運費NT$220，滿NT$5,000免運。" },
-        },
-      },
-      { idempotencyKey: "line-shop-" + order!.id }
+    res.json(
+      await preparePayment(String(req.params.id), req.body.packedWeightGrams)
     );
-    if (!session.url || session.livemode !== live())
-      throw new Error("Unexpected Stripe session");
-    await db.execute(
-      "UPDATE line_shop_orders SET session_id=?,checkout_url=?,status='pending' WHERE id=? AND status='quoting'",
-      [session.id, session.url, order!.id]
-    );
-    if (live())
-      await enqueue(
-        db,
-        order!.id,
-        "payment_ready",
-        customer.email,
-        `ROKA IZUMI｜請付款 ${order!.id}`,
-        `訂單：${order!.id}\n商品小計：NT$${order!.subtotal}\nEMS運費：NT$${quote.shippingTwd}（商品滿NT$2,000運費NT$220，滿NT$5,000免運）\n總額：NT$${order!.subtotal + quote.shippingTwd}\nStripe 安全付款（24小時內有效）：${session.url}\n付款後3–5天內出貨。`
-      );
-    void drainShopMail();
-    res.json(summary((await orderById(db, order!.id))!));
   })
 );
 router.get(
@@ -629,7 +655,8 @@ export async function lineShopWebhook(req: Request, res: Response) {
           "paid_merchant",
           process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
           `ROKA IZUMI｜付款完成 ${order.id}`,
-          text + `\n\n${merchantCustomerDetails(customer)}\n請到管理頁安排出貨：${origin()}/line-shop/admin.html`
+          text +
+            `\n\n${merchantCustomerDetails(customer)}\n請到管理頁安排出貨：${origin()}/line-shop/admin.html`
         );
       }
     }

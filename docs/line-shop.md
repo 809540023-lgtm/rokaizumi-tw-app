@@ -1,8 +1,8 @@
 # LINE guest shop on the company server
 
-The independent storefront is `/line-shop/`. Customers request an order without signing in. An existing company administrator opens `/line-shop/admin.html`, confirms supply and postal eligibility, and enters the actual packed weight. Only then does the server reserve stock and create a Stripe Checkout link for the product subtotal plus the customer's half of Japan Post EMS postage.
+The independent storefront is `/line-shop/`. Customers select products and enter recipient details without signing in. The server reserves stock once, computes fixed buyer postage and creates a Stripe Checkout session immediately. The browser redirects directly to Stripe; no administrator quote is required. Existing pending sessions retain their original amounts and can be resumed from email.
 
-Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Seeded stock represents selection limits; the administrator must verify actual supply before quoting.
+Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Seeded stock represents selection limits; operators maintain inventory and arrange fulfillment.
 
 ## Render environment
 
@@ -17,13 +17,13 @@ Use separate secrets from the company's existing Stripe features:
 
 Reuse existing `DATABASE_URL`, database SSL configuration, administrator auth and `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`. Never commit secrets or place them in client JavaScript. A restricted key has no payout, bank-account or refund access.
 
-Register `https://rokaizumi-tw.jp/api/line-shop/stripe/webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.expired`, in the same mode as the key. Only signed events with matching currency, amount, mode, order metadata and reference mark orders paid. Visiting the success page does not mark payment successful. Stripe expiration releases reserved stock once. The same quote can be retried after a timeout without a second stock deduction or a second session.
+Register `https://rokaizumi-tw.jp/api/line-shop/stripe/webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.expired`, in the same mode as the key. Only signed events with matching currency, amount, mode, order metadata and reference mark orders paid. Visiting the success page does not mark payment successful. Stripe expiration releases reserved stock once. The same order submission can be retried after a timeout without a second stock deduction or a second session.
 
 Tables are created lazily and populated with INSERT IGNORE, so deployments do not overwrite existing inventory. Customer order URLs use random bearer tokens; do not publish them. Admin endpoints require the existing admin role, and POST requests must originate from the configured company domain.
 
 ## Operational checks
 
-1. In Stripe test mode, request an order, confirm weight, pay with an official test card, and verify the webhook and admin status. Test-mode emails are intentionally suppressed.
+1. In Stripe test mode, submit recipient details, follow the returned checkout URL, pay with an official test card, and verify the webhook and admin status. Test-mode emails are intentionally suppressed.
 2. Verify customer and merchant notification delivery when enabling live mode. No real charge should be submitted by an agent without the customer's payment action.
 3. Redirect the LINE shop entry to the independent storefront only after payment validation. The previous Sites page cannot process financial transactions.
 

@@ -14,7 +14,7 @@ export type ShopItem = {
   unitPriceTwd: number;
 };
 export class ShopInputError extends Error {}
-export const TERMS_VERSION = "2026-10-11-line-shop-v2";
+export const TERMS_VERSION = "2026-10-11-line-shop-v3";
 export const MIN_ORDER_TWD = 2000;
 export function orderShippingTwd(subtotalTwd: number) {
   if (!Number.isSafeInteger(subtotalTwd) || subtotalTwd < MIN_ORDER_TWD)

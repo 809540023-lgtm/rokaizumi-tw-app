@@ -174,7 +174,7 @@ function sumHtml(t) {
   return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>EMS 運費${t.subtotal >= 5000 ? "（免運）" : ""}</span><strong>${money(t.shipping)}</strong></div><p class="muted">商品滿 NT$2,000 可下單，運費 NT$220；商品滿 NT$5,000 免運（門檻不含運費）。</p><div class="sumrow total"><span>總額</span><span>${money(t.total)}</span></div></div>`;
 }
 function shippingOptions(t) {
-  return `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">商品 NT$2,000～4,999 運費 NT$220。店家確認供貨與寄送條件後寄送刷卡連結，付款後3–5天內出貨。</p></div>`;
+  return `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">商品 NT$2,000～4,999 運費 NT$220。填寫收件資料後直接刷卡付款，付款後3–5天內出貨。</p></div>`;
 }
 function renderCart() {
   const t = totals();
@@ -195,7 +195,7 @@ function renderCart() {
         .join("") +
       shippingOptions(t) +
       sumHtml(t) +
-      `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "確認運費並下單"}</button><p class="muted">最低訂購商品小計 NT$2,000（不含運費，面膜、超市與好市多可合併計算）。確認供貨及含包材重量後寄送刷卡連結。</p>`
+      `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">最低訂購商品小計 NT$2,000（不含運費，面膜、超市與好市多可合併計算）。填寫收件資料後直接進入 Stripe 刷卡付款。</p>`
     : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
 function priceEvidence(p) {
@@ -228,7 +228,7 @@ function checkout() {
     return;
   }
   $("checkoutbody").innerHTML =
-    `<p>免會員下單。店家確認供貨與寄送條件後，會寄送 Stripe 刷卡連結。現在不扣款。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>（滿 NT$5,000 免運）。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。運費確認後再付款。</label><button class="btn" type="submit">送出訂單・等待運費確認</button></form>`;
+    `<p>免會員下單。填完收件資料後直接進入 Stripe 安全付款頁，確認總額後刷卡。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>（滿 NT$5,000 免運）。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往 Stripe 付款。</label><button class="btn" type="submit">前往 Stripe 刷卡付款</button></form>`;
   $("checkout").showModal();
 }
 let orderToken = null;
@@ -264,7 +264,11 @@ document.addEventListener("submit", async e => {
     if (!r.ok) throw Error(d.error);
     const url = "?order=" + encodeURIComponent(d.id) + "&token=" + orderToken;
     history.replaceState(null, "", url);
-    showOrder(d);
+    if (d.checkoutUrl) {
+      cart.clear();
+      try { localStorage.removeItem(CART_KEY); } catch {}
+      location.assign(d.checkoutUrl);
+    } else showOrder(d);
   } catch (error) {
     toast(error.message || "提交未確認成功，請重試");
     button.disabled = false;
@@ -272,7 +276,7 @@ document.addEventListener("submit", async e => {
 });
 function showOrder(d) {
   $("checkoutbody").innerHTML =
-    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "運費已確認，請刷卡付款" : d.status === "expired" ? "付款期限已過" : "訂單已收到，等待運費確認"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；EMS 運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "確認供貨後通知付款總額。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>付款後3–5天內出貨。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
+    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；EMS 運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>付款後3–5天內出貨。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
   if (!$("checkout").open) $("checkout").showModal();
 }
 async function refreshOrder() {

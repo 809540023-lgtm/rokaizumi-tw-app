@@ -43,7 +43,7 @@
           <h1>日本好市多</h1>
           <p>28款好市多商品，從點心、飲品到生活用品。</p>
           <p class="muted">
-            售價依收據未折扣原價加30%，再以5日圓換算1台幣、無條件進位。照片為參考；運費確認後付款。
+            售價依收據未折扣原價加30%，再以5日圓換算1台幣、無條件進位。照片為參考；填寫收件資料後直接刷卡付款。
           </p>
         </div>
         <div id="costco-products" class="grid"></div>
@@ -53,7 +53,7 @@
           <p class="edition">JAPAN SUPERMARKET SELECTION / VOL. 01</p>
           <h1>日本超市必買</h1>
           <p>101款日本超市選物，從一杯茶到日常料理。</p>
-          <p class="muted">售價與可選數量請見商品詳情。運費確認後付款。</p>
+          <p class="muted">售價與可選數量請見商品詳情。填寫收件資料後直接刷卡付款。</p>
         </div>
         <div
           id="supermarket-filters"
@@ -68,7 +68,7 @@
           <p class="edition">JAPAN MASK SELECTION / VOL. 01</p>
           <h1>日本面膜選物</h1>
           <p>68款面膜與眼膜，從日常保濕到局部保養。</p>
-          <p class="muted">售價與可選數量請見商品詳情。運費確認後付款。</p>
+          <p class="muted">售價與可選數量請見商品詳情。填寫收件資料後直接刷卡付款。</p>
         </div>
         <div id="products" class="grid"></div>
       </section>
@@ -85,8 +85,7 @@
             NT$2,000，不含運費。
           </p>
           <p>
-            不用註冊或登入。填寫收件資料後，店家確認供貨、寄送條件與整單含包材重量，再寄送
-            Stripe 刷卡連結。付款前可查看商品小計、運費及總額。
+            不用註冊或登入。挑好商品、填寫收件資料後，直接進入 Stripe 安全付款頁。付款前可查看商品小計、運費及總額。
           </p>
           <p>
             日本郵政 EMS 配送。商品小計 NT$2,000～4,999 運費 NT$220，商品滿 NT$5,000 免運（門檻不含運費）。付款後3–5天內出貨，送達時間另計。
@@ -122,11 +121,11 @@
     </dialog>
     <dialog id="checkout">
       <div class="dialoghead">
-        <h2>結帳・確認運費</h2>
+        <h2>結帳・收件資料</h2>
         <button
           class="close"
           data-close="checkout"
-          aria-label="關閉結帳・確認運費"
+          aria-label="關閉結帳・收件資料"
         >
           關閉
         </button>
@@ -160,7 +159,7 @@
               '[data-tab="' + tab + '"] small'
             ).textContent = window[key].length + " 款";
             document.querySelector("#" + tab + " .intro .muted").textContent =
-              "售價與可選數量請見商品詳情。運費確認後付款。";
+              "售價與可選數量請見商品詳情。填寫收件資料後直接刷卡付款。";
           }
           if (!c.enabled)
             document.querySelector(".notice").textContent =
