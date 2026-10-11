@@ -55,7 +55,7 @@ const candlePrice = (market: "AU" | "TW") => market === "TW"
   : { currency: "aud", amount: 99, label: "ROKA IZUMI · Five handmade candles" };
 
 async function createCandleCheckout(order: CandleOrder, market: "AU" | "TW") {
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = process.env.STRIPE_SECRET_KEY || process.env.LINE_SHOP_STRIPE_SECRET_KEY;
   if (!key) throw new Error("Stripe payment is not configured");
   const stripe = new Stripe(key);
   const price = candlePrice(market);
