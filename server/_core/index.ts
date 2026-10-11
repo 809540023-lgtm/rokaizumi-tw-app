@@ -15,6 +15,7 @@ import candleOrdersRouter from "../candle-orders";
 import { registerAiRoutes } from "./ai";
 import { maskAgentRouter } from "../mask/agentRoutes";
 import { registerMaskPhotoRoute } from "../mask/photos";
+import lineShopRouter, { registerLineShop, drainShopMail } from "../line-shop";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -43,9 +44,11 @@ async function startServer() {
   });
   // Stripe requires the untouched request body to verify its webhook signature.
   app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
+  registerLineShop(app);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use("/api/line-shop", lineShopRouter);
   app.use("/api/candles/orders", candleOrdersRouter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
@@ -90,6 +93,8 @@ async function startServer() {
 
   // Initialize Telegram Bot
   initTelegramBot();
+  const shopMailTimer = setInterval(() => { void drainShopMail(); }, 60000);
+  shopMailTimer.unref();
 }
 
 startServer().catch(console.error);

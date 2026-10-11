@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>ROKA IZUMI｜日本嚴選商店</title>
+    <meta
+      name="description"
+      content="日本大阪出貨的嚴選商店。68款面膜與眼膜、日本超市必買101選、好市多28款，查看商品與介紹。"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23102c42'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-size='23' font-family='serif'%3ER%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="notice">
+      日本直寄台灣｜商品小計滿 NT$1,500｜確認運費後刷卡付款
+    </div>
+    <header>
+      <div class="top">
+        <div class="brand">ROKA IZUMI<small>ろかいずみ合同会社</small></div>
+        <span class="pill">日本直寄台灣 · 繁體中文</span>
+      </div>
+      <nav aria-label="商店分類">
+        <span class="nav-caption">選擇商品分類</span>
+        <div class="catalog-switch">
+          <button class="active" data-tab="shop" aria-label="面膜選物">
+            面膜選物<small>68 款</small></button
+          ><button data-tab="supermarket" aria-label="日本超市必買">
+            日本超市必買<small>101 款</small></button
+          ><button data-tab="costco" aria-label="日本好市多">
+            日本好市多<small>28 款</small>
+          </button>
+        </div>
+        <div class="utility-switch">
+          <button data-tab="bag">購物袋 <span id="bagcount">0</span></button
+          ><button data-tab="guide">購物說明</button>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <section id="shop">
+        <div class="intro">
+          <p class="edition">JAPAN MASK SELECTION / VOL. 01</p>
+          <h1>日本面膜選物</h1>
+          <p>68款面膜與眼膜，從日常保濕到局部保養。</p>
+          <p class="muted">售價與可選數量請見商品詳情。運費確認後付款。</p>
+        </div>
+        <div id="products" class="grid"></div>
+      </section>
+      <section id="supermarket" class="hidden">
+        <div class="intro">
+          <p class="edition">JAPAN SUPERMARKET SELECTION / VOL. 01</p>
+          <h1>日本超市必買</h1>
+          <p>101款日本超市選物，從一杯茶到日常料理。</p>
+          <p class="muted">售價與可選數量請見商品詳情。運費確認後付款。</p>
+        </div>
+        <div
+          id="supermarket-filters"
+          class="catalog-filters"
+          aria-label="商品分類"
+        ></div>
+        <p id="supermarket-count" class="muted"></p>
+        <div id="supermarket-products" class="grid"></div>
+      </section>
+      <section id="costco" class="hidden">
+        <div class="intro">
+          <p class="edition">JAPAN COSTCO SELECTION / VOL. 01</p>
+          <h1>日本好市多</h1>
+          <p>28款好市多商品，從點心、飲品到生活用品。</p>
+          <p class="muted">
+            售價依收據未折扣原價加30%，再以5日圓換算1台幣、無條件進位。照片為參考；運費確認後付款。
+          </p>
+        </div>
+        <div id="costco-products" class="grid"></div>
+      </section>
+      <section id="bag" class="hidden">
+        <p class="edition">YOUR SELECTION</p>
+        <h1>購物袋</h1>
+        <div id="cart"></div>
+      </section>
+      <section id="guide" class="hidden">
+        <h1>購物說明</h1>
+        <div class="panel">
+          <p>
+            面膜、日本超市與好市多商品可合併選購。商品小計需滿
+            NT$1,500，不含運費。
+          </p>
+          <p>
+            不用註冊或登入。填寫收件資料後，店家確認供貨、寄送條件與整單含包材重量，再寄送
+            Stripe 刷卡連結。付款前可查看商品小計、運費及總額。
+          </p>
+          <p>
+            日本郵政 EMS 官方料金由公司與客人各付一半，以 5 日圓換算 1
+            台幣、台幣運費無條件進位。付款後3–5天內出貨，送達時間另計。
+          </p>
+          <p>
+            客服：<a href="mailto:info@rokaizumi-tw.jp">info@rokaizumi-tw.jp</a>
+          </p>
+          <p><a href="policies.html">商店資料、退貨與隱私說明</a></p>
+        </div>
+      </section>
+      <p><a href="policies.html">商店資料・購物條款與隱私說明</a></p>
+      <footer>
+        ろかいずみ合同会社（ROKA IZUMI）<br />日本面膜・日本超市必買・日本好市多
+        · 日本嚴選商店<br /><a href="mailto:info@rokaizumi-tw.jp"
+          >info@rokaizumi-tw.jp</a
+        ><br /><a href="admin.html">商店管理登入</a>
+      </footer>
+    </main>
+    <div class="cartbar">
+      <div class="cartbar-inner">
+        <span id="bartext">68款面膜與眼膜 · 已標示售價</span
+        ><button id="barbutton">查看購物袋</button>
+      </div>
+    </div>
+    <dialog id="detail">
+      <div class="dialoghead">
+        <h2 id="detailtitle"></h2>
+        <button class="close" data-close="detail" aria-label="關閉商品詳情">
+          關閉
+        </button>
+      </div>
+      <div id="detailbody"></div>
+    </dialog>
+    <dialog id="checkout">
+      <div class="dialoghead">
+        <h2>結帳・確認運費</h2>
+        <button
+          class="close"
+          data-close="checkout"
+          aria-label="關閉結帳・確認運費"
+        >
+          關閉
+        </button>
+      </div>
+      <div id="checkoutbody"></div>
+    </dialog>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script>
+      (async () => {
+        try {
+          const c = await fetch("/api/line-shop/config").then(r => r.json());
+          window.SHOP_CONFIG = c;
+          const r = await fetch("/api/line-shop/products", {
+            cache: "no-store",
+          });
+          if (!r.ok) throw Error();
+          const d = await r.json();
+          window.PRODUCTS = d.products.filter(p => p.catalog === "shop");
+          window.SUPERMARKET_PRODUCTS = d.products.filter(
+            p => p.catalog === "supermarket"
+          );
+          window.COSTCO_PRODUCTS = d.products.filter(
+            p => p.catalog === "costco"
+          );
+          for (const [tab, key] of [
+            ["shop", "PRODUCTS"],
+            ["supermarket", "SUPERMARKET_PRODUCTS"],
+            ["costco", "COSTCO_PRODUCTS"],
+          ]) {
+            document.querySelector(
+              '[data-tab="' + tab + '"] small'
+            ).textContent = window[key].length + " 款";
+            document.querySelector("#" + tab + " .intro .muted").textContent =
+              "售價與可選數量請見商品詳情。運費確認後付款。";
+          }
+          if (!c.enabled)
+            document.querySelector(".notice").textContent =
+              "刷卡設定準備中｜暫未開放下單";
+          else if (c.mode === "test")
+            document.querySelector(".notice").textContent =
+              "Stripe 測試環境｜不會實際扣款";
+          const js = document.createElement("script");
+          js.src = "app.js";
+          document.body.appendChild(js);
+        } catch {
+          document.querySelector(".notice").textContent =
+            "商品資料暫時無法載入，請稍後再試";
+        }
+      })();
+    </script>
+  </body>
+</html>

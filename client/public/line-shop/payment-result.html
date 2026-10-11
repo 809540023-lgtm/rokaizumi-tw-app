@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><meta name="referrer" content="no-referrer" /><title>
+    ROKA IZUMI｜付款結果</title
+  ><link rel="stylesheet" href="style.css" />
+  <main>
+    <h1>付款結果</h1>
+    <div class="panel" id="result" role="status">正在確認付款狀態…</div>
+    <p><button class="btn" id="refresh">重新確認</button></p>
+    <p><a href="./">返回商店</a></p>
+  </main>
+  <script>
+    async function check() {
+      const q = new URLSearchParams(location.search),
+        box = document.getElementById("result");
+      if (q.has("cancelled")) {
+        box.textContent =
+          "你已返回商店。這個動作不代表付款失敗或訂單取消；請從訂單信件查看狀態與付款連結。";
+        return;
+      }
+      const id = q.get("session_id");
+      if (!id) {
+        box.textContent = "請從 Stripe 付款完成頁返回，或查看訂單信件。";
+        return;
+      }
+      try {
+        const r = await fetch(
+          "/api/line-shop/session/" + encodeURIComponent(id),
+          { cache: "no-store" }
+        );
+        const d = await r.json();
+        if (!r.ok) throw Error(d.error);
+        box.textContent =
+          d.status === "paid"
+            ? `${d.mode === "test" ? "測試付款成功（未實際扣款）" : "付款成功"}。訂單 ${d.id}，總額 NT$${d.totalTwd}。付款後3–5天內出貨，送達時間另計。`
+            : d.status === "expired"
+              ? "付款期限已過，請聯絡店家。"
+              : "付款確認中，請稍後重新確認。若已扣款，請勿再次付款。";
+      } catch (e) {
+        box.textContent = e.message || "付款結果仍在確認中，請稍後再試。";
+      }
+    }
+    document.getElementById("refresh").onclick = check;
+    check();
+  </script>
+</html>

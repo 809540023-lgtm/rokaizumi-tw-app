@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>ROKA IZUMI｜訂單管理</title
+  ><link rel="stylesheet" href="style.css" />
+  <main>
+    <h1>LINE 商店訂單管理</h1>
+    <p>請先使用公司網站的管理員帳號<a href="/login">登入</a>。</p>
+    <p>
+      確認供貨、商品寄送條件與整單含包材重量後，建立 EMS 運費及 Stripe
+      付款連結。客人負擔官方料金的50%，以日幣÷5換算台幣、無條件進位。
+    </p>
+    <button class="btn" id="refresh">更新訂單</button>
+    <div id="orders" role="status"></div>
+    <h2>寄信狀態</h2>
+    <div id="mail"></div>
+  </main>
+  <script>
+    const esc = s =>
+      String(s ?? "").replace(
+        /[&<>"']/g,
+        c =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c]
+      );
+    async function load() {
+      try {
+        const r = await fetch("/api/line-shop/admin/orders", {
+          cache: "no-store",
+        });
+        const d = await r.json();
+        if (!r.ok) throw Error(d.error);
+        document.getElementById("orders").innerHTML =
+          d.orders
+            .map(
+              o =>
+                `<article class="panel"><h2>${esc(o.id)}</h2><p>${esc(o.mode)}｜${esc(o.status)}｜${esc(o.createdAt)}</p><p>商品 NT$${o.subtotalTwd}；運費 ${o.shippingTwd === null ? "待報價" : "NT$" + o.shippingTwd}</p><p>${esc(o.customer.name)}｜${esc(o.customer.email)}｜${esc(o.customer.phone)}</p><p>${esc(o.customer.postalCode)} ${esc(o.customer.address)}</p><ul>${o.items.map(i => `<li>${esc(i.productId)} ${esc(i.name)} × ${i.quantity}</li>`).join("")}</ul>${["awaiting_quote", "quoting"].includes(o.status) ? `<form data-order="${esc(o.id)}"><label>整單含包材重量（克）<input name="weight" type="number" min="1" max="30000" step="1" required value="${o.weightGrams || ""}"></label><label><input type="checkbox" name="supply" required>已確認供貨</label><label><input type="checkbox" name="shipping" required>已確認所有商品可寄送至台灣</label><button class="btn">確認報價並寄送刷卡連結</button></form>` : ""}${o.checkoutUrl ? `<p><a href="${esc(o.checkoutUrl)}" target="_blank" rel="noopener">查看 Stripe 付款頁</a></p>` : ""}</article>`
+            )
+            .join("") || "<p>目前沒有訂單。</p>";
+        document.getElementById("mail").innerHTML =
+          d.mail
+            .map(
+              m =>
+                `<p>${esc(m.order_id)}｜${esc(m.kind)}｜${esc(m.state)}${["review", "sending"].includes(m.state) ? "（請核對寄信服務紀錄；系統不會自動重寄，以免重複通知）" : ""}</p>`
+            )
+            .join("") || "目前沒有通知。";
+      } catch (e) {
+        document.getElementById("orders").textContent = e.message;
+      }
+    }
+    document.addEventListener("submit", async e => {
+      const f = e.target;
+      if (!f.dataset.order) return;
+      e.preventDefault();
+      const b = f.querySelector("button");
+      b.disabled = true;
+      try {
+        const r = await fetch(
+          "/api/line-shop/admin/orders/" +
+            encodeURIComponent(f.dataset.order) +
+            "/quote",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              packedWeightGrams: Number(f.elements.weight.value),
+              supplyConfirmed: f.elements.supply.checked,
+              shippingAllowedConfirmed: f.elements.shipping.checked,
+            }),
+          }
+        );
+        const d = await r.json();
+        if (!r.ok) throw Error(d.error);
+        await load();
+      } catch (e) {
+        alert(e.message || "報價未確認成功，請沿用原重量重試");
+        b.disabled = false;
+      }
+    });
+    document.getElementById("refresh").onclick = load;
+    load();
+  </script>
+</html>
