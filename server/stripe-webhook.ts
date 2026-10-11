@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import Stripe from 'stripe';
 import { markOrderPaidByStripeSessionId } from './db';
+import { markCandleOrderPaidByStripeSessionId } from './candle-orders';
 
 export async function handleStripeWebhook(req: Request, res: Response) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -35,6 +36,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.payment_status === 'paid') {
         await markOrderPaidByStripeSessionId(session.id);
+        await markCandleOrderPaidByStripeSessionId(session.id);
       }
     }
 
