@@ -215,6 +215,9 @@ function customerInput(value: any) {
     );
   return customer;
 }
+function merchantCustomerDetails(customer: any) {
+  return `收件姓名：${customer.name}\n聯絡Email：${customer.email}\n電話：${customer.phone}\n郵遞區號：${customer.postalCode}\n收件地址：${customer.address}`;
+}
 function summary(order: RowDataPacket) {
   return {
     id: order.id,
@@ -351,7 +354,7 @@ router.post(
           "request_merchant",
           process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
           `ROKA IZUMI｜新訂單待報價 ${id}`,
-          `請確認供貨、寄送條件及整單含包材重量。\n${text}\n管理：${origin()}/line-shop/admin.html`
+          `請確認供貨、寄送條件及整單含包材重量。\n${text}\n\n${merchantCustomerDetails(customer)}\n管理：${origin()}/line-shop/admin.html`
         );
       }
       await conn.commit();
@@ -625,7 +628,7 @@ export async function lineShopWebhook(req: Request, res: Response) {
           "paid_merchant",
           process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
           `ROKA IZUMI｜付款完成 ${order.id}`,
-          text + `\n請到管理頁安排出貨：${origin()}/line-shop/admin.html`
+          text + `\n\n${merchantCustomerDetails(customer)}\n請到管理頁安排出貨：${origin()}/line-shop/admin.html`
         );
       }
     }
