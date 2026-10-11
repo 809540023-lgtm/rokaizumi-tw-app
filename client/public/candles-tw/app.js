@@ -11,6 +11,14 @@ const data = [
 const selected = new Set();
 const grid = document.getElementById('products');
 const dialog = document.getElementById('photo-dialog');
+const orderForm = document.getElementById('order-form');
+const paymentOptions = document.createElement('fieldset');
+paymentOptions.className = 'payment-options';
+paymentOptions.innerHTML = '<legend>付款方式</legend><label><input type="radio" name="paymentMethod" value="card" checked> 信用卡／金融卡（Stripe）</label><label><input type="radio" name="paymentMethod" value="bank_transfer"> 銀行轉帳</label>';
+orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
+document.querySelector('#order .order-grid > div:first-child p').textContent = '任選五款 NT$1,499，含從日本寄送至台灣。選好五款並填寫收件資料後，可使用信用卡／金融卡透過 Stripe 付款，或選擇銀行轉帳。確認款項後開始製作，並在 3 個工作日內完成、提供快遞單號。';
+document.querySelector('#order-help > p').textContent = '價格 NT$1,499，含寄送至台灣。填寫資料後選擇信用卡付款或銀行轉帳。';
+document.querySelector('.selected > small').textContent = '填寫台灣收件資料後，可選擇信用卡付款或銀行轉帳。';
 let activePhoto = null;
 function showScene(scene) {
   if (!activePhoto) return;
@@ -114,6 +122,10 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || '請稍後再試。');
+    if (result.checkoutUrl) {
+      window.location.assign(result.checkoutUrl);
+      return;
+    }
     document.getElementById('order-reference').textContent = result.orderNumber;
     document.getElementById('notification-warning').hidden = result.notificationSent === true;
     form.hidden = true;
