@@ -4,8 +4,8 @@ import { markOrderPaidByStripeSessionId } from './db';
 import { markCandleOrderPaidByStripeSessionId } from './candle-orders';
 
 export async function handleStripeWebhook(req: Request, res: Response) {
-  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY || process.env.LINE_SHOP_STRIPE_SECRET_KEY;
+  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET || process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET;
   if (!stripeSecretKey || !stripeWebhookSecret) {
     console.error('Stripe webhook received without Stripe configuration');
     res.status(503).json({ error: 'Stripe webhook is not configured' });
