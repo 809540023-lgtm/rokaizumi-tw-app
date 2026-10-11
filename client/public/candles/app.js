@@ -14,6 +14,18 @@ let orderPlaced = false;
 let submitting = false;
 const grid = document.getElementById('products');
 const dialog = document.getElementById('photo-dialog');
+const orderForm = document.getElementById('order-form');
+const paymentOptions = document.createElement('fieldset');
+paymentOptions.className = 'payment-options';
+paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" checked> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="bank_transfer"> Australian bank transfer</label>';
+orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
+document.querySelector('#order .order-grid > div:first-child p').textContent = '5 for A$99, including delivery to Australia from Japan. Choose five designs and enter your delivery details. You can pay securely by credit card through Stripe or by local Australian bank transfer. Production begins after payment is confirmed, and we provide a courier tracking number within 3 business days of receiving payment.';
+document.querySelector('#order-help > p').textContent = 'Delivery to Australia · A$99 total. Choose card payment or bank transfer after entering your details.';
+document.querySelector('#order .selected > small').textContent = 'No sign-up. A$99 total, including delivery. Choose card payment or bank transfer.';
+document.getElementById('submit-order').textContent = 'Continue to secure payment · A$99';
+paymentOptions.addEventListener('change', () => {
+  document.getElementById('submit-order').textContent = paymentOptions.querySelector('input:checked').value === 'card' ? 'Continue to secure payment · A$99' : 'Place order · A$99';
+});
 let activePhoto = null;
 function showScene(scene) {
   if (!activePhoto) return;
@@ -120,6 +132,10 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Please try again.');
+    if (result.checkoutUrl) {
+      window.location.assign(result.checkoutUrl);
+      return;
+    }
     orderPlaced = true;
     document.getElementById('order-reference').textContent = result.orderNumber;
     document.getElementById('payment-reference').textContent = result.orderNumber;
