@@ -101,12 +101,12 @@ async function initialize(db: Pool) {
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_limits (bucket CHAR(64) PRIMARY KEY, hits INT NOT NULL, expires_at BIGINT NOT NULL)`
   );
-  for (const p of seed)
-    if (!excluded.has(p.id))
-      await db.execute(
-        "INSERT IGNORE INTO line_shop_products (id,data_json,stock) VALUES (?,?,?)",
-        [p.id, JSON.stringify(p), p.stock]
-      );
+  const products = seed.filter(p => !excluded.has(p.id));
+  if (products.length)
+    await db.query(
+      "INSERT IGNORE INTO line_shop_products (id,data_json,stock) VALUES ?",
+      [products.map(p => [p.id, JSON.stringify(p), p.stock])]
+    );
 }
 async function catalog(db: Pool | PoolConnection) {
   const [rows] = await db.query<RowDataPacket[]>(
@@ -233,14 +233,12 @@ function handled(fn: (req: Request, res: Response) => Promise<any>) {
     try {
       await fn(req, res);
     } catch (e) {
-      res
-        .status(e instanceof ShopInputError ? 400 : 503)
-        .json({
-          error:
-            e instanceof ShopInputError
-              ? e.message
-              : "服務暫時無法使用，請稍後再試",
-        });
+      res.status(e instanceof ShopInputError ? 400 : 503).json({
+        error:
+          e instanceof ShopInputError
+            ? e.message
+            : "服務暫時無法使用，請稍後再試",
+      });
     }
   };
 }
