@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { randomUUID, createHash } from "node:crypto";
 import { markCandleOrderPaidByStripeSessionId } from "./candle-orders";
+import { canRemind, reminderText } from "./line-shop-reminders";
 import seed from "./public/line-shop-catalog.json";
 import { sdk } from "./_core/sdk";
 import {
@@ -141,12 +142,47 @@ async function enqueue(
     [id, kind, recipient, subject, body]
   );
 }
+async function queuePaymentReminders(db: Pool) {
+  const [orders] = await db.query<RowDataPacket[]>(
+    `SELECT o.* FROM line_shop_orders o
+     INNER JOIN line_shop_mail original ON original.order_id=o.id AND original.kind='payment_ready'
+     WHERE o.status='pending' AND o.mode='live' AND o.session_id IS NOT NULL
+       AND original.created_at<=CURRENT_TIMESTAMP-INTERVAL 12 HOUR
+       AND original.created_at>CURRENT_TIMESTAMP-INTERVAL 24 HOUR
+       AND NOT EXISTS (SELECT 1 FROM line_shop_mail reminder WHERE reminder.order_id=o.id AND reminder.kind='payment_reminder_12h')
+     ORDER BY original.created_at LIMIT 20`
+  );
+  const stripe = new Stripe(key());
+  for (const order of orders) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(order.session_id);
+      if (!canRemind(order as any, session)) continue;
+      const customer = parsed<any>(order.customer_json);
+      await enqueue(
+        db,
+        order.id,
+        "payment_reminder_12h",
+        customer.email,
+        `ROKA IZUMI｜付款提醒 ${order.id}`,
+        reminderText(order as any, session)
+      );
+    } catch {
+      console.error("LINE shop payment reminder check will retry");
+    }
+  }
+}
 let draining = false;
 export async function drainShopMail() {
   if (draining || !configured() || !live()) return;
   draining = true;
   try {
     const db = await database();
+    // Runs on the existing one-minute mail timer, including after restarts.
+    try {
+      await queuePaymentReminders(db);
+    } catch {
+      console.error("LINE shop payment reminder queue will retry");
+    }
     const [rows] = await db.query<RowDataPacket[]>(
       "SELECT * FROM line_shop_mail WHERE state='pending' ORDER BY id LIMIT 10"
     );
@@ -166,6 +202,37 @@ export async function drainShopMail() {
       );
       if (!claimed.affectedRows) continue;
       try {
+        if (mail.kind === "payment_reminder_12h") {
+          const order = await orderById(db, mail.order_id);
+          if (!order || order.status !== "pending" || order.mode !== "live") {
+            await db.execute(
+              "UPDATE line_shop_mail SET state='cancelled' WHERE id=?",
+              [mail.id]
+            );
+            continue;
+          }
+          // Check Stripe again immediately before sending: payment webhooks may be delayed.
+          let session: Stripe.Checkout.Session;
+          try {
+            session = await new Stripe(key()).checkout.sessions.retrieve(
+              order.session_id
+            );
+          } catch {
+            // No SMTP attempt occurred, so this check can safely retry on the next tick.
+            await db.execute(
+              "UPDATE line_shop_mail SET state='pending' WHERE id=?",
+              [mail.id]
+            );
+            continue;
+          }
+          if (!canRemind(order as any, session)) {
+            await db.execute(
+              "UPDATE line_shop_mail SET state='cancelled' WHERE id=?",
+              [mail.id]
+            );
+            continue;
+          }
+        }
         const sent = await transport.sendMail({
           from: process.env.EMAIL_FROM || "ROKA IZUMI <info@rokaizumi-tw.jp>",
           to: mail.recipient,

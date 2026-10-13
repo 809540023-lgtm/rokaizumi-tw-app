@@ -68,7 +68,14 @@
           d.mail
             .map(
               m =>
-                `<p>${esc(m.order_id)}｜${esc({ paid_merchant: "公司已付款通知", paid_customer: "客戶付款成功通知", request_merchant: "公司新訂單通知" }[m.kind] || m.kind)}｜${esc(m.state)}${["review", "sending"].includes(m.state) ? "（請核對寄信服務紀錄；系統不會自動重寄，以免重複通知）" : ""}</p>`
+                `<p>${esc(m.order_id)}｜${esc(
+                  {
+                    payment_reminder_12h: "客戶12小時付款提醒",
+                    paid_merchant: "公司已付款通知",
+                    paid_customer: "客戶付款成功通知",
+                    request_merchant: "公司新訂單通知",
+                  }[m.kind] || m.kind
+                )}｜${esc(m.state)}${["review", "sending"].includes(m.state) ? "（請核對寄信服務紀錄；系統不會自動重寄，以免重複通知）" : ""}</p>`
             )
             .join("") || "目前沒有通知。";
       } catch (e) {
