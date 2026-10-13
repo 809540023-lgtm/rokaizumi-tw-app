@@ -171,6 +171,21 @@ const candleNames: Record<number, string> = {
 };
 
 export function customerConfirmationText(order: CandleOrder, paymentMethod: CandlePaymentMethod = "bank_transfer") {
+  if (order.market === "TW") return [
+    `${order.name} 您好：`, "", "謝謝您訂購 ROKA IZUMI 手作蠟燭！",
+    `已收到訂單 ${order.id}。目前尚待付款，本信不是付款收據。`,
+    "", "您選擇的五款", ...order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`),
+    "", "總金額：NT$1,499，包含寄送至台灣的運費。",
+    paymentMethod === "card"
+      ? "請在下單後開啟的 Stripe 結帳頁完成信用卡／金融卡付款，無須另外銀行轉帳。"
+      : "您選擇銀行轉帳；我們會另以 Email 提供付款資料。收到付款資料前請勿自行匯款。",
+    "", "收件資料", order.name, `${order.postcode} ${order.suburb}${order.state}${order.street}`, `電話：${order.phone}`,
+    ...(order.note ? [`備註：${order.note}`] : []),
+    "", "確認款項後開始製作，並在3個工作日內完成、提供快遞單號，運送時間另計。",
+    "顏色隨機，恕無法指定。雙狗組算一款；RZ-C029為手套與毛線球各一，RZ-C030為單顆。",
+    "如需更正資料，請直接回覆本信並註明訂單編號，無須重複下單。",
+    "", "ROKA IZUMI · 日本大阪手作", "https://rokaizumi-tw.jp/candles-tw/",
+  ].join("\n");
   const bank = audPayment.bank;
   return [
     `Hi ${order.name},`, "", "Thank you for choosing ROKA IZUMI handmade candles!",
@@ -206,11 +221,12 @@ const escapeEmailHtml = (value: string) => value.replace(/[&<>"']/g, char => ({ 
 
 async function notifyCustomer(order: CandleOrder, paymentMethod: CandlePaymentMethod = "bank_transfer") {
   const text = customerConfirmationText(order, paymentMethod);
-  const html = `<div style="max-width:640px;margin:auto;padding:24px;font:16px/1.65 Arial,sans-serif;color:#302a29"><h1 style="font:28px Georgia,serif">ROKA IZUMI</h1><h2 style="font-size:20px">Order confirmation — awaiting payment</h2><div style="white-space:pre-wrap">${escapeEmailHtml(text).replace(/\n/g, "<br>")}</div></div>`;
-  return sendOrderEmail(order.email, `ROKA IZUMI | Order ${order.id} — awaiting payment`, text, `${order.id}-customer`, html);
+  const heading = order.market === "TW" ? "訂單確認 — 尚待付款" : "Order confirmation — awaiting payment";
+  const html = `<div style="max-width:640px;margin:auto;padding:24px;font:16px/1.65 Arial,sans-serif;color:#302a29"><h1 style="font:28px Georgia,serif">ROKA IZUMI</h1><h2 style="font-size:20px">${heading}</h2><div style="white-space:pre-wrap">${escapeEmailHtml(text).replace(/\n/g, "<br>")}</div></div>`;
+  return sendOrderEmail(order.email, order.market === "TW" ? `ROKA IZUMI｜訂單 ${order.id} — 尚待付款` : `ROKA IZUMI | Order ${order.id} — awaiting payment`, text, `${order.id}-customer`, html);
 }
 
-// Only new AU orders are enrolled, so a deploy never emails historical customers.
+// Only newly queued orders are enrolled; deployment never emails historical customers.
 async function ensureCustomerEmailTable(db: mysql.Pool) {
   await db.query("CREATE TABLE IF NOT EXISTS candle_customer_emails (order_id varchar(32) PRIMARY KEY, created_at datetime NOT NULL, sent_at datetime NULL)");
 }
@@ -228,16 +244,22 @@ export async function retryPendingCustomerEmails() {
   customerRetryRunning = true;
   try {
     await ensureCustomerEmailTable(db);
+    await ensureTaiwanTable(db);
     const [rows] = await db.query<mysql.RowDataPacket[]>(`SELECT o.id, o.customer_name, o.customer_email, o.customer_phone,
-      o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.payment_method
+      o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.payment_method, 'AU' AS market
       FROM candle_orders o INNER JOIN candle_customer_emails c ON c.order_id = o.id
       WHERE c.sent_at IS NULL AND o.status = 'awaiting_payment' AND c.created_at < UTC_TIMESTAMP() - INTERVAL 2 MINUTE
-      ORDER BY c.created_at ASC LIMIT 100`);
+      UNION ALL
+      SELECT o.id, o.customer_name, o.customer_email, o.customer_phone,
+      o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.payment_method, 'TW' AS market
+      FROM candle_orders_tw o INNER JOIN candle_customer_emails c ON c.order_id = o.id
+      WHERE c.sent_at IS NULL AND o.status IN ('awaiting_payment', 'awaiting_reply') AND c.created_at < UTC_TIMESTAMP() - INTERVAL 2 MINUTE
+      LIMIT 100`);
     for (const row of rows) {
       const items = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
       const sent = await notifyCustomer({ id: row.id, name: row.customer_name, email: row.customer_email,
         phone: row.customer_phone, street: row.street_address, suburb: row.suburb, state: row.state,
-        postcode: row.postcode, items, note: row.note, paymentMethod: row.payment_method === "card" ? "card" : "bank_transfer" });
+        postcode: row.postcode, items, note: row.note, market: row.market === "TW" ? "TW" : "AU", paymentMethod: row.payment_method === "card" ? "card" : "bank_transfer" }, row.payment_method === "card" ? "card" : "bank_transfer");
       if (sent) await recordCustomerEmail(db, row.id);
     }
   } catch (error) {
@@ -296,7 +318,49 @@ async function retryPendingNotifications() {
   }
 }
 
-const retryEmails = () => { void retryPendingNotifications(); void retryPendingCustomerEmails(); };
+async function ensurePaidEmailTable(db: mysql.Pool) {
+  await db.query("CREATE TABLE IF NOT EXISTS candle_paid_emails (order_id varchar(32) NOT NULL, market varchar(2) NOT NULL, kind varchar(10) NOT NULL, sent_at datetime NULL, PRIMARY KEY (order_id, kind))");
+}
+
+let paidRetryRunning = false;
+export async function retryPaidCandleEmails() {
+  if (paidRetryRunning || !notificationChannelReady()) return;
+  const db = database();
+  if (!db) return;
+  paidRetryRunning = true;
+  try {
+    await ensurePaidEmailTable(db);
+    for (const market of ["AU", "TW"] as const) {
+      const table = market === "TW" ? "candle_orders_tw" : "candle_orders";
+      // Only rows enrolled by a verified payment are considered, never historical orders.
+      const [queued] = await db.query<mysql.RowDataPacket[]>("SELECT order_id, kind FROM candle_paid_emails WHERE market = ? AND sent_at IS NULL LIMIT 100", [market]);
+      for (const mail of queued) {
+        const [rows] = await db.execute<mysql.RowDataPacket[]>(`SELECT * FROM ${table} WHERE id = ? AND status = 'paid'`, [mail.order_id]);
+        if (rows.length !== 1) continue;
+        const row = rows[0];
+        const items: number[] = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
+        const designs = items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`).join("\n");
+        const merchant = mail.kind === "merchant";
+        const text = market === "TW" ? [
+          `訂單 ${row.id}：付款成功`, "已確認 Stripe 付款 NT$1,499，含寄送台灣運費。", designs,
+          "確認款項後開始製作，3個工作日內完成並提供快遞單號，運送時間另計。",
+          ...(merchant ? [`客戶：${row.customer_name}`, `Email：${row.customer_email}`, `電話：${row.customer_phone}`, `地址：${row.postcode} ${row.suburb}${row.state}${row.street_address}`, `備註：${row.note || "無"}`] : ["如需更正收件資料，請回覆本信並註明訂單編號。"]),
+        ].join("\n") : [
+          `Order ${row.id}: payment confirmed`, "Your Stripe payment of A$99.00 is confirmed. Delivery to Australia is included.", designs,
+          "Production begins after payment. We will complete your set and provide a courier tracking number within 3 business days. Delivery time is additional.",
+          ...(merchant ? [`Customer: ${row.customer_name}`, `Email: ${row.customer_email}`, `Phone: ${row.customer_phone}`, `Address: ${row.street_address}, ${row.suburb}, ${row.state} ${row.postcode}`, `Note: ${row.note || "None"}`] : ["Reply to this email with your order number if you need to correct your delivery details."]),
+        ].join("\n");
+        const sent = await sendOrderEmail(merchant ? notifyAddress() : row.customer_email,
+          market === "TW" ? `ROKA IZUMI｜付款成功 ${row.id}` : `ROKA IZUMI | Payment confirmed ${row.id}`,
+          text, `${row.id}-paid-${mail.kind}`);
+        if (sent) await db.execute("UPDATE candle_paid_emails SET sent_at = UTC_TIMESTAMP() WHERE order_id = ? AND kind = ? AND sent_at IS NULL", [row.id, mail.kind]);
+      }
+    }
+  } catch (error) { console.error("Could not retry paid candle emails", error); }
+  finally { paidRetryRunning = false; }
+}
+
+const retryEmails = () => { void retryPendingNotifications(); void retryPendingCustomerEmails(); void retryPaidCandleEmails(); };
 const notificationTimer = setInterval(retryEmails, 10 * 60 * 1000);
 notificationTimer.unref();
 setTimeout(retryEmails, 15_000).unref();
@@ -417,23 +481,43 @@ router.post("/tw", async (req, res) => {
       checkoutUrl = session.url ?? undefined;
       await db.execute("UPDATE candle_orders_tw SET stripe_session_id = ? WHERE id = ?", [session.id, id]);
     }
-    const notificationSent = await notifyNewOrder(order);
+    let customerEmailQueued = false;
+    try {
+      await ensureCustomerEmailTable(db);
+      await db.execute("INSERT INTO candle_customer_emails (order_id, created_at, sent_at) VALUES (?, UTC_TIMESTAMP(), NULL)", [id]);
+      customerEmailQueued = true;
+    } catch (error) { console.error("Could not queue Taiwan customer candle email", error); }
+    const [notificationSent, customerEmailSent] = await Promise.all([notifyNewOrder(order), notifyCustomer(order, paymentMethod)]);
+    if (customerEmailSent && customerEmailQueued) {
+      try { await recordCustomerEmail(db, id); } catch (error) { console.error("Could not record Taiwan customer candle email", error); }
+    }
     if (notificationSent) {
       try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
     }
-    return res.status(201).json({ orderNumber: id, notificationSent, checkoutUrl, payment: { method: paymentMethod, currency: "TWD", amount: 1499, status: "awaiting_payment" } });
+    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, checkoutUrl, payment: { method: paymentMethod, currency: "TWD", amount: 1499, status: "awaiting_payment" } });
   } catch (error) {
     console.error("Could not save Taiwan candle order", error);
     return res.status(503).json({ error: "暫時無法收單，請稍後再試。" });
   }
 });
 
-export async function markCandleOrderPaidByStripeSessionId(sessionId: string) {
+// Called only after Stripe signature verification by either supported endpoint.
+export async function markCandleOrderPaidByStripeSessionId(session: Stripe.Checkout.Session) {
+  if (!session.metadata?.candleOrderId) return;
+  const market = session.metadata.candleMarket;
+  if (market !== "AU" && market !== "TW") throw new Error("Invalid candle market");
+  const price = candlePrice(market);
+  if (session.payment_status !== "paid" || session.currency !== price.currency || session.amount_total !== price.amount * 100)
+    throw new Error("Candle payment amount or status mismatch");
   const db = database();
-  if (!db) return;
-  try { await db.execute("UPDATE candle_orders SET status = 'paid' WHERE stripe_session_id = ?", [sessionId]); } catch { /* table may not exist yet */ }
-  try { await db.execute("UPDATE candle_orders_tw SET status = 'paid' WHERE stripe_session_id = ?", [sessionId]); } catch { /* table may not exist yet */ }
+  if (!db) throw new Error("Candle database unavailable");
+  const table = market === "TW" ? "candle_orders_tw" : "candle_orders";
+  const [rows] = await db.execute<mysql.RowDataPacket[]>(`SELECT id FROM ${table} WHERE id = ? AND stripe_session_id = ?`, [session.metadata.candleOrderId, session.id]);
+  if (rows.length !== 1) throw new Error("Unknown candle payment session");
+  await db.execute(`UPDATE ${table} SET status = 'paid' WHERE id = ? AND stripe_session_id = ?`, [session.metadata.candleOrderId, session.id]);
+  await ensurePaidEmailTable(db);
+  await db.execute("INSERT IGNORE INTO candle_paid_emails (order_id, market, kind, sent_at) VALUES (?, ?, 'customer', NULL), (?, ?, 'merchant', NULL)", [session.metadata.candleOrderId, market, session.metadata.candleOrderId, market]);
+  void retryPaidCandleEmails();
 }
 
 export default router;
-

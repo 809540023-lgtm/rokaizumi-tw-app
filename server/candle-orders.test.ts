@@ -52,9 +52,12 @@ const smtpServer = net.createServer(socket => {
 });
 
 // 讓模組以為有資料庫，才走得進寄信那一段。
-const { savedOrders, dbWrites, pendingCustomerRows } = vi.hoisted(() => ({ savedOrders: [] as unknown[][], dbWrites: [] as {sql: string; values: unknown[]}[], pendingCustomerRows: [] as Record<string, unknown>[] }));
+const { savedOrders, dbWrites, pendingCustomerRows, paidMailRows } = vi.hoisted(() => ({ savedOrders: [] as unknown[][], dbWrites: [] as {sql: string; values: unknown[]}[], pendingCustomerRows: [] as Record<string, unknown>[], paidMailRows: [] as Record<string, unknown>[] }));
 vi.mock("mysql2/promise", () => {
-  const pool = { query: async (sql: string) => [sql.includes("INNER JOIN candle_customer_emails") ? pendingCustomerRows : []], execute: async (sql: string, values: unknown[]) => { dbWrites.push({sql, values}); if (sql.startsWith("INSERT INTO candle_orders ")) savedOrders.push(values); return [{}, null]; } };
+  const pool = { query: async (sql: string, values?: unknown[]) => [sql.includes("INNER JOIN candle_customer_emails") ? pendingCustomerRows : sql.startsWith("SELECT order_id, kind FROM candle_paid_emails") ? paidMailRows.filter(r => r.market === values?.[0] && !r.sent_at) : []], execute: async (sql: string, values: unknown[]) => { dbWrites.push({sql, values});
+    if (sql.startsWith("SELECT * FROM candle_orders")) return [[{id: values[0], customer_name: "測試客人", customer_email: "customer@example.com", customer_phone: "0912345678", street_address: "1 Test Street", suburb: "台北市", state: "中正區", postcode: "100", items: [1,2,3,5,7], note: "", status: "paid"}], null];
+    if (sql.startsWith("UPDATE candle_paid_emails")) { const r = paidMailRows.find(r => r.order_id === values[0] && r.kind === values[1]); if (r) r.sent_at = true; }
+    if (sql.startsWith("INSERT INTO candle_orders ")) savedOrders.push(values); return [{}, null]; } };
   return { default: { createPool: () => pool }, createPool: () => pool };
 });
 
@@ -151,7 +154,7 @@ describe("蠟燭訂單通知信", () => {
 
     expect(body.customerEmailSent).toBe(true);
     expect(delivered).toHaveLength(2);
-    const mail = delivered.find(mail => mail.includes("To: owner@example.com"))!;
+    const mail = delivered.find(mail => /^To: owner@example.com$/m.test(mail))!;
     const [headers, ...bodyParts] = mail.split(/\r?\n\r?\n/);
     const text = decodeQuotedPrintable(bodyParts.join("\n\n"));
     const compact = text.replace(/\s+/g, "");
@@ -211,6 +214,63 @@ describe("蠟燭訂單通知信", () => {
     expect(decoded).toContain("&lt;img src=x onerror=&quot;bad&quot;&gt;");
   });
 
+  it("台灣客戶收到台幣確認信，未付款不誤稱付款完成", async () => {
+    const before = delivered.length;
+    const response = await fetch(`http://127.0.0.1:${port}/api/candles/orders/tw`, {
+      method: "POST", headers: {"content-type": "application/json"},
+      body: JSON.stringify({...order, market: "TW", city: "台北市", region: "中正區", postcode: "100", phone: "0912345678"}),
+    });
+    const body = await response.json();
+    expect(response.status).toBe(201);
+    expect(body.customerEmailSent).toBe(true);
+    expect(body.notificationSent).toBe(true);
+    const mail = delivered.slice(before).find(m => m.includes("To: customer@example.com"))!;
+    const decoded = decodeQuotedPrintable(mail);
+    expect(decoded).toContain("NT$1,499");
+    expect(decoded).toContain("目前尚待付款");
+    expect(decoded).toContain("另以 Email 提供付款資料");
+    expect(decoded).toContain("台北市中正區");
+    expect(decoded).not.toContain("774-001");
+    expect(decodeEncodedWords(mail.replace(/\r?\n[ \t]+/g, " ")).replace(/\s+/g, "")).toContain("尚待付款");
+    expect(dbWrites.some(w => w.sql.startsWith("UPDATE candle_customer_emails") && w.values[0] === body.orderNumber)).toBe(true);
+    const { customerConfirmationText } = await import("./candle-orders");
+    const text = customerConfirmationText({id: body.orderNumber, ...order, market: "TW"}, "card");
+    expect(text).toContain("Stripe");
+    expect(text).not.toContain("另以 Email 提供付款資料");
+  });
+
+  it("台灣刷卡訂單補寄仍使用刷卡說明", async () => {
+    const before = delivered.length;
+    pendingCustomerRows.push({id: "RI-TW-RETRY", customer_name: "測試客人", customer_email: "customer@example.com", customer_phone: "0912345678", street_address: "1 Test Street", suburb: "台北市", state: "中正區", postcode: "100", items: [1,2,3,5,7], note: "", market: "TW", payment_method: "card"});
+    const {retryPendingCustomerEmails} = await import("./candle-orders");
+    await retryPendingCustomerEmails();
+    expect(delivered).toHaveLength(before + 1);
+    const text = decodeQuotedPrintable(delivered.at(-1)!);
+    expect(text).toContain("Stripe");
+    expect(text).not.toContain("另以 Email 提供付款資料");
+    expect(text).not.toContain("774-001");
+    pendingCustomerRows.length = 0;
+  });
+
+  it("付款成功信分別寄給店家與客戶，已寄出不重寄", async () => {
+    const before = delivered.length;
+    paidMailRows.push({order_id: "RI-TW-PAID", market: "TW", kind: "customer"}, {order_id: "RI-TW-PAID", market: "TW", kind: "merchant"});
+    const {retryPaidCandleEmails} = await import("./candle-orders");
+    await retryPaidCandleEmails();
+    const mails = delivered.slice(before);
+    expect(mails).toHaveLength(2);
+    expect(mails.some(m => /^To: owner@example.com$/m.test(m))).toBe(true);
+    expect(mails.some(m => /^To: customer@example.com$/m.test(m))).toBe(true);
+    for (const mail of mails) {
+      const text = decodeQuotedPrintable(mail);
+      expect(text).toContain("付款成功"); expect(text).toContain("NT$1,499");
+      expect(text).not.toContain("尚待付款");
+    }
+    await retryPaidCandleEmails();
+    expect(delivered).toHaveLength(before + 2);
+    paidMailRows.length = 0;
+  });
+
   it("寄信不可用時，訂單仍保存並回傳轉帳資料", async () => {
     delete process.env.SMTP_HOST;
     delete process.env.SMTP_USER;
@@ -239,4 +299,3 @@ describe("蠟燭訂單通知信", () => {
   });
 
 });
-

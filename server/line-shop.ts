@@ -7,6 +7,7 @@ import mysql, {
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { randomUUID, createHash } from "node:crypto";
+import { markCandleOrderPaidByStripeSessionId } from "./candle-orders";
 import seed from "./public/line-shop-catalog.json";
 import { sdk } from "./_core/sdk";
 import {
@@ -589,6 +590,16 @@ export async function lineShopWebhook(req: Request, res: Response) {
   )
     return res.json({ received: true });
   const session = event.data.object as Stripe.Checkout.Session;
+  if (session.metadata?.candleOrderId) {
+    try {
+      if (event.type !== "checkout.session.expired" && session.payment_status === "paid")
+        await markCandleOrderPaidByStripeSessionId(session);
+      return res.json({ received: true });
+    } catch {
+      console.error("Candle payment confirmation needs retry");
+      return res.status(500).json({ error: "Candle payment confirmation pending" });
+    }
+  }
   if (!session.metadata?.line_shop_order) return res.json({ received: true });
   let conn: PoolConnection | undefined;
   try {

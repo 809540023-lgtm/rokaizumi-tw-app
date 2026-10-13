@@ -36,7 +36,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.payment_status === 'paid') {
         await markOrderPaidByStripeSessionId(session.id);
-        await markCandleOrderPaidByStripeSessionId(session.id);
+        await markCandleOrderPaidByStripeSessionId(session);
       }
     }
 

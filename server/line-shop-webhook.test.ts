@@ -10,6 +10,8 @@ vi.mock("mysql2/promise", () => ({
     }),
   },
 }));
+const { markCandlePayment } = vi.hoisted(() => ({ markCandlePayment: vi.fn() }));
+vi.mock("./candle-orders", () => ({ markCandleOrderPaidByStripeSessionId: markCandlePayment }));
 import router, { registerLineShop } from "./line-shop";
 let server: Server | undefined;
 afterEach(async () => {
@@ -17,6 +19,7 @@ afterEach(async () => {
     await new Promise<void>(resolve => server!.close(() => resolve()));
   server = undefined;
   vi.unstubAllEnvs();
+  markCandlePayment.mockReset();
 });
 async function post(payload: string, signature: string) {
   const app = express();
@@ -82,4 +85,27 @@ describe("LINE shop webhook trust boundary", () => {
     });
     expect((await post(payload + " ", header)).status).toBe(400);
   });
+  it("routes signed paid candle sessions through the existing endpoint", async () => {
+    setup();
+    const session = {id: "cs_candle", payment_status: "paid", currency: "twd", amount_total: 149900, metadata: {candleOrderId: "RI-TW-TEST", candleMarket: "TW"}};
+    const body = JSON.stringify({id: "evt_candle", livemode: false, type: "checkout.session.completed", data: {object: session}});
+    const signature = Stripe.webhooks.generateTestHeaderString({payload: body, secret: "whsec_test_secret"});
+    expect((await post(body, signature)).status).toBe(200);
+    expect(markCandlePayment).toHaveBeenCalledWith(session);
+  });
+  it("returns a retryable error when candle persistence fails", async () => {
+    setup();
+    markCandlePayment.mockRejectedValueOnce(new Error("Database unavailable"));
+    const body = JSON.stringify({id: "evt_candle", livemode: false, type: "checkout.session.async_payment_succeeded", data: {object: {id: "cs_candle", payment_status: "paid", metadata: {candleOrderId: "RI-TEST"}}}});
+    const signature = Stripe.webhooks.generateTestHeaderString({payload: body, secret: "whsec_test_secret"});
+    expect((await post(body, signature)).status).toBe(500);
+  });
+  it("does not mark unpaid or expired candle sessions as paid", async () => {
+    setup();
+    const body = JSON.stringify({id: "evt_candle", livemode: false, type: "checkout.session.expired", data: {object: {id: "cs_candle", payment_status: "unpaid", metadata: {candleOrderId: "RI-TEST"}}}});
+    const signature = Stripe.webhooks.generateTestHeaderString({payload: body, secret: "whsec_test_secret"});
+    expect((await post(body, signature)).status).toBe(200);
+    expect(markCandlePayment).not.toHaveBeenCalled();
+  });
+
 });
