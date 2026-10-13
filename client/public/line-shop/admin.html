@@ -9,7 +9,11 @@
     <h1>LINE 商店訂單管理</h1>
     <p>請先使用公司網站的管理員帳號<a href="/login">登入</a>。</p>
     <p>
-      新訂單會自動計算運費並建立 Stripe 付款連結。此頁可查詢付款狀態與安排出貨；舊訂單仍可處理。商品小計須滿 NT$2,000；NT$2,000～4,999 運費 NT$220，滿 NT$5,000 免運（不含運費）。重量仍用於確認 EMS 可寄送條件。
+      客人付款成功後，公司會收到已付款通知。已付款訂單可操作「開始備貨」，實際寄出後操作「標記已出貨」，並填寫物流單號。<br />新訂單會自動計算運費並建立
+      Stripe
+      付款連結。此頁可查詢付款狀態與安排出貨；舊訂單仍可處理。商品小計須滿
+      NT$2,000；NT$2,000～4,999 運費 NT$220，滿 NT$5,000
+      免運（不含運費）。重量仍用於確認 EMS 可寄送條件。
     </p>
     <button class="btn" id="refresh">更新訂單</button>
     <div id="orders" role="status"></div>
@@ -29,6 +33,23 @@
             "'": "&#39;",
           })[c]
       );
+    const paymentLabels = {
+      paid: "已付款",
+      pending: "待付款",
+      expired: "付款逾期",
+      awaiting_quote: "待報價",
+      quoting: "建立付款中",
+    };
+    const fulfillmentLabels = {
+      awaiting_preparation: "待備貨",
+      preparing: "備貨中",
+      shipped: "已出貨",
+      unpaid: "尚未付款",
+    };
+    function fulfillment(o) {
+      if (o.status !== "paid") return "";
+      return `<p><strong>出貨狀態：${esc(fulfillmentLabels[o.fulfillmentStatus] || o.fulfillmentStatus)}</strong>${o.shippedAt ? "｜出貨時間：" + esc(o.shippedAt) : ""}</p><form data-fulfillment="${esc(o.id)}"><label>物流單號（選填）<input name="tracking" maxlength="100" value="${esc(o.trackingNumber)}"></label>${o.fulfillmentStatus === "awaiting_preparation" ? '<button class="btn" name="action" value="preparing">開始備貨</button>' : o.fulfillmentStatus === "preparing" ? '<button class="btn" name="action" value="shipped">標記已出貨</button>' : '<button class="btn" name="action" value="shipped">儲存物流單號</button>'}<p role="status" class="result"></p></form>`;
+    }
     async function load() {
       try {
         const r = await fetch("/api/line-shop/admin/orders", {
@@ -40,14 +61,14 @@
           d.orders
             .map(
               o =>
-                `<article class="panel"><h2>${esc(o.id)}</h2><p>${esc(o.mode)}｜${esc(o.status)}｜${esc(o.createdAt)}</p><p>商品 NT$${o.subtotalTwd}；運費 ${o.shippingTwd === null ? "待報價" : "NT$" + o.shippingTwd}</p><p>${esc(o.customer.name)}｜${esc(o.customer.email)}｜${esc(o.customer.phone)}</p><p>${esc(o.customer.postalCode)} ${esc(o.customer.address)}</p><ul>${o.items.map(i => `<li>${esc(i.productId)} ${esc(i.name)} × ${i.quantity}</li>`).join("")}</ul>${["awaiting_quote", "quoting"].includes(o.status) ? `<form data-order="${esc(o.id)}"><label>整單含包材重量（克）<input name="weight" type="number" min="1" max="30000" step="1" required value="${o.weightGrams || ""}"></label><label><input type="checkbox" name="supply" required>已確認供貨</label><label><input type="checkbox" name="shipping" required>已確認所有商品可寄送至台灣</label><button class="btn">確認報價並寄送刷卡連結</button></form>` : ""}${o.checkoutUrl ? `<p><a href="${esc(o.checkoutUrl)}" target="_blank" rel="noopener">查看 Stripe 付款頁</a></p>` : ""}</article>`
+                `<article class="panel"><h2>${esc(o.id)}</h2><p>${esc(o.mode)}｜${esc(paymentLabels[o.status] || o.status)}｜${esc(o.createdAt)}</p><p>商品 NT$${o.subtotalTwd}；運費 ${o.shippingTwd === null ? "待報價" : "NT$" + o.shippingTwd}</p><p>${esc(o.customer.name)}｜${esc(o.customer.email)}｜${esc(o.customer.phone)}</p><p>${esc(o.customer.postalCode)} ${esc(o.customer.address)}</p><ul>${o.items.map(i => `<li>${esc(i.productId)} ${esc(i.name)} × ${i.quantity}</li>`).join("")}</ul>${["awaiting_quote", "quoting"].includes(o.status) ? `<form data-order="${esc(o.id)}"><label>整單含包材重量（克）<input name="weight" type="number" min="1" max="30000" step="1" required value="${o.weightGrams || ""}"></label><label><input type="checkbox" name="supply" required>已確認供貨</label><label><input type="checkbox" name="shipping" required>已確認所有商品可寄送至台灣</label><button class="btn">確認報價並寄送刷卡連結</button></form>` : ""}${fulfillment(o)}${o.checkoutUrl ? `<p><a href="${esc(o.checkoutUrl)}" target="_blank" rel="noopener">查看 Stripe 付款頁</a></p>` : ""}</article>`
             )
             .join("") || "<p>目前沒有訂單。</p>";
         document.getElementById("mail").innerHTML =
           d.mail
             .map(
               m =>
-                `<p>${esc(m.order_id)}｜${esc(m.kind)}｜${esc(m.state)}${["review", "sending"].includes(m.state) ? "（請核對寄信服務紀錄；系統不會自動重寄，以免重複通知）" : ""}</p>`
+                `<p>${esc(m.order_id)}｜${esc({ paid_merchant: "公司已付款通知", paid_customer: "客戶付款成功通知", request_merchant: "公司新訂單通知" }[m.kind] || m.kind)}｜${esc(m.state)}${["review", "sending"].includes(m.state) ? "（請核對寄信服務紀錄；系統不會自動重寄，以免重複通知）" : ""}</p>`
             )
             .join("") || "目前沒有通知。";
       } catch (e) {
@@ -56,6 +77,37 @@
     }
     document.addEventListener("submit", async e => {
       const f = e.target;
+      if (f.dataset.fulfillment) {
+        e.preventDefault();
+        const b = e.submitter;
+        if (!b) return;
+        if (b.value === "shipped" && !confirm("確認此訂單已交付物流寄出？"))
+          return;
+        b.disabled = true;
+        try {
+          const r = await fetch(
+            "/api/line-shop/admin/orders/" +
+              encodeURIComponent(f.dataset.fulfillment) +
+              "/fulfillment",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                status: b.value,
+                trackingNumber: f.elements.tracking.value,
+              }),
+            }
+          );
+          const d = await r.json();
+          if (!r.ok) throw Error(d.error);
+          await load();
+        } catch (error) {
+          f.querySelector(".result").textContent =
+            error.message || "狀態未更新，請重試";
+          b.disabled = false;
+        }
+        return;
+      }
       if (!f.dataset.order) return;
       e.preventDefault();
       const b = f.querySelector("button");

@@ -103,6 +103,9 @@ async function initialize(db: Pool) {
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_limits (bucket CHAR(64) PRIMARY KEY, hits INT NOT NULL, expires_at BIGINT NOT NULL)`
   );
+  await db.query(
+    `CREATE TABLE IF NOT EXISTS line_shop_fulfillment (order_id VARCHAR(40) PRIMARY KEY, status VARCHAR(20) NOT NULL, tracking_number VARCHAR(100) NOT NULL DEFAULT '', shipped_at TIMESTAMP NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`
+  );
   const products = seed.filter(p => !excluded.has(p.id));
   if (products.length)
     await db.query(
@@ -383,7 +386,7 @@ router.get(
   handled(async (_req, res) => {
     const db = await database();
     const [orders] = await db.query<RowDataPacket[]>(
-      "SELECT * FROM line_shop_orders ORDER BY created_at DESC LIMIT 100"
+      "SELECT o.*, f.status AS fulfillment_status, f.tracking_number, f.shipped_at FROM line_shop_orders o LEFT JOIN line_shop_fulfillment f ON f.order_id=o.id ORDER BY o.created_at DESC LIMIT 100"
     );
     const [mail] = await db.query<RowDataPacket[]>(
       "SELECT id,order_id,kind,state,created_at FROM line_shop_mail ORDER BY id DESC LIMIT 200"
@@ -394,9 +397,71 @@ router.get(
         customer: parsed(o.customer_json),
         createdAt: o.created_at,
         weightGrams: o.weight_grams,
+        fulfillmentStatus:
+          o.status === "paid"
+            ? o.fulfillment_status || "awaiting_preparation"
+            : "unpaid",
+        trackingNumber: o.tracking_number || "",
+        shippedAt: o.shipped_at,
       })),
       mail,
     });
+  })
+);
+router.post(
+  "/admin/orders/:id/fulfillment",
+  handled(async (req, res) => {
+    const status = req.body?.status;
+    const tracking = req.body?.trackingNumber ?? "";
+    if (
+      !["preparing", "shipped"].includes(status) ||
+      typeof tracking !== "string" ||
+      tracking.length > 100 ||
+      /[\r\n]/.test(tracking)
+    )
+      throw new ShopInputError("請選擇備貨中或已出貨，物流單號不得超過100字");
+    const db = await database();
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const order = await orderById(conn, String(req.params.id), true);
+      if (!order) {
+        await conn.rollback();
+        return res.status(404).json({ error: "找不到訂單" });
+      }
+      if (order.status !== "paid") {
+        await conn.rollback();
+        return res.status(409).json({ error: "尚未確認付款，無法安排出貨" });
+      }
+      const [rows] = await conn.execute<RowDataPacket[]>(
+        "SELECT * FROM line_shop_fulfillment WHERE order_id=?",
+        [order.id]
+      );
+      const current = rows[0];
+      if (current?.status === "shipped" && status !== "shipped") {
+        await conn.rollback();
+        return res.status(409).json({ error: "已出貨訂單不能改回備貨中" });
+      }
+      if (status === "shipped" && !current) {
+        await conn.rollback();
+        return res.status(409).json({ error: "請先將訂單設為備貨中" });
+      }
+      await conn.execute(
+        "INSERT INTO line_shop_fulfillment (order_id,status,tracking_number,shipped_at) VALUES (?,?,?,IF(?='shipped',CURRENT_TIMESTAMP,NULL)) ON DUPLICATE KEY UPDATE status=VALUES(status),tracking_number=VALUES(tracking_number),shipped_at=IF(VALUES(status)='shipped',COALESCE(shipped_at,CURRENT_TIMESTAMP),NULL)",
+        [order.id, status, tracking.trim(), status]
+      );
+      await conn.commit();
+      res.json({
+        id: order.id,
+        fulfillmentStatus: status,
+        trackingNumber: tracking.trim(),
+      });
+    } catch (e) {
+      await conn.rollback();
+      throw e;
+    } finally {
+      conn.release();
+    }
   })
 );
 async function preparePayment(id: string, packedWeightGrams?: unknown) {
@@ -592,12 +657,17 @@ export async function lineShopWebhook(req: Request, res: Response) {
   const session = event.data.object as Stripe.Checkout.Session;
   if (session.metadata?.candleOrderId) {
     try {
-      if (event.type !== "checkout.session.expired" && session.payment_status === "paid")
+      if (
+        event.type !== "checkout.session.expired" &&
+        session.payment_status === "paid"
+      )
         await markCandleOrderPaidByStripeSessionId(session);
       return res.json({ received: true });
     } catch {
       console.error("Candle payment confirmation needs retry");
-      return res.status(500).json({ error: "Candle payment confirmation pending" });
+      return res
+        .status(500)
+        .json({ error: "Candle payment confirmation pending" });
     }
   }
   if (!session.metadata?.line_shop_order) return res.json({ received: true });
@@ -665,7 +735,7 @@ export async function lineShopWebhook(req: Request, res: Response) {
           order.id,
           "paid_merchant",
           process.env.LINE_SHOP_NOTIFY_EMAIL || "rokaizumi@gmail.com",
-          `ROKA IZUMI｜付款完成 ${order.id}`,
+          `ROKA IZUMI｜已付款・待備貨 ${order.id}`,
           text +
             `\n\n${merchantCustomerDetails(customer)}\n請到管理頁安排出貨：${origin()}/line-shop/admin.html`
         );

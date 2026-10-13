@@ -32,3 +32,9 @@ Email is persisted in an outbox with unique order/kind identifiers. `sent` means
 ## Validation
 
 `vitest run server/line-shop-pricing.test.ts server/line-shop-webhook.test.ts` covers server-authoritative prices, minimum order, quantities, EMS boundaries, payment matching, raw webhook signatures, tampering and mode mismatch. `npm run build` verifies the production frontend and server bundle. Live payment and email delivery still require credential setup and end-to-end verification.
+
+## Paid notifications and fulfillment
+
+After a verified Stripe payment, the existing transactional outbox sends the company an `已付款・待備貨` email (configured `LINE_SHOP_NOTIFY_EMAIL`, default `rokaizumi@gmail.com`), with items, amount, recipient details and a link to `/line-shop/admin.html`. Duplicate payment events retain the unique order/kind notification key.
+
+In the administrator page, paid orders start at 待備貨. Select 開始備貨, then 標記已出貨 after handing the parcel to the carrier. Optional tracking numbers can be recorded or corrected. Shipping time is retained on repeat saves. Payment and fulfillment are separate records, so later Stripe event retries cannot reset shipment progress. Unpaid orders cannot be fulfilled; shipped orders cannot return to preparation. All writes require the existing administrator role and configured company origin. Fulfillment is stored in a lazily created table without rewriting existing orders.
