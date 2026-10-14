@@ -128,7 +128,9 @@ async function catalog(db: Pool | PoolConnection) {
         price: product.price,
         stock: r.stock,
         catalog: product.catalog,
-        jp: product.jp,
+        // Costco's Japanese label is sourced from receipts and can contain
+        // internal shorthand. Keep it out of every customer-facing surface.
+        jp: product.catalog === "costco" ? "" : product.jp,
         spec: product.spec,
         weight: product.weight,
         tag: product.tag,
