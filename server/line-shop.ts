@@ -37,6 +37,7 @@ const configured = () =>
       process.env.SMTP_PASS
   );
 const hash = (s: string) => createHash("sha256").update(s).digest("hex");
+const customerDescriptions = new Map(seed.map(product => [product.id, product.desc]));
 const parsed = <T>(value: string | T): T =>
   typeof value === "string" ? JSON.parse(value) : value;
 const excluded = new Set([
@@ -135,10 +136,9 @@ async function catalog(db: Pool | PoolConnection) {
         weight: product.weight,
         tag: product.tag,
         category: product.category,
-        desc:
-          product.catalog === "costco"
-            ? `${product.name}。實際規格、成分、過敏原及保存方式，請以收到的商品包裝標示為準。`
-            : product.desc,
+        // Descriptions are maintained in the catalog file. The database uses
+        // INSERT IGNORE for stock initialization, so its product copy can lag.
+        desc: customerDescriptions.get(product.id) ?? product.desc,
         jan: product.jan,
         image: product.image,
         imageCrop: product.imageCrop,
