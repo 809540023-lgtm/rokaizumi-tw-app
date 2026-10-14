@@ -167,7 +167,7 @@ function renderGrocery() {
 function renderCostco() {
   $("costco-products").innerHTML = COSTCO.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">好市多 ${esc(p.costcoItemNumber)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 件 · 運費另計</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 件 · 運費另計</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
   ).join("");
 }
 function sumHtml(t) {
@@ -198,25 +198,12 @@ function renderCart() {
       `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">最低訂購商品小計 NT$2,000（不含運費，面膜、超市與好市多可合併計算）。填寫收件資料後直接進入 Stripe 刷卡付款。</p>`
     : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
-function priceEvidence(p) {
-  if (p.catalog === "costco")
-    return `<p class="muted">計價方式：好市多收據未折扣含稅原價加30%，按5日圓換算1台幣，台幣無條件進位。</p>`;
-  if (p.officialPriceJPY)
-    return `<p class="muted">計價依據：日本官方含稅價 ¥${p.officialPriceJPY.toLocaleString("ja-JP")} × 1.3 ÷ 5，台幣四捨五入。 <a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看官方商品資料</a></p>`;
-  if (p.catalog === "supermarket") {
-    const jpy =
-      p.referenceTaxIncludedJPY ??
-      Math.round(p.referenceJPY * 1.08 * 100) / 100;
-    return `<p class="muted">計價依據：日本含稅參考售價 ¥${jpy.toLocaleString("ja-JP")} × 1.3 ÷ 5，台幣無條件進位。 <a href="${esc(p.priceSource || p.source)}" target="_blank" rel="noopener noreferrer">查看價格來源</a></p>`;
-  }
-  return "";
-}
 function detail(id) {
   const p = P.find(p => p.id === id);
   if (!p) return;
   $("detailtitle").textContent = p.name;
   $("detailbody").innerHTML =
-    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}<p class="meta">${p.id} · ${esc(p.jp)}</p><section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>原裝規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : "售價・運費另計"}</span></p>${priceEvidence(p)}${p.platformPriceJPY ? `<p class="muted">計價依據：${esc(p.priceBasis)} ¥${p.platformPriceJPY.toLocaleString("ja-JP")}（含稅，不含運費及點數優惠）× 1.3 ÷ 5。${p.priceNote ? esc(p.priceNote) : ""} <a href="${esc(p.priceSource)}" target="_blank" rel="noopener noreferrer">查看價格來源</a></p>` : ""}<p><strong>可選數量上限：</strong>${p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p><p class="muted">商品條碼（JAN）：${p.jan || "待確認"}${p.catalog === "supermarket" && p.jan ? "（網頁資料待實物核對）" : ""}</p>${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>請依實際包裝確認規格、保存方式、原料及使用說明。</p><p>${esc(p.photoNote)}</p>${p.source ? `<a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看商品參考資料</a>` : ""}</section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>原廠標示資料已供初步篩選。請再次核對實際包裝的原料、過敏原、開封後保存方法與賞味期限。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}<button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button>`;
+    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}${p.jp ? `<p class="meta">${esc(p.jp)}</p>` : ""}<section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>商品規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : "售價・運費另計"}</span></p><p><strong>可選數量上限：</strong>${p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p>${p.jan ? `<p class="muted">商品條碼（JAN）：${esc(p.jan)}${p.catalog === "supermarket" ? "（網頁資料待實物核對）" : ""}</p>` : ""}${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>實際規格、成分、過敏原及保存方式，請以收到的商品包裝標示為準。</p></section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>原廠標示資料已供初步篩選。請再次核對實際包裝的原料、過敏原、開封後保存方法與賞味期限。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}<button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button>`;
   $("detail").showModal();
 }
 function checkout() {

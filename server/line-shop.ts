@@ -120,7 +120,36 @@ async function catalog(db: Pool | PoolConnection) {
   );
   return rows
     .filter(r => !excluded.has(r.id))
-    .map(r => ({ ...parsed<ShopProduct>(r.data_json), stock: r.stock }));
+    .map(r => {
+      const product = parsed<ShopProduct>(r.data_json);
+      const publicProduct: ShopProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        stock: r.stock,
+        catalog: product.catalog,
+        jp: product.jp,
+        spec: product.spec,
+        weight: product.weight,
+        tag: product.tag,
+        category: product.category,
+        desc:
+          product.catalog === "costco"
+            ? `${product.name}。實際規格、成分、過敏原及保存方式，請以收到的商品包裝標示為準。`
+            : product.desc,
+        jan: product.jan,
+        image: product.image,
+        imageCrop: product.imageCrop,
+        source: product.source,
+        ingredients: product.ingredients,
+        storage: product.storage,
+      };
+      if (product.catalog === "costco") {
+        delete publicProduct.jan;
+        delete publicProduct.source;
+      }
+      return publicProduct;
+    });
 }
 async function orderById(db: Pool | PoolConnection, id: string, lock = false) {
   const [rows] = await db.execute<RowDataPacket[]>(
