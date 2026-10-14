@@ -66,6 +66,7 @@ const excluded = new Set([
     "63068",
   ].map(id => "COSTCO-" + id),
 ]);
+const STOCK_RESET_MIGRATION = "2026-10-14-stock-10";
 let pool: Pool | undefined;
 let initialization: Promise<void> | undefined;
 async function database() {
@@ -108,12 +109,50 @@ async function initialize(db: Pool) {
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_fulfillment (order_id VARCHAR(40) PRIMARY KEY, status VARCHAR(20) NOT NULL, tracking_number VARCHAR(100) NOT NULL DEFAULT '', shipped_at TIMESTAMP NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`
   );
+  await db.query(
+    `CREATE TABLE IF NOT EXISTS line_shop_migrations (migration_key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`
+  );
   const products = seed.filter(p => !excluded.has(p.id));
   if (products.length)
     await db.query(
       "INSERT IGNORE INTO line_shop_products (id,data_json,stock) VALUES ?",
       [products.map(p => [p.id, JSON.stringify(p), p.stock])]
     );
+  await setStoreStockToTen(db);
+}
+async function setStoreStockToTen(db: Pool) {
+  const conn = await db.getConnection();
+  const lockName = "line_shop_stock_reset_2026_10_14";
+  try {
+    const [locks] = await conn.query<RowDataPacket[]>(
+      "SELECT GET_LOCK(?,60) AS acquired",
+      [lockName]
+    );
+    if (Number(locks[0]?.acquired) !== 1)
+      throw new Error("Could not acquire LINE shop stock migration lock");
+
+    await conn.beginTransaction();
+    const [applied] = await conn.execute<RowDataPacket[]>(
+      "SELECT migration_key FROM line_shop_migrations WHERE migration_key=? FOR UPDATE",
+      [STOCK_RESET_MIGRATION]
+    );
+    if (!applied.length) {
+      await conn.execute(
+        "UPDATE line_shop_products SET stock=10 WHERE active=TRUE"
+      );
+      await conn.execute(
+        "INSERT INTO line_shop_migrations (migration_key) VALUES (?)",
+        [STOCK_RESET_MIGRATION]
+      );
+    }
+    await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    await conn.query("SELECT RELEASE_LOCK(?)", [lockName]);
+    conn.release();
+  }
 }
 async function catalog(db: Pool | PoolConnection) {
   const [rows] = await db.query<RowDataPacket[]>(
