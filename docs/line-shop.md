@@ -2,7 +2,7 @@
 
 The independent storefront is `/line-shop/`. Customers select products and enter recipient details without signing in. The server reserves stock once, computes fixed buyer postage and creates a Stripe Checkout session immediately. The browser redirects directly to Stripe; no administrator quote is required. Existing pending sessions retain their original amounts and can be resumed from email.
 
-Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. The storefront, checkout, order notifications and policies state that orders ship from Japan within seven business days after ordering; delivery time is separate. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Seeded stock represents selection limits; operators maintain inventory and arrange fulfillment.
+Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. The storefront, checkout, order notifications and policies state that orders ship from Japan within seven business days after ordering; delivery time is separate. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Operators maintain inventory and arrange fulfillment.
 
 ## Render environment
 
@@ -20,6 +20,8 @@ Reuse existing `DATABASE_URL`, database SSL configuration, administrator auth an
 Register `https://rokaizumi-tw.jp/api/line-shop/stripe/webhook` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `checkout.session.expired`, in the same mode as the key. Only signed events with matching currency, amount, mode, order metadata and reference mark orders paid. Visiting the success page does not mark payment successful. Stripe expiration releases reserved stock once. The same order submission can be retried after a timeout without a second stock deduction or a second session.
 
 Tables are created lazily and populated with INSERT IGNORE, so deployments do not overwrite existing inventory. Customer order URLs use random bearer tokens; do not publish them. Admin endpoints require the existing admin role, and POST requests must originate from the configured company domain.
+
+The one-time `2026-10-14-stock-10` migration sets every active listing's stock to 10. Later checkouts continue to decrement stock, and expired reservations restore it. Seed catalog entries also start at 10 for newly inserted products.
 
 ## Operational checks
 
