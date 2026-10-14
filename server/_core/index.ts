@@ -93,8 +93,32 @@ async function startServer() {
 
   // Initialize Telegram Bot
   initTelegramBot();
-  const shopMailTimer = setInterval(() => { void drainShopMail(); }, 60000);
-  shopMailTimer.unref();
+  // Process order mail only at 07:00 and 19:00 Japan time.
+  const scheduleShopMailRun = () => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const nowSeconds =
+      Number(values.hour) * 3600 +
+      Number(values.minute) * 60 +
+      Number(values.second);
+    const targets = [7 * 3600, 19 * 3600];
+    const nextTarget = targets.find(target => target > nowSeconds);
+    const secondsUntilNext =
+      nextTarget === undefined
+        ? 24 * 3600 - nowSeconds + targets[0]
+        : nextTarget - nowSeconds;
+    const timer = setTimeout(() => {
+      void drainShopMail().finally(scheduleShopMailRun);
+    }, secondsUntilNext * 1000);
+    timer.unref();
+  };
+  scheduleShopMailRun();
 }
 
 startServer().catch(console.error);
