@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface YamadaProduct {
   code: string;
@@ -7,6 +8,7 @@ interface YamadaProduct {
 }
 
 export default function Yamada() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<YamadaProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,8 +62,8 @@ export default function Yamada() {
       {/* Header */}
       <div className="bg-gradient-to-r from-[#A78BFA] to-[#7C3AED] text-white py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2">山田化學(Yamada Kagaku)</h1>
-          <p className="text-lg opacity-90">日本廚房・生活用品全系列 | {products.length} 商品</p>
+          <h1 className="text-4xl font-bold mb-2">{t('yamada.title')}</h1>
+          <p className="text-lg opacity-90">{t('yamada.sub')} | {products.length} {t('yamada.count')}</p>
         </div>
       </div>
 
@@ -69,7 +71,7 @@ export default function Yamada() {
       <div className="container mx-auto px-4 py-8">
         <input
           type="text"
-          placeholder="搜尋商品名稱或品番..."
+          placeholder={t('yamada.search')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A78BFA]"
@@ -80,11 +82,11 @@ export default function Yamada() {
       <div className="container mx-auto px-4 pb-12">
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">載入中...</p>
+            <p className="text-gray-500">{t('yamada.loading')}</p>
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">未找到符合條件的商品</p>
+            <p className="text-gray-500">{t('yamada.empty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -118,8 +120,8 @@ export default function Yamada() {
       {/* Footer Info */}
       <div className="bg-gray-100 py-8 mt-12">
         <div className="container mx-auto px-4 text-center text-gray-600">
-          <p className="mb-2">山田化學官方網站：<a href="https://yamada-kagaku.com" className="text-[#7C3AED] hover:underline">yamada-kagaku.com</a></p>
-          <p className="text-sm">品番格式：3 + 編號 + yama</p>
+          <p className="mb-2">{t('yamada.official')}<a href="https://yamada-kagaku.com" className="text-[#7C3AED] hover:underline">yamada-kagaku.com</a></p>
+          <p className="text-sm">{t('yamada.codeFormat')}</p>
         </div>
       </div>
     </div>

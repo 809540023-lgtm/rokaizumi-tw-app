@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TripVideo {
   id: number;
@@ -12,6 +13,7 @@ interface TripVideo {
 }
 
 export default function TripVideos() {
+  const { t } = useLanguage();
   const { data: trips } = trpc.trips.list.useQuery();
   const { data: allVideos } = trpc.tripVideos.list.useQuery();
   const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export default function TripVideos() {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      alert('連結已複製到剪貼簿！');
+      alert(t('trip.copied'));
     }
   };
 
@@ -52,9 +54,9 @@ export default function TripVideos() {
                 ろかいずみ合同会社
               </Link>
             <nav className="flex gap-6">
-              <Link href="/" className="text-gray-700 hover:text-[#ff6b35]">首頁</Link>
-              <Link href="/products" className="text-gray-700 hover:text-[#ff6b35]">產品</Link>
-              <Link href="/videos" className="text-[#ff6b35] font-semibold">影片</Link>
+              <Link href="/" className="text-gray-700 hover:text-[#ff6b35]">{t('nav.home')}</Link>
+              <Link href="/products" className="text-gray-700 hover:text-[#ff6b35]">{t('nav.products')}</Link>
+              <Link href="/videos" className="text-[#ff6b35] font-semibold">{t('nav.videos')}</Link>
             </nav>
           </div>
         </div>
@@ -63,10 +65,10 @@ export default function TripVideos() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            🎬 日本採購影片
+            🎬 {t('trip.title')}
           </h1>
           <p className="text-lg text-gray-600">
-            即時直擊日本採購現場，第一手商品資訊
+            {t('trip.sub')}
           </p>
         </div>
 
@@ -92,10 +94,10 @@ export default function TripVideos() {
                           }`}
                         >
                           {trip.status === 'completed'
-                            ? '已完成'
+                            ? t('trip.status.completed')
                             : trip.status === 'ongoing'
-                            ? '進行中'
-                            : '預計'}
+                            ? t('trip.status.ongoing')
+                            : t('trip.status.planned')}
                         </span>
                       </div>
                       {trip.notes && (
@@ -103,7 +105,7 @@ export default function TripVideos() {
                       )}
                     </div>
                     <div className="text-gray-500 text-sm">
-                      {videos.length} 個影片
+                      {videos.length} {t('trip.videoCount')}
                     </div>
                   </div>
                 </div>
@@ -146,13 +148,13 @@ export default function TripVideos() {
                             onClick={() => handleShare(video)}
                             className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
                           >
-                            分享
+                            {t('trip.share')}
                           </button>
                           <button
                             onClick={() => setSelectedVideoUrl(video.videoUrl)}
                             className="flex-1 bg-[#ff6b35] text-white px-4 py-2 rounded-lg hover:bg-[#ff5722] transition-colors text-sm font-semibold"
                           >
-                            觀看
+                            {t('trip.watch')}
                           </button>
                         </div>
                       </div>
@@ -166,10 +168,10 @@ export default function TripVideos() {
           <div className="bg-white rounded-xl shadow-sm p-12 text-center">
             <div className="text-6xl mb-4">🎬</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              暫無影片
+              {t('trip.empty.title')}
             </h3>
             <p className="text-gray-600">
-              影片即將上傳，敬請期待
+              {t('trip.empty.desc')}
             </p>
           </div>
         )}

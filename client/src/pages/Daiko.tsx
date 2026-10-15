@@ -3,15 +3,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Link as LinkIcon, Package, ExternalLink } from "lucide-react";
 import { LINE_ADD_FRIEND_URL } from "@/lib/line";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // 國際運費級距（日圓）— 預估值，請依實際物流費率調整
-const SHIPPING: Record<
-  string,
-  { label: string; note: string; tiers: { max: number; jpy: number }[] }
-> = {
+// 顯示名稱與說明放在 LanguageContext 的 daiko.ship.*
+const SHIPPING: Record<string, { tiers: { max: number; jpy: number }[] }> = {
   ems: {
-    label: "EMS（快速・含追蹤）",
-    note: "約 3–6 天，含追蹤與基本保險",
     tiers: [
       { max: 500, jpy: 1450 },
       { max: 1000, jpy: 2150 },
@@ -22,8 +19,6 @@ const SHIPPING: Record<
     ],
   },
   air_small: {
-    label: "航空小包（經濟・較慢）",
-    note: "適合輕小件，約 7–14 天",
     tiers: [
       { max: 100, jpy: 720 },
       { max: 250, jpy: 1080 },
@@ -33,6 +28,9 @@ const SHIPPING: Record<
     ],
   },
 };
+
+const SHIP_LABEL_KEY: Record<string, string> = { ems: "daiko.ship.ems", air_small: "daiko.ship.air" };
+const SHIP_NOTE_KEY: Record<string, string> = { ems: "daiko.ship.emsNote", air_small: "daiko.ship.airNote" };
 
 const JPY_TO_TWD = 0.21; // 參考匯率，可調整
 const SERVICE_RATE = 0.05; // 代購服務費 5%
@@ -45,6 +43,7 @@ function shippingJPY(method: string, grams: number): number | null {
 }
 
 export default function Daiko() {
+  const { t } = useLanguage();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState<any>(null);
@@ -67,14 +66,14 @@ export default function Daiko() {
       const data = await res.json().catch(() => ({}));
       setFetched(data || {});
       if (!data || !data.ok) {
-        setError((data && data.error) || "無法取得商品資訊，請手動填寫下方欄位。");
+        setError((data && data.error) || t("daiko.errFetch"));
       } else {
         setTitle(data.title || "");
         setImage(data.image || "");
         if (data.priceJPY) setPriceJPY(String(data.priceJPY));
       }
     } catch (e) {
-      setError("連線失敗，請手動填寫下方欄位。");
+      setError(t("daiko.errNetwork"));
       setFetched({});
     }
     setLoading(false);
@@ -94,15 +93,13 @@ export default function Daiko() {
       <SiteHeader />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl w-full">
         <div className="text-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">日本代購・貼網址報價</h1>
-          <p className="text-sm text-gray-500 mt-2">
-            貼上任何日本商店的商品網址，立即試算「商品費用 ＋ 國際運費」
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold">{t("daiko.title")}</h1>
+          <p className="text-sm text-gray-500 mt-2">{t("daiko.sub")}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-5">
           <label className="text-sm font-bold mb-2 flex items-center gap-1.5">
-            <LinkIcon className="w-4 h-4 text-[#0ABAB5]" /> 商品網址
+            <LinkIcon className="w-4 h-4 text-[#0ABAB5]" /> {t("daiko.urlLabel")}
           </label>
           <div className="flex gap-2">
             <input
@@ -116,7 +113,7 @@ export default function Daiko() {
               disabled={loading || !url}
               className="px-4 py-2 rounded-lg bg-[#0ABAB5] text-white font-bold text-sm disabled:opacity-60 whitespace-nowrap"
             >
-              {loading ? "讀取中..." : "取得商品資訊"}
+              {loading ? t("daiko.fetching") : t("daiko.fetch")}
             </button>
           </div>
           {error && <div className="text-xs text-amber-600 mt-2">{error}</div>}
@@ -140,15 +137,15 @@ export default function Daiko() {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="商品名稱"
+                  placeholder={t("daiko.productName")}
                   className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm"
                 />
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500 shrink-0">商品日圓價</span>
+                  <span className="text-sm text-gray-500 shrink-0">{t("daiko.priceJpy")}</span>
                   <input
                     value={priceJPY}
                     onChange={(e) => setPriceJPY(e.target.value.replace(/[^0-9]/g, ""))}
-                    placeholder="例 2980"
+                    placeholder={t("daiko.pricePlaceholder")}
                     className="w-32 px-2 py-1.5 border border-gray-200 rounded text-sm"
                   />
                   <span className="text-sm text-gray-400">円</span>
@@ -158,7 +155,7 @@ export default function Daiko() {
 
             <div className="grid sm:grid-cols-2 gap-3 mt-5">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">預估重量（公克）</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("daiko.grams")}</label>
                 <input
                   value={grams}
                   onChange={(e) => setGrams(e.target.value.replace(/[^0-9]/g, ""))}
@@ -166,43 +163,43 @@ export default function Daiko() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">運送方式</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("daiko.method")}</label>
                 <select
                   value={method}
                   onChange={(e) => setMethod(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
                 >
-                  {Object.entries(SHIPPING).map(([k, v]) => (
+                  {Object.keys(SHIPPING).map(k => (
                     <option key={k} value={k}>
-                      {v.label}
+                      {t(SHIP_LABEL_KEY[k])}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-1">{SHIPPING[method].note}</p>
+            <p className="text-xs text-gray-400 mt-1">{t(SHIP_NOTE_KEY[method])}</p>
 
             <div className="mt-5 bg-[#FEF9F3] rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">商品原價</span>
+                <span className="text-gray-500">{t("daiko.goods")}</span>
                 <span>{fmtJ(p)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">代購服務費（5%）</span>
+                <span className="text-gray-500">{t("daiko.service")}</span>
                 <span>{fmtJ(service)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">國際運費</span>
-                <span>{ship == null ? "超重，請洽詢" : fmtJ(ship)}</span>
+                <span className="text-gray-500">{t("daiko.shipping")}</span>
+                <span>{ship == null ? t("daiko.overweight") : fmtJ(ship)}</span>
               </div>
               <div className="border-t border-gray-200 pt-2 flex justify-between items-baseline">
-                <span className="font-bold">合計</span>
+                <span className="font-bold">{t("daiko.total")}</span>
                 <span className="text-right">
                   <span className="font-bold text-lg text-[#E26D5C]">
                     {totalJPY == null ? "—" : fmtJ(totalJPY)}
                   </span>
                   {totalJPY != null && (
-                    <span className="block text-xs text-gray-500">約 {twd(totalJPY)}</span>
+                    <span className="block text-xs text-gray-500">{t("daiko.approx")} {twd(totalJPY)}</span>
                   )}
                 </span>
               </div>
@@ -214,11 +211,10 @@ export default function Daiko() {
               rel="noreferrer"
               className="mt-4 w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#06C755] text-white font-bold text-sm"
             >
-              透過 LINE 確認下單 <ExternalLink className="w-4 h-4" />
+              {t("daiko.lineCta")} <ExternalLink className="w-4 h-4" />
             </a>
             <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
-              ※ 運費為級距預估值，實際以包裹重量與當日物流費率為準；匯率參考 1 円 ≈ {JPY_TO_TWD}{" "}
-              元。代購僅收取「商品費用 ＋ 國際運費」兩項。
+              {t("daiko.note1")}{JPY_TO_TWD}{t("daiko.note2")}
             </p>
           </div>
         )}

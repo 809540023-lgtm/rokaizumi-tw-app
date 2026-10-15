@@ -6,8 +6,10 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 import { LINE_ADD_FRIEND_URL } from '@/lib/line';
 import { guides } from './Guides';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function GuideDetail() {
+  const { t } = useLanguage();
   const [, params] = useRoute('/guides/:slug');
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,13 +26,13 @@ export default function GuideDetail() {
         />
         <div className="flex-1 container mx-auto px-4 py-24 text-center">
           <div className="text-6xl mb-4">📄</div>
-          <h1 className="text-2xl font-bold mb-3">找不到這篇指南</h1>
-          <p className="text-gray-600 mb-8">文章可能已移除或網址有誤。</p>
+          <h1 className="text-2xl font-bold mb-3">{t('guideDetail.notFound.title')}</h1>
+          <p className="text-gray-600 mb-8">{t('guideDetail.notFound.desc')}</p>
           <Link
             href="/guides"
             className="inline-flex items-center gap-2 bg-[#0ABAB5] hover:bg-[#089B96] text-white px-8 py-3 rounded-xl font-bold transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> 回選品指南
+            <ArrowLeft className="w-4 h-4" /> {t('guideDetail.back')}
           </Link>
         </div>
         <SiteFooter />
@@ -54,7 +56,7 @@ export default function GuideDetail() {
           href="/guides"
           className="inline-flex items-center gap-2 text-[#089B96] hover:text-[#0ABAB5] font-bold mb-8"
         >
-          <ArrowLeft className="w-4 h-4" /> 回選品指南
+          <ArrowLeft className="w-4 h-4" /> {t('guideDetail.back')}
         </Link>
 
         <header className="mb-8">
@@ -62,30 +64,24 @@ export default function GuideDetail() {
             {guide.cover}
           </div>
           <span className="text-xs font-bold text-[#089B96] tracking-wider uppercase">
-            {guide.cat}
+            {t(`guides.${guide.key}.cat`)}
           </span>
-          <h1 className="text-3xl md:text-4xl font-black mt-2 mb-4 leading-tight">{guide.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-black mt-2 mb-4 leading-tight">{t(`guides.${guide.key}.title`)}</h1>
           <div className="flex gap-4 text-sm text-gray-400">
             <span>{guide.date}</span>
-            <span>{guide.readTime}閱讀</span>
+            <span>{t(`guides.${guide.key}.readTime`)}{t('guides.readTime')}</span>
           </div>
         </header>
 
         <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-5">
-          <p className="text-lg font-medium text-gray-800">{guide.excerpt}</p>
-          <p>
-            這份指南由日本介護福祉士撰寫，針對台灣家庭的居家環境與使用習慣整理。
-            完整內容正在編輯中，若您現在就需要建議，歡迎直接透過 LINE 與我們聯繫，
-            由專人依長輩的身體狀況與居家空間為您推薦。
-          </p>
+          <p className="text-lg font-medium text-gray-800">{t(`guides.${guide.key}.excerpt`)}</p>
+          <p>{t('guideDetail.body')}</p>
         </div>
 
         {/* CTA */}
         <div className="mt-12 bg-white rounded-2xl p-8 text-center shadow-sm">
-          <h2 className="text-2xl font-bold mb-3">不確定該買哪一款？</h2>
-          <p className="text-gray-600 mb-6">
-            加 LINE 客服，由介護福祉士 1 對 1 推薦最適合的款式。
-          </p>
+          <h2 className="text-2xl font-bold mb-3">{t('guides.cta.title')}</h2>
+          <p className="text-gray-600 mb-6">{t('guideDetail.cta.sub')}</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <a
               href={LINE_ADD_FRIEND_URL}
@@ -93,13 +89,13 @@ export default function GuideDetail() {
               rel="noopener noreferrer"
               className="inline-block bg-[#0ABAB5] hover:bg-[#089B96] text-white px-8 py-3.5 rounded-xl font-bold transition-colors"
             >
-              💬 加 LINE 諮詢
+              {t('guides.cta.btn')}
             </a>
             <Link
               href="/products"
               className="inline-block border-2 border-[#0ABAB5] text-[#0ABAB5] hover:bg-[#0ABAB5] hover:text-white px-8 py-3.5 rounded-xl font-bold transition-colors"
             >
-              瀏覽商品 →
+              {t('guideDetail.browse')}
             </Link>
           </div>
         </div>
@@ -107,7 +103,7 @@ export default function GuideDetail() {
         {/* 其他指南 */}
         {others.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-xl font-bold mb-5">其他選品指南</h2>
+            <h2 className="text-xl font-bold mb-5">{t('guideDetail.others')}</h2>
             <div className="grid sm:grid-cols-3 gap-4">
               {others.map(g => (
                 <Link
@@ -119,9 +115,9 @@ export default function GuideDetail() {
                     {g.cover}
                   </div>
                   <div className="p-4">
-                    <span className="text-[11px] font-bold text-[#089B96]">{g.cat}</span>
+                    <span className="text-[11px] font-bold text-[#089B96]">{t(`guides.${g.key}.cat`)}</span>
                     <h3 className="text-sm font-bold mt-1 leading-snug group-hover:text-[#0ABAB5] line-clamp-2">
-                      {g.title}
+                      {t(`guides.${g.key}.title`)}
                     </h3>
                   </div>
                 </Link>

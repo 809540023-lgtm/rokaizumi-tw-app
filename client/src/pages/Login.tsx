@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Login() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,14 +25,14 @@ export default function Login() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "發生錯誤，請稍後再試");
+        setError(data.error || t("login.errGeneric"));
         setLoading(false);
         return;
       }
       // 成功：重新載入讓 session 生效
       window.location.href = "/";
     } catch {
-      setError("網路錯誤，請稍後再試");
+      setError(t("login.errNetwork"));
       setLoading(false);
     }
   }
@@ -41,10 +43,10 @@ export default function Login() {
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-center mb-1">
-            {mode === "login" ? "會員登入" : "註冊新帳號"}
+            {mode === "login" ? t("login.title") : t("login.registerTitle")}
           </h1>
           <p className="text-center text-gray-500 text-sm mb-6">
-            登入後即可加入購物車並完成結帳
+            {t("login.sub")}
           </p>
 
           <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
@@ -55,7 +57,7 @@ export default function Login() {
                 mode === "login" ? "bg-white shadow text-[#0ABAB5]" : "text-gray-500"
               }`}
             >
-              登入
+              {t("login.tabLogin")}
             </button>
             <button
               type="button"
@@ -64,20 +66,20 @@ export default function Login() {
                 mode === "register" ? "bg-white shadow text-[#0ABAB5]" : "text-gray-500"
               }`}
             >
-              註冊
+              {t("login.tabRegister")}
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "register" && (
               <div>
-                <label className="block text-sm font-medium mb-1">姓名（選填）</label>
+                <label className="block text-sm font-medium mb-1">{t("login.name")}</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#0ABAB5]"
-                  placeholder="您的稱呼"
+                  placeholder={t("login.namePlaceholder")}
                 />
               </div>
             )}
@@ -93,14 +95,14 @@ export default function Login() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">密碼</label>
+              <label className="block text-sm font-medium mb-1">{t("login.password")}</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#0ABAB5]"
-                placeholder={mode === "register" ? "至少 6 個字" : "請輸入密碼"}
+                placeholder={mode === "register" ? t("login.passwordPlaceholderRegister") : t("login.passwordPlaceholderLogin")}
               />
             </div>
 
@@ -113,7 +115,7 @@ export default function Login() {
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-[#0ABAB5] text-white font-bold text-sm disabled:opacity-60"
             >
-              {loading ? "處理中..." : mode === "login" ? "登入" : "註冊並登入"}
+              {loading ? t("login.processing") : mode === "login" ? t("login.submit") : t("login.submitRegister")}
             </button>
           </form>
         </div>

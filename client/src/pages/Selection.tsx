@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { toast } from "sonner";
 import { Upload, Sparkles, X, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // 將圖片縮到最長邊 900px 的 JPEG data URL，避免資料量過大
 function resizeImage(file: File, maxSide = 900): Promise<string> {
@@ -40,6 +41,7 @@ function resizeImage(file: File, maxSide = 900): Promise<string> {
 }
 
 export default function Selection() {
+  const { t } = useLanguage();
   const { user } = useAuth() as any;
   const fileRef = useRef<HTMLInputElement>(null);
   const { data: categories = [] } = trpc.categories.list.useQuery();
@@ -55,7 +57,7 @@ export default function Selection() {
 
   const createMut = trpc.products.create.useMutation({
     onSuccess: () => {
-      toast.success("商品已上架！");
+      toast.success(t("selection.success"));
       setImages([]);
       setName("");
       setDescription("");
@@ -66,8 +68,8 @@ export default function Selection() {
     },
     onError: (e: any) =>
       toast.error(e?.message?.includes("permission") || e?.message?.includes("admin")
-        ? "上架需要管理員權限，請先開通你的帳號為管理員。"
-        : e?.message || "上架失敗"),
+        ? t("selection.errPermission")
+        : e?.message || t("selection.errPublish")),
   });
 
   async function handleFiles(files: FileList | null) {
@@ -85,7 +87,7 @@ export default function Selection() {
 
   async function runAI() {
     if (!images.length) {
-      toast.error("請先上傳至少一張商品圖片");
+      toast.error(t("selection.errNoImage"));
       return;
     }
     setAiLoading(true);
@@ -98,7 +100,7 @@ export default function Selection() {
       });
       const data = await res.json().catch(() => ({}));
       if (!data.ok) {
-        setAiNote(data.error || "AI 無法辨識，請手動填寫。");
+        setAiNote(data.error || t("selection.aiFail"));
         setAiLoading(false);
         return;
       }
@@ -106,7 +108,7 @@ export default function Selection() {
       if (d.name) setName(d.name);
       const feat =
         Array.isArray(d.features) && d.features.length
-          ? "\n\n【商品特色】\n" + d.features.map((f: string) => "・" + f).join("\n")
+          ? "\n\n" + t("selection.features") + "\n" + d.features.map((f: string) => "・" + f).join("\n")
           : "";
       setDescription((d.description || "") + feat);
       if (d.suggestedCategory) {
@@ -115,17 +117,17 @@ export default function Selection() {
         );
         if (match) setCategoryId(match.id);
       }
-      setAiNote("AI 已產生草稿，請確認與編輯後再上架。");
+      setAiNote(t("selection.aiDone"));
     } catch {
-      setAiNote("連線失敗，請手動填寫。");
+      setAiNote(t("selection.aiNetwork"));
     }
     setAiLoading(false);
   }
 
   function submit() {
-    if (!name.trim()) return toast.error("請輸入商品名稱");
-    if (!priceTWD) return toast.error("請輸入售價");
-    if (categoryId === "") return toast.error("請選擇分類");
+    if (!name.trim()) return toast.error(t("selection.errNoName"));
+    if (!priceTWD) return toast.error(t("selection.errNoPrice"));
+    if (categoryId === "") return toast.error(t("selection.errNoCategory"));
     createMut.mutate({
       name: name.trim(),
       description: description.trim(),
@@ -143,7 +145,7 @@ export default function Selection() {
       <div className="min-h-screen bg-[#FEF9F3] flex flex-col">
         <SiteHeader />
         <main className="flex-1 container mx-auto px-4 py-20 text-center">
-          <p className="text-gray-600">請先登入後使用選品上架。</p>
+          <p className="text-gray-600">{t("selection.loginRequired")}</p>
         </main>
         <SiteFooter />
       </div>
@@ -154,9 +156,9 @@ export default function Selection() {
     <div className="min-h-screen bg-[#FEF9F3] flex flex-col">
       <SiteHeader />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl w-full">
-        <h1 className="text-2xl font-bold mb-1">選品上架</h1>
+        <h1 className="text-2xl font-bold mb-1">{t("selection.title")}</h1>
         <p className="text-sm text-gray-500 mb-6">
-          上傳商品照片或截圖 → AI 自動帶出草稿 → 編輯後一鍵上架。
+          {t("selection.sub")}
         </p>
 
         {/* 圖片上傳 */}
@@ -172,7 +174,7 @@ export default function Selection() {
                   <X className="w-3 h-3" />
                 </button>
                 {i === 0 && (
-                  <span className="absolute bottom-0 left-0 text-[10px] bg-[#0ABAB5] text-white px-1 rounded-tr">主圖</span>
+                  <span className="absolute bottom-0 left-0 text-[10px] bg-[#0ABAB5] text-white px-1 rounded-tr">{t("selection.mainImage")}</span>
                 )}
               </div>
             ))}
@@ -181,7 +183,7 @@ export default function Selection() {
               className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-[#0ABAB5]"
             >
               <Upload className="w-5 h-5" />
-              <span className="text-[10px] mt-1">上傳</span>
+              <span className="text-[10px] mt-1">{t("selection.upload")}</span>
             </button>
             <input
               ref={fileRef}
@@ -198,7 +200,7 @@ export default function Selection() {
             className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E26D5C] text-white font-bold text-sm disabled:opacity-60"
           >
             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            AI 辨識並產生草稿
+            {t("selection.aiDraft")}
           </button>
           {aiNote && <div className="text-xs text-gray-500 mt-2">{aiNote}</div>}
         </div>
@@ -206,29 +208,29 @@ export default function Selection() {
         {/* 編輯欄位 */}
         <div className="bg-white rounded-2xl border border-gray-200 p-5 mt-4 space-y-4">
           <div>
-            <label className="block text-sm font-bold mb-1">商品名稱</label>
+            <label className="block text-sm font-bold mb-1">{t("selection.name")}</label>
             <input value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-1">商品說明</label>
+            <label className="block text-sm font-bold mb-1">{t("selection.description")}</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={6} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div className="grid sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-bold mb-1">售價（NT$）</label>
+              <label className="block text-sm font-bold mb-1">{t("selection.price")}</label>
               <input value={priceTWD} onChange={(e) => setPriceTWD(e.target.value.replace(/[^0-9]/g, ""))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">分類</label>
+              <label className="block text-sm font-bold mb-1">{t("selection.category")}</label>
               <select value={categoryId} onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : "")} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-                <option value="">請選擇</option>
+                <option value="">{t("selection.selectPlaceholder")}</option>
                 {(categories as any[]).map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold mb-1">庫存</label>
+              <label className="block text-sm font-bold mb-1">{t("selection.stock")}</label>
               <input value={stock} onChange={(e) => setStock(e.target.value.replace(/[^0-9]/g, ""))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           </div>
@@ -238,7 +240,7 @@ export default function Selection() {
             disabled={createMut.isPending}
             className="w-full py-2.5 rounded-lg bg-[#0ABAB5] text-white font-bold text-sm disabled:opacity-60"
           >
-            {createMut.isPending ? "上架中..." : "一鍵上架"}
+            {createMut.isPending ? t("selection.publishing") : t("selection.publish")}
           </button>
         </div>
       </main>

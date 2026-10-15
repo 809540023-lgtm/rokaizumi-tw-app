@@ -6,47 +6,29 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 import { LINE_ADD_FRIEND_URL, LINE_OFFICIAL_ACCOUNT_ID } from '@/lib/line';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const bullets = [
-  { icon: '💰', title: '批發折扣', desc: '訂購量越大、折扣越多，最高再省 22%' },
-  { icon: '📄', title: '月結發票', desc: '開立統編、可月結 30 / 60 天' },
-  { icon: '🤝', title: '專屬窗口', desc: '1 對 1 LINE 客服 + 中日雙語業務' },
-  { icon: '📦', title: '備品保留', desc: '常用品項預留庫存，下單隔日出貨' },
-  { icon: '🚛', title: '指定配送', desc: '可指定到貨時間，協助上樓組裝' },
-  { icon: '🩺', title: '專業諮詢', desc: '介護福祉士提供住戶適性建議' },
+const BULLETS = [
+  { icon: '💰', key: 'b1' },
+  { icon: '📄', key: 'b2' },
+  { icon: '🤝', key: 'b3' },
+  { icon: '📦', key: 'b4' },
+  { icon: '🚛', key: 'b5' },
+  { icon: '🩺', key: 'b6' },
 ];
 
-const useCases = [
-  {
-    icon: '🏥',
-    title: '長照中心 / 安養機構',
-    bullet: [
-      '床、輪椅、紙尿褲整批採購',
-      '可指定每月固定送貨日',
-      '可依住戶評估建議規格',
-    ],
-  },
-  {
-    icon: '🏠',
-    title: '居家照護業者',
-    bullet: [
-      '客戶個案推薦商品代採',
-      '可代開立發票給保險業者',
-      '備品快速到貨補件',
-    ],
-  },
-  {
-    icon: '🏢',
-    title: '醫療院所 / 復健所',
-    bullet: [
-      '專業復健器材直接進口',
-      '專案報價與年度合約',
-      '進貨稅前報價可詢',
-    ],
-  },
+const USE_CASES = [
+  { icon: '🏥', key: 'uc1' },
+  { icon: '🏠', key: 'uc2' },
+  { icon: '🏢', key: 'uc3' },
 ];
+
+// 送出的值維持中文（沿用資料庫既有格式），只有畫面文字跟著語系切換
+const TYPE_VALUES = ['長照中心', '醫院 / 診所', '居家照護', '輔具租賃', '其他'];
+const BUDGET_VALUES = ['1 萬以下', '1-5 萬', '5-10 萬', '10-30 萬', '30 萬以上'];
 
 export default function B2B() {
+  const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -63,16 +45,16 @@ export default function B2B() {
 
   const submitInquiry = trpc.b2bInquiries.create.useMutation({
     onSuccess: () => {
-      toast.success('已收到您的詢價，業務 1 個工作天內聯繫您');
+      toast.success(t('b2b.form.success'));
       setForm({ company: '', name: '', phone: '', email: '', type: '長照中心', monthlyBudget: '5-10 萬', message: '' });
     },
-    onError: (e) => toast.error(e.message || '送出失敗，請稍後再試'),
+    onError: (e) => toast.error(e.message || t('b2b.form.error')),
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.company || !form.name || !form.phone) {
-      toast.error('公司名稱、聯絡人、電話為必填');
+      toast.error(t('b2b.form.required'));
       return;
     }
     setSubmitting(true);
@@ -81,7 +63,7 @@ export default function B2B() {
     } else {
       // fallback if API not available
       await new Promise(r => setTimeout(r, 500));
-      toast.success('已收到您的詢價（fallback 模式）');
+      toast.success(t('b2b.form.fallback'));
     }
     setSubmitting(false);
   };
@@ -98,16 +80,14 @@ export default function B2B() {
       <section className="bg-gradient-to-br from-[#0ABAB5] to-[#089B96] text-white py-16">
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-white/15 text-sm font-bold mb-5">
-            企業合作・B2B
+            {t('b2b.eye')}
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-            長照中心 . 醫療院所 . 居家照護業者
+            {t('b2b.title.1')}
             <br />
-            專屬採購方案
+            {t('b2b.title.2')}
           </h1>
-          <p className="text-lg opacity-90 max-w-xl mx-auto">
-            已服務 140+ 間台灣長照與醫療機構，從單筆採購到年度合約皆可規劃。
-          </p>
+          <p className="text-lg opacity-90 max-w-xl mx-auto">{t('b2b.hero.sub')}</p>
         </div>
       </section>
 
@@ -115,11 +95,11 @@ export default function B2B() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bullets.map(b => (
-              <div key={b.title} className="bg-white p-7 rounded-2xl shadow-sm">
+            {BULLETS.map(b => (
+              <div key={b.key} className="bg-white p-7 rounded-2xl shadow-sm">
                 <div className="text-3xl mb-3">{b.icon}</div>
-                <h3 className="text-lg font-bold mb-2">{b.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{b.desc}</p>
+                <h3 className="text-lg font-bold mb-2">{t(`b2b.${b.key}.title`)}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{t(`b2b.${b.key}.desc`)}</p>
               </div>
             ))}
           </div>
@@ -131,20 +111,20 @@ export default function B2B() {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-12">
             <span className="inline-block text-[#0ABAB5] font-bold text-sm tracking-widest uppercase mb-3">
-              三大採購情境
+              {t('b2b.uc.eye')}
             </span>
-            <h2 className="text-3xl font-bold">每一種機構，都有對應的合作方式</h2>
+            <h2 className="text-3xl font-bold">{t('b2b.uc.title')}</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {useCases.map(uc => (
-              <div key={uc.title} className="bg-[#FEF9F3] p-7 rounded-2xl">
+            {USE_CASES.map(uc => (
+              <div key={uc.key} className="bg-[#FEF9F3] p-7 rounded-2xl">
                 <div className="text-4xl mb-3">{uc.icon}</div>
-                <h3 className="text-xl font-bold mb-3">{uc.title}</h3>
+                <h3 className="text-xl font-bold mb-3">{t(`b2b.${uc.key}.title`)}</h3>
                 <ul className="space-y-1.5 text-sm text-gray-600">
-                  {uc.bullet.map(b => (
-                    <li key={b} className="flex gap-1.5">
+                  {['1', '2', '3'].map(n => (
+                    <li key={n} className="flex gap-1.5">
                       <span className="text-[#16A34A]">✓</span>
-                      {b}
+                      {t(`b2b.${uc.key}.${n}`)}
                     </li>
                   ))}
                 </ul>
@@ -158,9 +138,9 @@ export default function B2B() {
       <section className="py-16 bg-gradient-to-b from-[#FEF9F3] to-white">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-2">填寫採購需求，1 個工作天內回覆</h2>
+            <h2 className="text-3xl font-bold mb-2">{t('b2b.form.title')}</h2>
             <p className="text-gray-600">
-              或直接加 LINE 客服：
+              {t('b2b.form.sub')}
               <a
                 href={LINE_ADD_FRIEND_URL}
                 target="_blank"
@@ -175,51 +155,51 @@ export default function B2B() {
           <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-md space-y-5">
             <div className="grid md:grid-cols-2 gap-4">
               <Field
-                label="公司 / 機構名稱"
+                label={t('b2b.form.company')}
                 required
                 value={form.company}
                 onChange={v => setForm({ ...form, company: v })}
               />
               <Field
-                label="聯絡人"
+                label={t('b2b.form.name')}
                 required
                 value={form.name}
                 onChange={v => setForm({ ...form, name: v })}
               />
               <Field
-                label="電話"
+                label={t('b2b.form.phone')}
                 type="tel"
                 required
                 value={form.phone}
                 onChange={v => setForm({ ...form, phone: v })}
               />
               <Field
-                label="Email"
+                label={t('b2b.form.email')}
                 type="email"
                 value={form.email}
                 onChange={v => setForm({ ...form, email: v })}
               />
               <Select
-                label="機構類型"
+                label={t('b2b.form.type')}
                 value={form.type}
                 onChange={v => setForm({ ...form, type: v })}
-                options={['長照中心', '醫院 / 診所', '居家照護', '輔具租賃', '其他']}
+                options={TYPE_VALUES.map((v, i) => ({ value: v, label: t(`b2b.type.${i + 1}`) }))}
               />
               <Select
-                label="預計月採購金額"
+                label={t('b2b.form.budget')}
                 value={form.monthlyBudget}
                 onChange={v => setForm({ ...form, monthlyBudget: v })}
-                options={['1 萬以下', '1-5 萬', '5-10 萬', '10-30 萬', '30 萬以上']}
+                options={BUDGET_VALUES.map((v, i) => ({ value: v, label: t(`b2b.budget.${i + 1}`) }))}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-1.5">採購需求 / 想了解的商品</label>
+              <label className="block text-sm font-bold mb-1.5">{t('b2b.form.message')}</label>
               <textarea
                 rows={4}
                 value={form.message}
                 onChange={e => setForm({ ...form, message: e.target.value })}
-                placeholder="例如：想採購 10 張電動介護床 + 月供 30 箱紙尿褲"
+                placeholder={t('b2b.form.messagePlaceholder')}
                 className="w-full px-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#0ABAB5]"
               />
             </div>
@@ -229,11 +209,9 @@ export default function B2B() {
               disabled={submitting}
               className="w-full bg-[#DC2626] hover:bg-[#B91C1C] disabled:opacity-60 text-white px-6 py-4 rounded-xl font-bold transition-colors"
             >
-              {submitting ? '送出中…' : '送出採購需求 →'}
+              {submitting ? t('b2b.form.submitting') : t('b2b.form.submit')}
             </button>
-            <p className="text-xs text-gray-400 text-center">
-              我們僅用您的資料聯繫此次詢價，不會做行銷推播
-            </p>
+            <p className="text-xs text-gray-400 text-center">{t('b2b.form.privacy')}</p>
           </form>
         </div>
       </section>
@@ -274,7 +252,7 @@ interface SelectProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  options: string[];
+  options: { value: string; label: string }[];
 }
 
 function Select({ label, value, onChange, options }: SelectProps) {
@@ -286,9 +264,9 @@ function Select({ label, value, onChange, options }: SelectProps) {
         onChange={e => onChange(e.target.value)}
         className="w-full px-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-[#0ABAB5]"
       >
-        {options.map((opt: string) => (
-          <option key={opt} value={opt}>
-            {opt}
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
           </option>
         ))}
       </select>

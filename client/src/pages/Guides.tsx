@@ -4,65 +4,20 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 import { LINE_ADD_FRIEND_URL } from '@/lib/line';
+import { useLanguage } from '@/contexts/LanguageContext';
 
+// 標題／摘要等文字放在 LanguageContext 的 guides.gN.* 底下，這裡只留不會變的資料
 export const guides = [
-  {
-    slug: 'japanese-wheelchair-2026',
-    cat: '輪椅',
-    title: '2026 日本介護輪椅完全選購指南',
-    excerpt: '10 大熱銷品牌、4 個選購重點，從重量到輪徑一次搞懂。台灣家屬必看。',
-    cover: '🦽',
-    readTime: '8 分鐘',
-    date: '2026-05-12',
-  },
-  {
-    slug: 'electric-care-bed-choose',
-    cat: '介護床',
-    title: '電動介護床怎麼挑？3 馬達 vs 2 馬達差別',
-    excerpt: '從起背、起腳、升降三種馬達，到防褥瘡床墊配對。長期臥床家屬指南。',
-    cover: '🛏️',
-    readTime: '6 分鐘',
-    date: '2026-05-05',
-  },
-  {
-    slug: 'bathroom-safety-checklist',
-    cat: '入浴',
-    title: '浴室防滑全方位佈置：5 件必備輔具',
-    excerpt: '90% 的長輩跌倒發生在浴室。從淋浴椅、扶手到防滑墊，一次到位。',
-    cover: '🚿',
-    readTime: '5 分鐘',
-    date: '2026-04-28',
-  },
-  {
-    slug: 'adult-diaper-guide',
-    cat: '紙尿褲',
-    title: '成人紙尿褲怎麼算最划算？吸收量、尺寸一次看',
-    excerpt: '夜用 vs 日用、ライフリー vs アクティ、整箱買為什麼省 30%。',
-    cover: '📦',
-    readTime: '5 分鐘',
-    date: '2026-04-15',
-  },
-  {
-    slug: 'ayumi-care-shoes',
-    cat: '介護鞋',
-    title: '徳武産業あゆみ介護鞋怎麼挑？外反母趾與糖尿病足版本',
-    excerpt: '從 3E、5E、7E 鞋寬，到單足販售、室內外兩用，每一型號適合誰一目了然。',
-    cover: '👟',
-    readTime: '7 分鐘',
-    date: '2026-04-08',
-  },
-  {
-    slug: 'totalcare-mobility',
-    cat: '移動輔具',
-    title: '從手杖到電動輪椅：長輩行動能力 5 階段對照',
-    excerpt: '怎麼判斷該升級到下一階段？專業介護福祉士幫您做完整評估表。',
-    cover: '🚶',
-    readTime: '9 分鐘',
-    date: '2026-04-01',
-  },
+  { slug: 'japanese-wheelchair-2026', key: 'g1', cover: '🦽', date: '2026-05-12' },
+  { slug: 'electric-care-bed-choose', key: 'g2', cover: '🛏️', date: '2026-05-05' },
+  { slug: 'bathroom-safety-checklist', key: 'g3', cover: '🚿', date: '2026-04-28' },
+  { slug: 'adult-diaper-guide', key: 'g4', cover: '📦', date: '2026-04-15' },
+  { slug: 'ayumi-care-shoes', key: 'g5', cover: '👟', date: '2026-04-08' },
+  { slug: 'totalcare-mobility', key: 'g6', cover: '🚶', date: '2026-04-01' },
 ];
 
 export default function Guides() {
+  const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -78,14 +33,12 @@ export default function Guides() {
       <section className="bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] py-16">
         <div className="container mx-auto px-4 max-w-3xl text-center">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#0ABAB5]/12 text-[#089B96] text-sm font-bold mb-4">
-            選品指南・採購直擊
+            {t('video.title')}
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-            買對工具，照護就輕一半。
+            {t('guides.title')}
           </h1>
-          <p className="text-lg text-gray-600">
-            由日本介護福祉士撰寫，每篇都針對台灣家庭的真實情境。
-          </p>
+          <p className="text-lg text-gray-600">{t('guides.sub')}</p>
         </div>
       </section>
 
@@ -100,15 +53,15 @@ export default function Guides() {
                   </div>
                   <div className="p-5">
                     <span className="text-xs font-bold text-[#089B96] tracking-wider uppercase">
-                      {g.cat}
+                      {t(`guides.${g.key}.cat`)}
                     </span>
                     <h3 className="text-lg font-bold mt-2 mb-2 leading-snug group-hover:text-[#0ABAB5]">
-                      {g.title}
+                      {t(`guides.${g.key}.title`)}
                     </h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{g.excerpt}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-4">{t(`guides.${g.key}.excerpt`)}</p>
                     <div className="flex justify-between items-center text-xs text-gray-400">
                       <span>{g.date}</span>
-                      <span>{g.readTime}閱讀</span>
+                      <span>{t(`guides.${g.key}.readTime`)}{t('guides.readTime')}</span>
                     </div>
                   </div>
                 </Link>
@@ -120,17 +73,15 @@ export default function Guides() {
       {/* CTA */}
       <section className="py-16 bg-white text-center">
         <div className="container mx-auto px-4 max-w-2xl">
-          <h2 className="text-3xl font-bold mb-3">不確定該買哪一款？</h2>
-          <p className="text-gray-600 mb-6">
-            加 LINE 客服，由介護福祉士為您家中長輩 1 對 1 推薦最適合的款式。
-          </p>
+          <h2 className="text-3xl font-bold mb-3">{t('guides.cta.title')}</h2>
+          <p className="text-gray-600 mb-6">{t('guides.cta.sub')}</p>
           <a
             href={LINE_ADD_FRIEND_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-[#0ABAB5] hover:bg-[#089B96] text-white px-10 py-4 rounded-xl font-bold transition-colors"
           >
-            💬 加 LINE 諮詢
+            {t('guides.cta.btn')}
           </a>
         </div>
       </section>
