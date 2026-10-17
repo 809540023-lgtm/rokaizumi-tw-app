@@ -7,7 +7,7 @@
     <title>ROKA IZUMI｜日本嚴選商店</title>
     <meta
       name="description"
-      content="日本大阪出貨的嚴選商店。68款面膜與眼膜、日本超市必買101選、好市多28款，查看商品與介紹。"
+      content="日本大阪出貨的嚴選商店。面膜、日本超市、日本好市多與專屬賣場商品，查看商品與介紹。"
     />
     <link
       rel="icon"
@@ -28,7 +28,7 @@
       <nav aria-label="商店分類">
         <span class="nav-caption">選擇商品分類</span>
         <div class="catalog-switch">
-          <button class="active" data-tab="costco" aria-label="日本好市多">日本好市多<small>28 款</small></button><button data-tab="supermarket" aria-label="日本超市必買">日本超市必買<small>101 款</small></button><button data-tab="shop" aria-label="面膜選物">面膜選物<small>68 款</small></button>
+          <button class="active" data-tab="costco" aria-label="日本好市多">日本好市多<small>28 款</small></button><button data-tab="supermarket" aria-label="日本超市必買">日本超市必買<small>101 款</small></button><button data-tab="shop" aria-label="面膜選物">面膜選物<small>68 款</small></button><button data-tab="exclusive" aria-label="專屬賣場">專屬賣場<small>1 款</small></button>
         </div>
         <div class="utility-switch">
           <button data-tab="bag">購物袋 <span id="bagcount">0</span></button
@@ -46,6 +46,15 @@
         </ul>
         <p><strong>下單後七個工作天內從日本寄出。</strong>送達時間另計。</p>
       </aside>
+      <section id="exclusive" class="hidden">
+        <div class="intro">
+          <p class="edition">EXCLUSIVE LISTING</p>
+          <h1>專屬賣場</h1>
+          <p>指定商品專區，商品規格與使用注意事項請見商品詳情。</p>
+          <p class="muted">售價與可選數量請見商品詳情。填寫收件資料後直接刷卡付款。</p>
+        </div>
+        <div id="exclusive-products" class="grid"></div>
+      </section>
       <section id="costco">
         <div class="intro">
           <p class="edition">JAPAN COSTCO SELECTION / VOL. 01</p>
@@ -90,7 +99,7 @@
         <h1>購物說明</h1>
         <div class="panel">
           <p>
-            面膜、日本超市與好市多商品可合併選購。商品小計需滿
+            面膜、日本超市、好市多與專屬賣場商品可合併選購。商品小計需滿
             NT$2,000，不含運費。
           </p>
           <p>
@@ -107,7 +116,7 @@
       </section>
       <p><a href="policies.html">商店資料・購物條款與隱私說明</a></p>
       <footer>
-        ろかいずみ合同会社（ROKA IZUMI）<br />日本面膜・日本超市必買・日本好市多
+        ろかいずみ合同会社（ROKA IZUMI）<br />日本面膜・日本超市必買・日本好市多・專屬賣場
         · 日本嚴選商店<br /><a href="mailto:info@rokaizumi-tw.jp"
           >info@rokaizumi-tw.jp</a
         ><br /><a href="admin.html">商店管理登入</a>
@@ -159,10 +168,14 @@
           window.COSTCO_PRODUCTS = d.products.filter(
             p => p.catalog === "costco"
           );
+          window.EXCLUSIVE_PRODUCTS = d.products.filter(
+            p => p.catalog === "exclusive"
+          );
           for (const [tab, key] of [
             ["shop", "PRODUCTS"],
             ["supermarket", "SUPERMARKET_PRODUCTS"],
             ["costco", "COSTCO_PRODUCTS"],
+            ["exclusive", "EXCLUSIVE_PRODUCTS"],
           ]) {
             document.querySelector(
               '[data-tab="' + tab + '"] small'
@@ -177,7 +190,7 @@
             document.querySelector(".notice").textContent =
               "Stripe 測試環境｜不會實際扣款";
           const js = document.createElement("script");
-          js.src = "app.js?v=20261014-customer-copy-2";
+          js.src = "app.js?v=20261018-exclusive-fengmin-1";
           document.body.appendChild(js);
         } catch {
           document.querySelector(".notice").textContent =

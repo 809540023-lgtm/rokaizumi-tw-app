@@ -27,3 +27,5 @@ nav[aria-label="商店分類"]{display:flex;align-items:center;gap:16px;max-widt
 .test-consent{display:flex;flex-direction:row;align-items:flex-start;gap:10px;margin:18px 0}.test-consent input{width:auto;flex:none;margin-top:5px}
 
 .shipping-rules{background:var(--soft);margin:0 0 28px}.shipping-rules h2{font-size:18px;margin:0 0 8px}.shipping-rules ul{margin:0}.shipping-rules li{margin:4px 0}.shipping-rules p{margin:10px 0 0}
+
+@media(max-width:600px){.catalog-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
