@@ -9,9 +9,9 @@ let currentCatalog =
     ? "exclusive"
     : location.hash === "#shop"
       ? "shop"
-    : location.hash === "#supermarket"
-      ? "supermarket"
-      : "costco";
+      : location.hash === "#supermarket"
+        ? "supermarket"
+        : "costco";
 let groceryCategory = "全部";
 const cart = new Map();
 let shippingMethod = "ems";
