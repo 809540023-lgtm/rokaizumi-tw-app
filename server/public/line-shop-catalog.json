@@ -3987,5 +3987,20 @@
     "stock": 10,
     "source": "https://www.costco.co.jp/c/SANA-Soy-Milk-Isoflavone-Eye-Cream-30g-x-3/p/75900",
     "photoNote": "商品編號已對應；包裝為參考。"
+  },
+  {
+    "id": "EXC001",
+    "name": "くらしリズム 衣物去漬片 10盒組-鳳敏",
+    "jp": "くらしリズム シミ取りシート 個包装",
+    "spec": "10盒／組；每盒5包，共50包；單片約100×150mm",
+    "weight": 400,
+    "tag": "專屬賣場",
+    "desc": "日本製「くらしリズム」衣物去漬片，方便外出攜帶。每盒5包，10盒共50包，單片約100×150mm。使用時可先在污漬背面墊上紙巾，再以去漬片讓液體滲入污漬，輕柔拍拭後夾起帶走。適用於水性與油性污漬的應急處理；效果會因污漬種類與放置時間而異，頑固污漬請交由專業洗衣店處理。請勿用於人體；使用前先在衣物不明顯處測試，使用後請清洗衣物並洗淨手部。詳細注意事項以包裝標示為準。",
+    "source": "https://shop.tsuruha.co.jp/10136511.html",
+    "jan": "4582451693452",
+    "price": 1170,
+    "image": "/line-shop/stain-remover-sheets-10-boxes.jpg",
+    "stock": 2,
+    "catalog": "exclusive"
   }
 ]
