@@ -29,3 +29,15 @@ nav[aria-label="商店分類"]{display:flex;align-items:center;gap:16px;max-widt
 .shipping-rules{background:var(--soft);margin:0 0 28px}.shipping-rules h2{font-size:18px;margin:0 0 8px}.shipping-rules ul{margin:0}.shipping-rules li{margin:4px 0}.shipping-rules p{margin:10px 0 0}
 
 @media(max-width:600px){.catalog-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Make product-category selectors read clearly as buttons. */
+nav[aria-label="商店分類"]{display:block;padding:14px 20px 18px;background:linear-gradient(90deg,#edf6f8,#fff)}
+.nav-caption{display:block;margin:0 0 9px;color:var(--ink);font-size:16px;letter-spacing:.04em}
+.catalog-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.catalog-switch button{min-height:68px;align-items:center;justify-content:center;text-align:center;border:2px solid #7d9eaf;border-radius:14px;background:#fff;color:var(--ink);padding:11px 14px;box-shadow:0 3px 0 #102c421c;transition:background .15s,border-color .15s,transform .15s}
+.catalog-switch button:hover{background:#e7f3f6;border-color:var(--blue);transform:translateY(-2px)}
+.catalog-switch button.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 0 #102c4233}
+.catalog-switch small{display:inline-flex;align-items:center;margin-top:5px;padding:2px 9px;border-radius:99px;background:#e7f1f5;color:#31566a;font-weight:700}
+.catalog-switch button.active small{background:#ffffff30;color:#fff}
+@media(max-width:850px){nav[aria-label="商店分類"]{padding:12px 16px 15px}.catalog-switch{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.utility-switch{margin-top:8px}}
+@media(max-width:600px){.catalog-switch button{min-height:64px;padding:9px 8px;font-size:15px}.nav-caption{font-size:15px}}
