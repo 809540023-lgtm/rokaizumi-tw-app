@@ -12,6 +12,7 @@ dist
 *.zip
 *.tar
 *.gz
-data/
+data/*
+!data/products-full.json
 backups/
 deploy/ecs/README.md
