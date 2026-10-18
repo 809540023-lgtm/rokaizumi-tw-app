@@ -1,0 +1,39 @@
+# Staging only: access via SSH tunnel (127.0.0.1:3000).
+# Does NOT migrate an existing production database or change DNS.
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/ecs/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../../.env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: mysql://rokaizumi:${DB_PASSWORD:?Set_DB_PASSWORD}@db:3306/rokaizumi
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 650m
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: rokaizumi
+      MYSQL_USER: rokaizumi
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set_DB_ROOT_PASSWORD}
+    volumes:
+      - ecs_mysql_data:/var/lib/mysql
+    command: ["--innodb-buffer-pool-size=128M", "--max-connections=30", "--performance-schema=OFF"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    mem_limit: 650m
+volumes:
+  ecs_mysql_data:
