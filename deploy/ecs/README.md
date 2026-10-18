@@ -47,4 +47,28 @@ idempotent and runs on every boot:
 docker compose --env-file .env -f deploy/ecs/compose.yaml restart app
 ```
 
+A healthy first boot looks like this:
+
+```
+✅ 資料庫連線池已建立
+✅ 資料庫連線測試通過
+🆕 偵測到全新資料庫，開始初始化
+🔧 開始建立資料表（20 個 migration）
+✅ 資料表建立完成
+📦 匯入 1619 筆商品…
+✅ 已匯入 1619 筆商品、21 個分類
+Server running on http://localhost:3000/
+```
+
+If you see `❌ 資料庫連線測試失敗: self-signed certificate in certificate chain`,
+`DATABASE_SSL=false` is missing — the compose MySQL uses a self-signed cert that
+`rejectUnauthorized` will not accept.
+
+## Verified
+
+The image and the bootstrap were exercised end-to-end against a throwaway
+MySQL 8.0 before this was committed: 23 tables created, 1619 products
+(1399 with descriptions) and 21 categories imported, `/api/health` returning
+`{"status":"ok"}` and `products.list` serving rows from the database.
+
 Before production cutover: inventory all sites/branches, capture checksummed DB and uploads backups, compare orders/users, test checkout/webhooks/mail/LINE, add a reverse proxy with valid TLS, then change DNS. This staging stack is not a completed production migration.
