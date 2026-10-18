@@ -9,6 +9,14 @@ const data = [
   [27, 'Fruit & Flower Cake'], [28, 'Strawberry Cake'],
   [29, 'Knitted Mitten + Yarn Ball (1 of each)'], [30, 'Rose Ball (1 candle · random colour)']
 ];
+// Fill these five labels when the scent list is confirmed. The dropdown stays hidden until all five are ready.
+const scentOptions = [
+  { value: 'scent-1', label: '' },
+  { value: 'scent-2', label: '' },
+  { value: 'scent-3', label: '' },
+  { value: 'scent-4', label: '' },
+  { value: 'scent-5', label: '' },
+];
 const selected = new Set();
 let orderPlaced = false;
 let submitting = false;
@@ -18,6 +26,27 @@ const orderForm = document.getElementById('order-form');
 const paymentOptions = document.createElement('fieldset');
 paymentOptions.className = 'payment-options';
 paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" checked> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="bank_transfer"> Australian bank transfer</label>';
+const readyScentOptions = scentOptions.filter(option => option.label.trim());
+if (readyScentOptions.length === 5) {
+  const scentLabel = document.createElement('label');
+  scentLabel.htmlFor = 'scent-choice';
+  scentLabel.textContent = 'Choose one fragrance for your set';
+  const scentSelect = document.createElement('select');
+  scentSelect.id = 'scent-choice';
+  scentSelect.name = 'scent';
+  scentSelect.required = true;
+  scentSelect.setAttribute('aria-describedby', 'scent-help');
+  scentSelect.add(new Option('Choose a fragrance', ''));
+  for (const option of readyScentOptions)
+    scentSelect.add(new Option(option.label, option.value));
+  const scentHelp = document.createElement('small');
+  scentHelp.id = 'scent-help';
+  scentHelp.textContent = 'One fragrance will be used for all five candles.';
+  const noteLabel = orderForm.querySelector('label[for="order-note"]');
+  orderForm.insertBefore(scentLabel, noteLabel);
+  orderForm.insertBefore(scentSelect, noteLabel);
+  orderForm.insertBefore(scentHelp, noteLabel);
+}
 orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
 document.querySelector('#order .order-grid > div:first-child p').textContent = '5 for A$99, including delivery to Australia from Japan. Choose five designs and enter your delivery details. You can pay securely by credit card through Stripe or by local Australian bank transfer. Production begins after payment is confirmed, and we provide a courier tracking number within 3 business days of receiving payment.';
 document.querySelector('#order-help > p').textContent = 'Delivery to Australia · A$99 total. Choose card payment or bank transfer after entering your details.';
@@ -120,6 +149,12 @@ document.getElementById('order-form').addEventListener('submit', async event => 
   const status = document.getElementById('order-status');
   const button = document.getElementById('submit-order');
   const fields = Object.fromEntries(new FormData(form));
+  const scentSelect = form.querySelector('#scent-choice');
+  if (scentSelect?.value) {
+    const scentName = scentSelect.selectedOptions[0].textContent.trim();
+    fields.note = [fields.note?.trim(), `Fragrance choice: ${scentName}`].filter(Boolean).join('\\n\\n');
+    delete fields.scent;
+  }
   const payload = { ...fields, items: [...selected].sort((a, b) => a - b) };
   submitting = true;
   status.textContent = 'Submitting your order…';
