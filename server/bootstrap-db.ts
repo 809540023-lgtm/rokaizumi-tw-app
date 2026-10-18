@@ -31,6 +31,77 @@ function toTiDBCompatible(sql: string): string {
   return sql.replace(/(`?\w+`?\s+json)\s+DEFAULT\s*\([^)]*\)/gi, '$1');
 }
 
+/**
+ * 把 migration 檔切成單一語句。
+ *
+ * drizzle-kit 產生的檔案用 `--> statement-breakpoint` 分隔，但手寫的
+ * 0013_v4_additions.sql 沒有標記，整份檔案會被當成一句送出去而語法錯誤，
+ * 導致 newsletter_subscribers / b2b_inquiries / product_reviews 三張表
+ * 永遠建不起來。這裡兩種格式都支援：逐字元掃描，跳過註解與字串常值，
+ * 遇到分號才切。
+ */
+function splitStatements(sql: string): string[] {
+  const statements: string[] = [];
+  let current = '';
+  let quote: string | null = null;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let i = 0; i < sql.length; i++) {
+    const ch = sql[i];
+    const next = sql[i + 1];
+
+    if (inLineComment) {
+      if (ch === '\n') {
+        inLineComment = false;
+        current += ch;
+      }
+      continue;
+    }
+    if (inBlockComment) {
+      if (ch === '*' && next === '/') {
+        inBlockComment = false;
+        i++;
+      }
+      continue;
+    }
+    if (quote) {
+      current += ch;
+      if (ch === '\\') {
+        current += next ?? '';
+        i++;
+      } else if (ch === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (ch === '-' && next === '-') {
+      inLineComment = true;
+      i++;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      inBlockComment = true;
+      i++;
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === '`') {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+    if (ch === ';') {
+      statements.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  statements.push(current);
+
+  return statements.map(s => s.trim()).filter(Boolean);
+}
+
 /** 依序套用 drizzle 產生的 migration SQL */
 async function applyMigrations(pool: any) {
   const dir = ['drizzle', '../drizzle', '../../drizzle']
@@ -51,11 +122,7 @@ async function applyMigrations(pool: any) {
 
   for (const file of files) {
     const sql = toTiDBCompatible(fs.readFileSync(path.join(dir, file), 'utf-8'));
-    // drizzle 用 --> statement-breakpoint 分隔每一道 SQL
-    const statements = sql
-      .split(/--> statement-breakpoint/)
-      .map(s => s.trim())
-      .filter(Boolean);
+    const statements = splitStatements(sql);
 
     for (const stmt of statements) {
       try {

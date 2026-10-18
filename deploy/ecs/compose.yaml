@@ -12,6 +12,9 @@ services:
       NODE_ENV: production
       PORT: "3000"
       DATABASE_URL: mysql://rokaizumi:${DB_PASSWORD:?Set_DB_PASSWORD}@db:3306/rokaizumi
+      # db 是 compose 內網的服務名稱，MySQL 8.0 的自簽憑證過不了
+      # rejectUnauthorized，必須明確關閉 TLS。
+      DATABASE_SSL: "false"
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:

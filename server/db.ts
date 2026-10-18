@@ -160,6 +160,8 @@ initializeFallbackDB();
  */
 function isInternalHost(host: string): boolean {
   if (!host || host === 'localhost' || host === '127.0.0.1') return true;
+  // 沒有網點的主機名不可能是公開網域，例如 Docker Compose 的服務名稱 `db`。
+  if (!host.includes('.')) return true;
   // RFC1918 私有網段：10.x / 172.16-31.x / 192.168.x
   return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host);
 }

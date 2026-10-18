@@ -3,10 +3,13 @@ import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
-import { createServer as createViteServer } from "vite";
-import viteConfig from "../../vite.config";
 
 export async function setupVite(app: Express, server: Server) {
+  // vite 與 vite.config.ts 只在開發模式用到，而且都是 devDependencies。
+  // 這裡刻意用動態 import：esbuild 打包時會保持 external，正式環境
+  // （pnpm install --prod）才不會因為缺少 vite 而在啟動時 ERR_MODULE_NOT_FOUND。
+  const { createServer: createViteServer } = await import("vite");
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -14,8 +17,9 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
+    // 讓 Vite 自己載入設定檔，避免把 vite.config.ts 及其 devDependencies
+    // 一起打包進 dist/index.js。
+    configFile: path.resolve(import.meta.dirname, "../..", "vite.config.ts"),
     server: serverOptions,
     appType: "custom",
   });
