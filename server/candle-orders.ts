@@ -396,7 +396,7 @@ router.post("/", async (req, res) => {
     try { await db.query("ALTER TABLE candle_orders ADD COLUMN payment_method varchar(32) NOT NULL DEFAULT 'bank_transfer'"); } catch { /* existing column */ }
     try { await db.query("ALTER TABLE candle_orders ADD COLUMN stripe_session_id varchar(255) NULL"); } catch { /* existing column */ }
     await db.execute("INSERT INTO candle_orders (id,created_at,customer_name,customer_email,customer_phone,street_address,suburb,state,postcode,items,note,payment_method,status) VALUES (?,UTC_TIMESTAMP(),?,?,?,?,?,?,?,?,?,?,?)", [id, name, email, phone, street, suburb, state, postcode, JSON.stringify(items), note, paymentMethod, "awaiting_payment"]);
-    const order: CandleOrder = { id, name, email, phone, street, suburb, state, postcode, items, note: note!, market: "AU", paymentMethod };
+    const order: CandleOrder = { id, name, email, phone, street, suburb, state, postcode: postcode!, items, note: note!, market: "AU", paymentMethod };
     let checkoutUrl: string | undefined;
     if (paymentMethod === "card") {
       const session = await createCandleCheckout(order, "AU");
