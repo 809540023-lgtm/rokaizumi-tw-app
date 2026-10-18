@@ -81,7 +81,7 @@ export function shippingQuote(packedWeightGrams: unknown, subtotalTwd: number) {
   return {
     packedWeightGrams: Number(packedWeightGrams),
     emsJpy,
-    shippingTwd: orderShippingTwd(subtotalTwd),
+    shippingTwd: subtotalTwd > 0 ? orderShippingTwd(subtotalTwd) : 0,
   };
 }
 export function resolveShopItems(input: unknown, products: ShopProduct[]) {
