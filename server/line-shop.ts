@@ -190,6 +190,7 @@ async function catalog(db: Pool | PoolConnection) {
         delete publicProduct.jan;
         delete publicProduct.source;
       }
+      if (product.id === "EXC002") delete publicProduct.source;
       return publicProduct;
     });
 }
