@@ -13,6 +13,8 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+# Render 部署設定含 TiDB 主機／帳號等資訊，不可提交
+.env.render
 
 # IDE and editor files
 .vscode/

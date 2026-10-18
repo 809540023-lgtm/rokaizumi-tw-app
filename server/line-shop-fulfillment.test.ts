@@ -9,14 +9,29 @@ const mocks = vi.hoisted(() => ({
   commit: vi.fn(),
   rollback: vi.fn(),
   release: vi.fn(),
+  // initialize() 的庫存遷移會自己開一條連線並 commit 一次；用獨立的 spy，
+  // 才不會讓那次 commit 混進訂單交易的斷言。
+  migration: {
+    beginTransaction: vi.fn(),
+    commit: vi.fn(),
+    rollback: vi.fn(),
+    release: vi.fn(),
+  },
 }));
 vi.mock("./_core/sdk", () => ({ sdk: { authenticateRequest: mocks.auth } }));
 vi.mock("mysql2/promise", () => ({
   default: {
-    createPool: () => ({
-      query: mocks.query,
-      getConnection: async () => mocks,
-    }),
+    createPool: () => {
+      let connections = 0;
+      return {
+        query: mocks.query,
+        // 第一次 getConnection() 來自 initialize()，之後才是請求的交易。
+        getConnection: async () =>
+          ++connections === 1
+            ? { query: mocks.query, execute: mocks.execute, ...mocks.migration }
+            : mocks,
+      };
+    },
   },
 }));
 import router from "./line-shop";
@@ -31,7 +46,11 @@ async function update(
 ) {
   vi.clearAllMocks();
   vi.stubEnv("DATABASE_URL", "mysql://localhost/shop");
-  mocks.query.mockResolvedValue([[]]);
+  // initialize() 會用 GET_LOCK 取得庫存遷移鎖，回傳值必須是 acquired=1，
+  // 否則 database() 會拋錯，路由一律回 503。
+  mocks.query.mockImplementation(async (sql: string) =>
+    String(sql).includes("GET_LOCK") ? [[{ acquired: 1 }]] : [[]]
+  );
   mocks.auth.mockResolvedValue({ role: admin ? "admin" : "user" });
   mocks.execute.mockImplementation(async (sql: string) =>
     sql.startsWith("SELECT * FROM line_shop_orders")

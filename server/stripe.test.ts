@@ -1,25 +1,44 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// ENV 在模組載入時就讀取 process.env，所以必須在 import 之前設定。
+vi.hoisted(() => {
+  process.env.STRIPE_SECRET_KEY = 'sk_test_checkout';
+});
+
+vi.mock('stripe', () => ({
+  default: vi.fn(() => ({
+    checkout: {
+      sessions: {
+        create: vi.fn().mockResolvedValue({
+          id: 'cs_test_123',
+          url: 'https://checkout.stripe.com/pay/cs_test_123',
+        }),
+      },
+    },
+  })),
+}));
+
+// 這個測試只驗證 Stripe 結帳流程，資料庫以 mock 取代，
+// 才不會依賴 CI 的 MySQL 服務、種子商品與 users 外鍵。
+vi.mock('./db', async importOriginal => ({
+  ...(await importOriginal<typeof import('./db')>()),
+  getProductById: vi.fn(async (id: number) => ({
+    id,
+    name: `Test Product ${id}`,
+    price: 10000,
+    stock: 100,
+    status: 'available',
+  })),
+  createOrder: vi.fn(async () => 1),
+  setOrderStripeSessionId: vi.fn(async () => undefined),
+}));
+
 import { appRouter } from './routers';
-import { createMsw } from './_core/testUtils';
 
 describe('Stripe Payment Integration', () => {
   let caller: any;
 
   beforeEach(() => {
-    // Mock Stripe
-    vi.mock('stripe', () => ({
-      default: vi.fn(() => ({
-        checkout: {
-          sessions: {
-            create: vi.fn().mockResolvedValue({
-              id: 'cs_test_123',
-              url: 'https://checkout.stripe.com/pay/cs_test_123',
-            }),
-          },
-        },
-      })),
-    }));
-
     // Create a test caller with mock context
     caller = appRouter.createCaller({
       user: {

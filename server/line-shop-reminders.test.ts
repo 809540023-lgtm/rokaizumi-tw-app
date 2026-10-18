@@ -4,6 +4,10 @@ import { canRemind, reminderText } from "./line-shop-reminders";
 const m = vi.hoisted(() => ({
   query: vi.fn(),
   execute: vi.fn(),
+  beginTransaction: vi.fn(),
+  commit: vi.fn(),
+  rollback: vi.fn(),
+  release: vi.fn(),
   retrieve: vi.fn(),
   send: vi.fn(),
   close: vi.fn(),
@@ -18,7 +22,21 @@ vi.mock("stripe", () => ({
   },
 }));
 vi.mock("mysql2/promise", () => ({
-  default: { createPool: () => ({ query: m.query, execute: m.execute }) },
+  default: {
+    createPool: () => ({
+      query: m.query,
+      execute: m.execute,
+      // initialize() 會透過 getConnection() 取得庫存遷移鎖。
+      getConnection: async () => ({
+        query: m.query,
+        execute: m.execute,
+        beginTransaction: m.beginTransaction,
+        commit: m.commit,
+        rollback: m.rollback,
+        release: m.release,
+      }),
+    }),
+  },
 }));
 vi.mock("nodemailer", () => ({
   default: { createTransport: () => ({ sendMail: m.send, close: m.close }) },
@@ -69,6 +87,7 @@ beforeEach(() => {
     messageId: "msg1",
   });
   m.query.mockImplementation(async (sql: string) => {
+    if (sql.includes("GET_LOCK")) return [[{ acquired: 1 }]];
     if (sql.includes("INNER JOIN line_shop_mail original"))
       return [[...(mails.length ? [] : [order])]];
     if (sql.startsWith("SELECT * FROM line_shop_mail"))
