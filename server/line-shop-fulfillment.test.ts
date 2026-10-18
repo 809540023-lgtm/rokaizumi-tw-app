@@ -31,7 +31,11 @@ async function update(
 ) {
   vi.clearAllMocks();
   vi.stubEnv("DATABASE_URL", "mysql://localhost/shop");
-  mocks.query.mockResolvedValue([[]]);
+  // initialize() 會用 GET_LOCK 取得庫存遷移鎖，回傳值必須是 acquired=1，
+  // 否則 database() 會拋錯，路由一律回 503。
+  mocks.query.mockImplementation(async (sql: string) =>
+    String(sql).includes("GET_LOCK") ? [[{ acquired: 1 }]] : [[]]
+  );
   mocks.auth.mockResolvedValue({ role: admin ? "admin" : "user" });
   mocks.execute.mockImplementation(async (sql: string) =>
     sql.startsWith("SELECT * FROM line_shop_orders")

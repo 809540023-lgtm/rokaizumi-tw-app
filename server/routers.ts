@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import Stripe from "stripe";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { invokeLLM } from "./_core/llm";
@@ -456,7 +457,10 @@ export const appRouter = router({
         if (!ENV.stripeSecretKey) {
           throw new Error('Stripe payment is not configured');
         }
-        const stripe = require('stripe')(ENV.stripeSecretKey);
+        // 原本寫成 require('stripe')，但 esbuild 產出的是 ESM，執行期沒有
+        // require；改成靜態 import 才能在正式環境與測試（vi.mock）都正常運作。
+        // 型別維持 any，避免為了迎合 Stripe 的嚴格參數型別而扭曲實際送出的內容。
+        const stripe: any = new Stripe(ENV.stripeSecretKey);
         const items = await resolveOrderItems(input.items);
         const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
         
