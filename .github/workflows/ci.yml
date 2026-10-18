@@ -42,13 +42,8 @@ jobs:
       - name: Type check
         run: pnpm check
 
-      - name: Run tests
-        env:
-          DATABASE_URL: mysql://root:test@localhost:3306/rokaizumi_test
-          JWT_SECRET: test-secret-at-least-32-chars-long-string-here
-          NODE_ENV: test
-        run: pnpm test
-
+      # Build artifacts are needed for ECS staging even if integration tests
+      # later reveal missing test fixtures or database schema.
       - name: Build
         run: pnpm build
 
@@ -58,3 +53,10 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+      - name: Run tests
+        env:
+          DATABASE_URL: mysql://root:test@localhost:3306/rokaizumi_test
+          JWT_SECRET: test-secret-at-least-32-chars-long-string-here
+          NODE_ENV: test
+        run: pnpm test
