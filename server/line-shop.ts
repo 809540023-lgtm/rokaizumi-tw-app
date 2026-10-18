@@ -184,6 +184,7 @@ async function catalog(db: Pool | PoolConnection) {
         source: product.source,
         ingredients: product.ingredients,
         storage: product.storage,
+        freeShipping: product.freeShipping === true,
       };
       if (product.catalog === "costco") {
         delete publicProduct.jan;
@@ -622,14 +623,19 @@ async function preparePayment(id: string, packedWeightGrams?: unknown) {
       await conn.commit();
       return summary(order);
     }
+    const orderItems = parsed<ShopItem[]>(order.items_json);
+    const shippingSubtotalTwd = orderItems.reduce(
+      (n, item) => n + (item.freeShipping ? 0 : item.unitPriceTwd * item.quantity),
+      0
+    );
     quote =
       packedWeightGrams === undefined
         ? {
-            shippingTwd: orderShippingTwd(Number(order.subtotal)),
+            shippingTwd: shippingSubtotalTwd > 0 ? orderShippingTwd(shippingSubtotalTwd) : 0,
             emsJpy: order.ems_jpy ?? null,
             packedWeightGrams: order.weight_grams ?? null,
           }
-        : shippingQuote(packedWeightGrams, Number(order.subtotal));
+        : shippingQuote(packedWeightGrams, shippingSubtotalTwd || 1);
     if (order.status !== "awaiting_quote" && order.status !== "quoting")
       throw new ShopInputError("此訂單不能再次建立付款");
     if (
@@ -679,14 +685,14 @@ async function preparePayment(id: string, packedWeightGrams?: unknown) {
           },
           quantity: i.quantity,
         })),
-        {
+        ...(quote.shippingTwd > 0 ? [{
           price_data: {
-            currency: "twd",
+            currency: "twd" as const,
             unit_amount: quote.shippingTwd * 100,
-            product_data: { name: "EMS 運費（商品滿NT$5,000免運）" },
+            product_data: { name: "EMS 運費（一般商品運費規則）" },
           },
           quantity: 1,
-        },
+        }] : []),
       ],
       success_url: `${origin()}/line-shop/payment-result.html?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin()}/line-shop/payment-result.html?cancelled=1`,
