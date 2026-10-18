@@ -1,0 +1,17 @@
+.git
+.github
+node_modules
+dist
+.env
+.env.*
+!.env.example
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.zip
+*.tar
+*.gz
+data/
+backups/
+deploy/ecs/README.md
