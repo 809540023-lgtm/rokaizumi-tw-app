@@ -23,6 +23,28 @@ curl -I http://127.0.0.1:3000/
 
 If the server is remote, use `ssh -L 3000:127.0.0.1:3000 USER@ECS_IP` from a local computer and open `http://127.0.0.1:3000`.
 
-**Do not run** `pnpm db:push`, `scripts/seed-220-products.mjs`, or restore any SQL until an authoritative production backup is verified, a migration plan is approved, and the schema is compared. This compose setup creates an empty staging DB; features that need tables will fail until a **staging-only** schema is provisioned. Never use `docker compose down -v` on a database containing valuable data.
+**Do not run** `pnpm db:push`, `scripts/seed-220-products.mjs`, or restore any SQL until an authoritative production backup is verified, a migration plan is approved, and the schema is compared. This compose setup creates an empty staging DB; the app provisions its own schema on first boot (see below). Never use `docker compose down -v` on a database containing valuable data.
+
+## Schema bootstrap
+
+`server/db.ts` calls `bootstrapDatabase()` once the pool connects. It applies every
+`drizzle/*.sql` migration (idempotently, ignoring already-exists errors) and seeds
+`products` from `data/products-full.json`. The runtime image therefore ships
+`drizzle/` and `data/products-full.json` alongside `dist/` — do not remove those
+`COPY` lines from `deploy/ecs/Dockerfile`, or the container will come up with an
+empty database and silently fall back to static data.
+
+Watch the first boot to confirm it worked:
+
+```bash
+docker compose --env-file .env -f deploy/ecs/compose.yaml logs -f app | grep -E "資料庫|bootstrap|商品"
+```
+
+To re-run the bootstrap manually, restart the app container — the bootstrap is
+idempotent and runs on every boot:
+
+```bash
+docker compose --env-file .env -f deploy/ecs/compose.yaml restart app
+```
 
 Before production cutover: inventory all sites/branches, capture checksummed DB and uploads backups, compare orders/users, test checkout/webhooks/mail/LINE, add a reverse proxy with valid TLS, then change DNS. This staging stack is not a completed production migration.
