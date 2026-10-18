@@ -48,7 +48,7 @@ if (readyScentOptions.length === 5) {
   orderForm.insertBefore(scentHelp, noteLabel);
 }
 orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
-document.querySelector('#order .order-grid > div:first-child p').textContent = '5 for A$99, including delivery to Australia from Japan. Choose five designs and enter your delivery details. You can pay securely by credit card through Stripe or by local Australian bank transfer. Production begins after payment is confirmed, and we provide a courier tracking number within 3 business days of receiving payment.';
+document.querySelector('#order .order-grid > div:first-child p').textContent = 'Choose five designs for A$99, with delivery to Australia included. Pay by card or Australian bank transfer; we begin making your set after payment. Your tracking number is provided within 3 business days of payment. Delivery time is additional.';
 document.querySelector('#order-help > p').textContent = 'Delivery to Australia · A$99 total. Choose card payment or bank transfer after entering your details.';
 document.querySelector('#order .selected > small').textContent = 'No sign-up. A$99 total, including delivery. Choose card payment or bank transfer.';
 document.getElementById('submit-order').textContent = 'Continue to secure payment · A$99';
