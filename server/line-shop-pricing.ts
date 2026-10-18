@@ -12,6 +12,7 @@ export type ShopItem = {
   name: string;
   quantity: number;
   unitPriceTwd: number;
+  freeShipping?: boolean;
 };
 export class ShopInputError extends Error {}
 export const TERMS_VERSION = "2026-10-11-line-shop-v4";
@@ -105,14 +106,19 @@ export function resolveShopItems(input: unknown, products: ShopProduct[]) {
       name: p.name,
       quantity: i.quantity,
       unitPriceTwd: p.price,
+      freeShipping: p.freeShipping === true,
     };
   });
   const subtotalTwd = items.reduce(
     (n, i) => n + i.unitPriceTwd * i.quantity,
     0
   );
-  orderShippingTwd(subtotalTwd);
-  return { items, subtotalTwd };
+  const shippingSubtotalTwd = items.reduce(
+    (n, i) => n + (i.freeShipping ? 0 : i.unitPriceTwd * i.quantity),
+    0
+  );
+  if (shippingSubtotalTwd > 0) orderShippingTwd(shippingSubtotalTwd);
+  return { items, subtotalTwd, shippingSubtotalTwd };
 }
 export function validPaidSession(
   session: {
