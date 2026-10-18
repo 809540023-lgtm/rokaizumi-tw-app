@@ -8,6 +8,7 @@ import {
 } from "./line-shop-pricing";
 const products = [
   { id: "M001", name: "面膜", price: 500, stock: 10, catalog: "shop" },
+  { id: "EXC002", name: "市田柿", price: 799, stock: 120, catalog: "exclusive", freeShipping: true },
 ] as ShopProduct[];
 describe("LINE shop server prices and minimum", () => {
   it("ignores a forged browser price and enforces the product subtotal", () => {
@@ -24,6 +25,21 @@ describe("LINE shop server prices and minimum", () => {
         [{ ...products[0], price: 499 }]
       )
     ).toThrow("2,000");
+  });
+  it("allows the shipping-exempt Ichida-gaki below the normal minimum", () => {
+    expect(resolveShopItems([{ productId: "EXC002", quantity: 1 }], products)).toMatchObject({
+      subtotalTwd: 799,
+      shippingSubtotalTwd: 0,
+      items: [{ freeShipping: true }],
+    });
+    expect(resolveShopItems([
+      { productId: "M001", quantity: 4 },
+      { productId: "EXC002", quantity: 1 },
+    ], products).shippingSubtotalTwd).toBe(2000);
+    expect(() => resolveShopItems([
+      { productId: "M001", quantity: 2 },
+      { productId: "EXC002", quantity: 1 },
+    ], products)).toThrow("2,000");
   });
   it("rejects duplicate, removed, fractional and out of stock items", () => {
     for (const items of [

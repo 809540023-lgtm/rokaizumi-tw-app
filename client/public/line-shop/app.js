@@ -55,27 +55,18 @@ function price(p) {
   return p.price;
 }
 function totals() {
-  let count = 0,
-    subtotal = 0,
-    weight = 100,
-    weightUnknown = false;
+  let count = 0, subtotal = 0, shippingSubtotal = 0, hasFreeShipping = false,
+    weight = 100, weightUnknown = false;
   for (const p of P) {
-    const q = cart.get(p.id) || 0;
-    count += q;
-    subtotal += q * price(p);
+    const q = cart.get(p.id) || 0; count += q; subtotal += q * price(p);
+    if (q && p.freeShipping) hasFreeShipping = true;
+    else shippingSubtotal += q * price(p);
     if (q && p.weight === null) weightUnknown = true;
     else weight += q * p.weight;
   }
-  const shipping = count ? (subtotal >= 5000 ? 0 : 220) : 0;
-  return {
-    count,
-    subtotal,
-    weight,
-    weightUnknown,
-    shipping,
-    method: shippingMethod,
-    total: shipping === null ? null : subtotal + shipping,
-  };
+  const shipping = !count || !shippingSubtotal ? 0 : (shippingSubtotal >= 5000 ? 0 : 220);
+  return { count, subtotal, shippingSubtotal, hasFreeShipping, weight, weightUnknown,
+    shipping, method: shippingMethod, total: subtotal + shipping };
 }
 function showTab(tab) {
   if (!["shop", "supermarket", "costco", "exclusive", "bag", "guide"].includes(tab)) return;
@@ -178,14 +169,17 @@ function renderCostco() {
 function renderExclusive() {
   $("exclusive-products").innerHTML = EXCLUSIVE.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "專屬賣場")}</span></div><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 組 · 運費另計</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "專屬賣場")}</span></div><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 組 · ${p.freeShipping ? "此商品免運" : "運費另計"}</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
   ).join("");
 }
 function sumHtml(t) {
-  return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>EMS 運費${t.subtotal >= 5000 ? "（免運）" : ""}</span><strong>${money(t.shipping)}</strong></div><p class="muted">商品滿 NT$2,000 可下單，運費 NT$220；商品滿 NT$5,000 免運（門檻不含運費）。</p><div class="sumrow total"><span>總額</span><span>${money(t.total)}</span></div></div>`;
+  const rule = t.hasFreeShipping ? (t.shippingSubtotal ? "市田柿免運；其他商品依一般運費規則計算。" : "市田柿此商品免運。") : "一般商品滿 NT$2,000 可下單，運費 NT$220；滿 NT$5,000 免運。";
+  return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>${t.shippingSubtotal ? "一般商品 EMS 運費" : "運費"}${t.shippingSubtotal >= 5000 ? "（免運）" : ""}</span><strong>${money(t.shipping)}</strong></div><p class="muted">${rule}</p><div class="sumrow total"><span>總額</span><span>${money(t.total)}</span></div></div>`;
 }
 function shippingOptions(t) {
-  return `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">商品 NT$2,000～4,999 運費 NT$220。填寫收件資料後直接刷卡付款，下單後七個工作天內從日本寄出。</p></div>`;
+  return t.hasFreeShipping
+    ? `<div class="shipping-options"><strong>市田柿 NT$799｜此商品免運</strong><p class="muted">${t.shippingSubtotal ? "購物袋內的其他一般商品仍依一般運費規則計算。" : "單買市田柿不受一般商品運費門檻限制，結帳金額 NT$799。"}</p></div>`
+    : `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">一般商品 NT$2,000～4,999 運費 NT$220。填寫收件資料後直接刷卡付款，下單後七個工作天內從日本寄出。</p></div>`;
 }
 function renderCart() {
   const t = totals();
@@ -208,7 +202,7 @@ function renderCart() {
         .join("") +
       shippingOptions(t) +
       sumHtml(t) +
-      `<button class="btn" id="startCheckout" ${t.subtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.subtotal < MIN_ORDER_TWD ? "還差 " + money(MIN_ORDER_TWD - t.subtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">最低訂購商品小計 NT$2,000（不含運費，面膜、超市、好市多與專屬賣場可合併計算）。填寫收件資料後直接進入 Stripe 刷卡付款。</p>`
+      `<button class="btn" id="startCheckout" ${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "一般商品還差 " + money(MIN_ORDER_TWD - t.shippingSubtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">${t.hasFreeShipping ? "市田柿 NT$799 免運；一般商品仍須達 NT$2,000 才可下單。" : "一般商品小計須滿 NT$2,000 才可下單（不含運費）。"}填寫收件資料後直接進入 Stripe 刷卡付款。</p>`
     : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
 function detail(id) {
@@ -216,19 +210,19 @@ function detail(id) {
   if (!p) return;
   $("detailtitle").textContent = p.name;
   $("detailbody").innerHTML =
-    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}${p.jp ? `<p class="meta">${esc(p.jp)}</p>` : ""}${p.catalog === "costco" ? `<p class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</p>` : ""}<section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>商品規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : "售價・運費另計"}</span></p><p><strong>可選數量上限：</strong>${p.catalog === "exclusive" ? p.stock + " 組" : p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p>${p.jan ? `<p class="muted">商品條碼（JAN）：${esc(p.jan)}</p>` : ""}${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>商品搭配方式供您參考；成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : p.catalog === "exclusive" ? `<section aria-label="使用與保存"><h3>使用與注意事項</h3><p>請依商品包裝標示使用。使用前先在衣物不明顯處測試；本品不可用於人體，使用後請清洗衣物並洗淨手部。</p><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p></section>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}<button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button>`;
+    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}${p.jp ? `<p class="meta">${esc(p.jp)}</p>` : ""}${p.catalog === "costco" ? `<p class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</p>` : ""}<section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>商品規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : (p.freeShipping ? "此商品免運" : "售價・運費另計")}</span></p><p><strong>可選數量上限：</strong>${p.catalog === "exclusive" ? p.stock + " 組" : p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p>${p.jan ? `<p class="muted">商品條碼（JAN）：${esc(p.jan)}</p>` : ""}${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>商品搭配方式供您參考；成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : p.catalog === "exclusive" ? `<section aria-label="使用與保存"><h3>使用與注意事項</h3><p>請依商品包裝標示使用。使用前先在衣物不明顯處測試；本品不可用於人體，使用後請清洗衣物並洗淨手部。</p><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p></section>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}<button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button>`;
   $("detail").showModal();
 }
 function checkout() {
   const t = totals();
-  if (t.subtotal < MIN_ORDER_TWD) return;
+  if (t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD) return;
   const c = window.SHOP_CONFIG;
   if (!c?.enabled) {
     toast("刷卡設定尚未完成，暫未開放下單");
     return;
   }
   $("checkoutbody").innerHTML =
-    `<p>免會員下單。填完收件資料後直接進入 Stripe 安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>（滿 NT$5,000 免運）。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往 Stripe 付款。</label><button class="btn" type="submit">前往 Stripe 刷卡付款</button></form>`;
+    `<p>免會員下單。填完收件資料後直接進入 Stripe 安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（市田柿免運）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往 Stripe 付款。</label><button class="btn" type="submit">前往 Stripe 刷卡付款</button></form>`;
   $("checkout").showModal();
 }
 let orderToken = null;
@@ -276,7 +270,7 @@ document.addEventListener("submit", async e => {
 });
 function showOrder(d) {
   $("checkoutbody").innerHTML =
-    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；EMS 運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>下單後七個工作天內從日本寄出。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
+    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>下單後七個工作天內從日本寄出。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
   if (!$("checkout").open) $("checkout").showModal();
 }
 async function refreshOrder() {
