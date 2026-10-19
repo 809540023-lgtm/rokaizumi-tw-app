@@ -11,11 +11,11 @@ const data = [
 ];
 // Fill these five labels when the scent list is confirmed. The dropdown stays hidden until all five are ready.
 const scentOptions = [
-  { value: 'scent-1', label: '' },
-  { value: 'scent-2', label: '' },
-  { value: 'scent-3', label: '' },
-  { value: 'scent-4', label: '' },
-  { value: 'scent-5', label: '' },
+  { value: 'scent-white-floral', label: 'A. White Floral' },
+  { value: 'scent-relaxing-herb', label: 'B. Relaxing Herb' },
+  { value: 'scent-sweet-berry', label: 'C. Sweet Berry' },
+  { value: 'scent-citrus-mint', label: 'D. Citrus Mint' },
+  { value: 'scent-unscented', label: 'E. Unscented' },
 ];
 const selected = new Set();
 let orderPlaced = false;
