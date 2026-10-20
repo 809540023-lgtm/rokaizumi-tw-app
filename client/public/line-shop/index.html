@@ -103,7 +103,7 @@
             NT$2,000，不含運費。
           </p>
           <p>
-            不用註冊或登入。挑好商品、填寫收件資料後，直接進入 Stripe 安全付款頁。付款前可查看商品小計、運費及總額。
+            不用註冊或登入。挑好商品、填寫收件資料後，直接進入安全付款頁。付款前可查看商品小計、運費及總額。
           </p>
           <p>
             日本郵政 EMS 配送。商品小計 NT$2,000～4,999 運費 NT$220，商品滿 NT$5,000 免運（門檻不含運費）。下單後七個工作天內從日本寄出，送達時間另計。
@@ -190,7 +190,7 @@
             document.querySelector(".notice").textContent =
               "Stripe 測試環境｜不會實際扣款";
           const js = document.createElement("script");
-          js.src = "app.js?v=20261019-ichida-gaki-free-shipping-1";
+          js.src = "app.js?v=20261021-hide-stripe-label-1";
           document.body.appendChild(js);
         } catch {
           document.querySelector(".notice").textContent =
