@@ -202,7 +202,7 @@ function renderCart() {
         .join("") +
       shippingOptions(t) +
       sumHtml(t) +
-      `<button class="btn" id="startCheckout" ${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "一般商品還差 " + money(MIN_ORDER_TWD - t.shippingSubtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">${t.hasFreeShipping ? "市田柿 NT$799 免運；一般商品仍須達 NT$2,000 才可下單。" : "一般商品小計須滿 NT$2,000 才可下單（不含運費）。"}填寫收件資料後直接進入 Stripe 刷卡付款。</p>`
+      `<button class="btn" id="startCheckout" ${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "一般商品還差 " + money(MIN_ORDER_TWD - t.shippingSubtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">${t.hasFreeShipping ? "市田柿 NT$799 免運；一般商品仍須達 NT$2,000 才可下單。" : "一般商品小計須滿 NT$2,000 才可下單（不含運費）。"}填寫收件資料後直接前往刷卡。</p>`
     : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
 function detail(id) {
@@ -222,7 +222,7 @@ function checkout() {
     return;
   }
   $("checkoutbody").innerHTML =
-    `<p>免會員下單。填完收件資料後直接進入 Stripe 安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（市田柿免運）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往 Stripe 付款。</label><button class="btn" type="submit">前往 Stripe 刷卡付款</button></form>`;
+    `<p>免會員下單。填完收件資料後直接進入安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（市田柿免運）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往刷卡。</label><button class="btn" type="submit">前往刷卡</button></form>`;
   $("checkout").showModal();
 }
 let orderToken = null;
@@ -270,7 +270,7 @@ document.addEventListener("submit", async e => {
 });
 function showOrder(d) {
   $("checkoutbody").innerHTML =
-    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}">前往 Stripe 刷卡付款</a>` : ""}<p>下單後七個工作天內從日本寄出。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
+    `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}" >前往刷卡付款</a>` : ""}<p>下單後七個工作天內從日本寄出。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
   if (!$("checkout").open) $("checkout").showModal();
 }
 async function refreshOrder() {
