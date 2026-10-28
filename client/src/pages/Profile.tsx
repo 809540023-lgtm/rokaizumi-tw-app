@@ -12,6 +12,7 @@ import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/lib/price';
 import { ProductImage } from '@/components/ProductImage';
 import { SiteHeader } from '@/components/SiteHeader';
+import { imgSrc } from '@/lib/imageSrc';
 
 export default function Profile() {
   const { language } = useLanguage();
@@ -388,7 +389,7 @@ export default function Profile() {
                   {wishlistData.map((item: any) => (
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                       <ProductImage
-                        src={item.wishlists_product?.imageUrl}
+                        src={imgSrc(item.wishlists_product?.imageUrl)}
                         alt={item.wishlists_product?.name || 'Product'}
                         className="aspect-square w-full bg-white object-contain p-3"
                       />

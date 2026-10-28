@@ -14,6 +14,7 @@ import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
 import candleOrdersRouter from "../candle-orders";
 import { registerAiRoutes } from "./ai";
+import { registerImageProxy } from "../image-proxy";
 import { maskAgentRouter } from "../mask/agentRoutes";
 import { registerMaskPhotoRoute } from "../mask/photos";
 import lineShopRouter, { registerLineShop, drainShopMail } from "../line-shop";
@@ -44,6 +45,8 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
   });
+  // 商品圖片代理（外部圖床防盜連時的後援）
+  registerImageProxy(app);
   // Stripe requires the untouched request body to verify its webhook signature.
   app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
   registerLineShop(app);

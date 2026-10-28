@@ -14,6 +14,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { useProductsFallback } from '../hooks/useProductsFallback';
 import { MAX_CART_QUANTITY, useCart } from '../hooks/useCart';
 import { ProductImage } from '@/components/ProductImage';
+import { imgSrc } from '@/lib/imageSrc';
 
 export default function HomePage() {
   const [location, setLocation] = useWouterLocation();
@@ -318,7 +319,7 @@ export default function HomePage() {
                   <Link href={`/product/${product.id}`} className="block">
                       <div className="w-full aspect-square bg-white overflow-hidden p-2 sm:p-3">
                         <ProductImage
-                          src={product.imageUrl}
+                          src={imgSrc(product.imageUrl)}
                           alt={product.name}
                           className="w-full h-full object-contain hover:scale-105 transition-transform"
                         />
@@ -393,7 +394,7 @@ export default function HomePage() {
                   <Link href={`/product/${product.id}`} className="block">
                       <div className="w-full aspect-square bg-white overflow-hidden p-2 sm:p-3">
                         <ProductImage
-                          src={product.imageUrl}
+                          src={imgSrc(product.imageUrl)}
                           alt={product.name}
                           className="w-full h-full object-contain hover:scale-105 transition-transform"
                         />

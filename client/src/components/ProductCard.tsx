@@ -1,6 +1,7 @@
 import { Link } from 'wouter';
 import { ShoppingCart, Eye, Star } from 'lucide-react';
 import { formatPrice, type PriceLanguage } from '@/lib/price';
+import { imgSrc } from '@/lib/imageSrc';
 
 interface Product {
   id: number;
@@ -37,7 +38,7 @@ export function ProductCard({
         <Link href={`/product/${product.id}`} className="block relative aspect-square bg-gray-100 overflow-hidden">
           {product.imageUrl ? (
             <img
-              src={product.imageUrl}
+              src={imgSrc(product.imageUrl)}
               alt={product.name}
               loading="lazy"
               className="w-full h-full object-contain p-3 group-hover:scale-[1.06] transition-transform duration-300"

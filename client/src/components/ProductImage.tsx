@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { imgSrc } from '@/lib/imageSrc';
 
 interface Props {
   src?: string | null;
@@ -31,7 +32,7 @@ export function ProductImage({ src, alt, className = '' }: Props) {
 
   return (
     <img
-      src={src}
+      src={imgSrc(src)}
       alt={alt}
       loading="lazy"
       onError={() => setFailed(true)}

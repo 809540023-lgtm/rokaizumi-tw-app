@@ -46,10 +46,13 @@ if (renderDbHost && renderDbName && renderDbUser && renderDbPassword) {
   process.exit(0);
 }
 
-// 3. 嘗試使用已知的 TiDB Cloud 參數
+// 3. 嘗試使用 TiDB Cloud 備用參數（連線資訊一律由環境變數提供）
 console.log('3️⃣ 嘗試 TiDB Cloud 備用參數...');
-if (process.env.TIDB_PASSWORD) {
-  const url = `mysql://3FVGt3RqCkiFaDE.0fde5e63513d:${process.env.TIDB_PASSWORD}@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/bMn2Gb7rjKtySEiV2r5RyX`;
+const tidbHost = process.env.TIDB_HOST;
+const tidbUser = process.env.TIDB_USER;
+const tidbDatabase = process.env.TIDB_DATABASE;
+if (process.env.TIDB_PASSWORD && tidbHost && tidbUser && tidbDatabase) {
+  const url = `mysql://${tidbUser}:${process.env.TIDB_PASSWORD}@${tidbHost}:4000/${tidbDatabase}`;
   process.env.DATABASE_URL = url;
   console.log('✅ 使用 TIDB_PASSWORD 變數');
   process.exit(0);

@@ -10,6 +10,7 @@ import { useMemo } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { ProductImage } from '@/components/ProductImage';
 import { SiteHeader } from '@/components/SiteHeader';
+import { imgSrc } from '@/lib/imageSrc';
 
 // 定義分類映射
 const ELDERLY_SUBCATEGORIES = ['健康監測', '安全監控', '床邊照護', '復健器材', '行動輔助', '衛浴安全', '護理用品', '生活輔具'];
@@ -123,7 +124,7 @@ export default function CategoryProducts() {
                 <Link href={`/product/${product.id}`} className="block">
                     <div className="relative">
                       <ProductImage
-                        src={product.imageUrl}
+                        src={imgSrc(product.imageUrl)}
                         alt={product.name}
                         className="w-full aspect-square bg-white object-contain p-3 hover:scale-105 transition-transform"
                       />

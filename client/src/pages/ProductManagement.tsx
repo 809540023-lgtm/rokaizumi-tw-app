@@ -14,6 +14,7 @@ import {
   X,
   Upload,
 } from 'lucide-react';
+import { imgSrc } from '@/lib/imageSrc';
 
 interface Product {
   id: number;
@@ -433,7 +434,7 @@ export default function ProductManagement() {
                       <div className="flex items-center gap-3">
                         {product.imageUrl && (
                           <img 
-                            src={product.imageUrl} 
+                            src={imgSrc(product.imageUrl)} 
                             alt={product.name}
                             className="w-10 h-10 object-cover rounded"
                           />

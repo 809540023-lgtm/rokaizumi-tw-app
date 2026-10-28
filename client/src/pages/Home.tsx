@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useLocation as useWouterLocation } from 'wouter';
 import { MobileMenu } from '@/components/MobileMenu';
+import { imgSrc } from '@/lib/imageSrc';
 
 export default function Home() {
   const [location, setLocation] = useWouterLocation();
@@ -232,7 +233,7 @@ export default function Home() {
                       {product.imageUrl && (
                         <div className="w-full h-48 bg-gray-200 overflow-hidden">
                           <img
-                            src={product.imageUrl}
+                            src={imgSrc(product.imageUrl)}
                             alt={product.name}
                             className="w-full h-full object-cover hover:scale-105 transition-transform"
                           />
@@ -306,7 +307,7 @@ export default function Home() {
                     {product.imageUrl && (
                       <div className="w-full h-48 bg-gray-200 overflow-hidden">
                         <img
-                          src={product.imageUrl}
+                          src={imgSrc(product.imageUrl)}
                           alt={product.name}
                           className="w-full h-full object-cover hover:scale-105 transition-transform"
                         />

@@ -5,13 +5,14 @@
 - 但 API 查詢 (categories.list, products.list 等) 返回 500 錯誤 ❌
 - 根本原因：`DATABASE_URL` 環境變量未在 Render 上設置
 
-## 🔍 已知的 TiDB Cloud 連接信息
+## 🔍 連線資訊
+實際的 host／user／database／密碼一律放在 Render Dashboard 的環境變數，不要寫進 repo。
 ```
-Host: gateway02.us-east-1.prod.aws.tidbcloud.com
+Host: <TIDB_HOST>
 Port: 4000
-User: 3FVGt3RqCkiFaDE.0fde5e63513d
-Database: bMn2Gb7rjKtySEiV2r5RyX
-Password: [需要在 Render Dashboard 中設置]
+User: <TIDB_USER>
+Database: <TIDB_DATABASE>
+Password: <在 Render Dashboard 設定>
 ```
 
 ## ✅ 快速修復步驟 (手動)
@@ -22,7 +23,7 @@ Password: [需要在 Render Dashboard 中設置]
 3. 進入 "Environment" 標籤
 4. 添加新的環境變數：
    ```
-   DATABASE_URL=mysql://3FVGt3RqCkiFaDE.0fde5e63513d:[PASSWORD]@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/bMn2Gb7rjKtySEiV2r5RyX
+   DATABASE_URL=mysql://<TIDB_USER>:[PASSWORD]@<TIDB_HOST>:4000/<TIDB_DATABASE>
    ```
 5. 點擊 "Deploy latest commit" 重新部署
 
@@ -35,7 +36,7 @@ curl -fsSL https://render.com/cli/install.sh | sh
 render login
 
 # 設置環境變數
-render env set DATABASE_URL "mysql://3FVGt3RqCkiFaDE.0fde5e63513d:[PASSWORD]@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/bMn2Gb7rjKtySEiV2r5RyX" --service rokaizumi-tw
+render env set DATABASE_URL "mysql://<TIDB_USER>:[PASSWORD]@<TIDB_HOST>:4000/<TIDB_DATABASE>" --service rokaizumi-tw
 
 # 部署
 render deploy --service rokaizumi-tw

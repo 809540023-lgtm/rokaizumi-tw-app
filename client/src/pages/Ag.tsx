@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LINE_ADD_FRIEND_URL } from "@/lib/line";
 import { trpc } from "@/lib/trpc";
+import { imgSrc } from '@/lib/imageSrc';
 
 type AgProduct = {
   id: number | string;
@@ -145,7 +146,7 @@ export default function Ag() {
                   >
                     {product.imageUrl ? (
                       <img
-                        src={product.imageUrl}
+                        src={imgSrc(product.imageUrl)}
                         alt={product.nameJa}
                         loading="lazy"
                         className="h-full w-full object-contain p-3"

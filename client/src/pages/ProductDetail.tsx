@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { MAX_CART_QUANTITY, useCart } from '@/hooks/useCart';
 import { SiteHeader } from '@/components/SiteHeader';
+import { imgSrc } from '@/lib/imageSrc';
 // ReviewSection removed per user request
 
 const manufacturerPageLine = /^(?:原廠頁面|原厂页面|原廠網站|原厂网站|メーカー(?:サイト|ページ)|公式(?:サイト|ページ)|official (?:page|website)|source url)\s*[:：].*$/i;
@@ -422,7 +423,7 @@ export default function ProductDetail() {
                       <div className="aspect-square bg-gray-200 overflow-hidden flex items-center justify-center relative">
                         {relatedProduct.imageUrl ? (
                           <img
-                            src={relatedProduct.imageUrl}
+                            src={imgSrc(relatedProduct.imageUrl)}
                             alt={relatedProduct.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           />

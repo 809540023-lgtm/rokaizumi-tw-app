@@ -5,6 +5,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { SiteHeader } from "@/components/SiteHeader";
 import { toast } from "sonner";
 import { Package, ClipboardList, Users, BarChart3, Pencil, Trash2, Search, Plus, X, ShieldCheck, Upload, FileSpreadsheet } from "lucide-react";
+import { imgSrc } from '@/lib/imageSrc';
 
 const A = trpc as any;
 
@@ -169,7 +170,7 @@ function ProductsTab() {
                 {list.map((p) => (
                   <tr key={p.id} className="border-t border-gray-100">
                     <td className="p-3"><div className="flex items-center gap-2">
-                      {p.imageUrl ? <img src={p.imageUrl} className="w-10 h-10 object-cover rounded border border-gray-100" /> : <div className="w-10 h-10 bg-gray-100 rounded" />}
+                      {p.imageUrl ? <img src={imgSrc(p.imageUrl)} className="w-10 h-10 object-cover rounded border border-gray-100" /> : <div className="w-10 h-10 bg-gray-100 rounded" />}
                       <span className="line-clamp-2 max-w-xs">{p.name}</span>
                     </div></td>
                     <td className="p-3 text-gray-600">{catName(p.categoryId)}</td>
