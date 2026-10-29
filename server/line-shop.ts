@@ -24,6 +24,23 @@ import {
 
 const router = Router();
 const origin = () => process.env.LINE_SHOP_ORIGIN || "https://rokaizumi-tw.jp";
+// The shop is also reachable on the Render host and on www before the
+// canonical redirect, so those same-site origins must be accepted too.
+const shopOrigins = () => {
+  const allowed = new Set([origin().replace(/\/+$/, "")]);
+  try {
+    const url = new URL(origin());
+    allowed.add(
+      `${url.protocol}//${url.hostname.startsWith("www.") ? url.hostname.slice(4) : `www.${url.hostname}`}`
+    );
+  } catch {}
+  if (process.env.RENDER_EXTERNAL_HOSTNAME)
+    allowed.add(`https://${process.env.RENDER_EXTERNAL_HOSTNAME}`);
+  return allowed;
+};
+const requestOrigin = (req: Request) =>
+  req.get("origin") ||
+  (req.get("referer") ? new URL(req.get("referer")!).origin : "");
 const live = () => process.env.LINE_SHOP_MODE === "live";
 const key = () => process.env.LINE_SHOP_STRIPE_SECRET_KEY || "";
 const configured = () =>
@@ -408,7 +425,13 @@ router.get(
 );
 router.use((req, res, next) => {
   if (req.method === "GET") return next();
-  if (req.get("origin") !== origin())
+  let submitted = "";
+  try {
+    submitted = requestOrigin(req);
+  } catch {
+    submitted = "";
+  }
+  if (!shopOrigins().has(submitted))
     return res.status(403).json({ error: "請從商店頁面提交" });
   next();
 });

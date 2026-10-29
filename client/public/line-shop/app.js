@@ -42,6 +42,40 @@ function saveCart() {
 }
 const MIN_ORDER_TWD = 2000;
 const $ = id => document.getElementById(id);
+const soldOut = p => !(p.stock > 0);
+const buyButton = p =>
+  soldOut(p) || p.price === null
+    ? `<button class="btn" disabled>${soldOut(p) ? "已售完" : "暫停加入"}</button>`
+    : `<button class="btn" data-add="${p.id}">加入購物袋</button>`;
+function openDialog(d) {
+  if (typeof d.showModal === "function") d.showModal();
+  else {
+    d.setAttribute("open", "");
+    d.classList.add("fallback-open");
+  }
+}
+function closeDialog(d) {
+  if (typeof d.close === "function") d.close();
+  else {
+    d.removeAttribute("open");
+    d.classList.remove("fallback-open");
+  }
+}
+function randomHex(bytes) {
+  const b = new Uint8Array(bytes);
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function")
+    crypto.getRandomValues(b);
+  else for (let i = 0; i < bytes; i++) b[i] = Math.floor(Math.random() * 256);
+  return Array.from(b, x => x.toString(16).padStart(2, "0")).join("");
+}
+function submissionId() {
+  return typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${randomHex(4)}-${randomHex(2)}-4${randomHex(2).slice(1)}-${
+        "89ab"[Math.floor(Math.random() * 4)]
+      }${randomHex(2).slice(1)}-${randomHex(6)}`;
+}
 const money = n => "NT$" + Math.round(n).toLocaleString("zh-TW");
 const esc = s =>
   String(s).replace(
@@ -140,7 +174,7 @@ function packImage(p) {
 function renderProducts() {
   $("products").innerHTML = MASKS.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${p.tag}</span></div><p class="price">${p.price === null ? "價格核對中" : money(price(p))}</p><p class="muted">${p.price === null ? `可選數量上限：${p.stock} 包／盒` : `可選數量上限：${p.stock} 包／盒 · 運費另計`}</p><button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button></div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${p.tag}</span></div><p class="price">${p.price === null ? "價格核對中" : money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : p.price === null ? `可選數量上限：${p.stock} 包／盒` : `可選數量上限：${p.stock} 包／盒 · 運費另計`}</p>${buyButton(p)}</div></article>`
   ).join("");
 }
 function renderGrocery() {
@@ -149,7 +183,7 @@ function renderGrocery() {
   )
     .map(
       p =>
-        `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 件 · 運費另計</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
+        `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · 運費另計`}</p>${buyButton(p)}</div></article>`
     )
     .join("");
   $("supermarket-count").textContent =
@@ -163,13 +197,13 @@ function renderGrocery() {
 function renderCostco() {
   $("costco-products").innerHTML = COSTCO.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 件 · 運費另計</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · 運費另計`}</p>${buyButton(p)}</div></article>`
   ).join("");
 }
 function renderExclusive() {
   $("exclusive-products").innerHTML = EXCLUSIVE.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "專屬賣場")}</span></div><p class="price">${money(price(p))}</p><p class="muted">可選數量上限：${p.stock} 組 · ${p.freeShipping ? "此商品免運" : "運費另計"}</p><button class="btn" data-add="${p.id}">加入購物袋</button></div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "專屬賣場")}</span></div><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 組 · ${p.freeShipping ? "此商品免運" : "運費另計"}`}</p>${buyButton(p)}</div></article>`
   ).join("");
 }
 function sumHtml(t) {
@@ -210,8 +244,8 @@ function detail(id) {
   if (!p) return;
   $("detailtitle").textContent = p.name;
   $("detailbody").innerHTML =
-    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}${p.jp ? `<p class="meta">${esc(p.jp)}</p>` : ""}${p.catalog === "costco" ? `<p class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</p>` : ""}<section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>商品規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : (p.freeShipping ? "此商品免運" : "售價・運費另計")}</span></p><p><strong>可選數量上限：</strong>${p.catalog === "exclusive" ? p.stock + " 組" : p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p>${p.jan ? `<p class="muted">商品條碼（JAN）：${esc(p.jan)}</p>` : ""}${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>商品搭配方式供您參考；成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : p.catalog === "exclusive" && p.id === "EXC002" ? `<section aria-label="保存提醒"><h3>保存提醒</h3><p>保存方式與期限請以實際商品包裝標示為準。</p></section>` : p.catalog === "exclusive" ? `<section aria-label="使用與保存"><h3>使用與注意事項</h3><p>請依商品包裝標示使用。使用前先在衣物不明顯處測試；本品不可用於人體，使用後請清洗衣物並洗淨手部。</p><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p></section>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}<button class="btn" data-add="${p.id}" ${p.price === null ? "disabled" : ""}>${p.price === null ? "暫停加入" : "加入購物袋"}</button>`;
-  $("detail").showModal();
+    `${p.image ? `<div class="detail-photo">${packImage(p)}</div>` : `<div class="detail-pending">${esc(p.jp)}<small>商品照片準備中</small></div>`}${p.jp ? `<p class="meta">${esc(p.jp)}</p>` : ""}${p.catalog === "costco" ? `<p class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</p>` : ""}<section aria-label="商品說明"><h3>商品說明</h3><p>${esc(p.desc)}</p></section><p><strong>商品規格：</strong>${esc(p.spec)}</p><p class="price">${p.price === null ? "價格核對中" : money(price(p))} <span class="muted">${p.price === null ? "" : (p.freeShipping ? "此商品免運" : "售價・運費另計")}</span></p><p><strong>${soldOut(p) ? "目前無現貨" : "可選數量上限："}</strong>${soldOut(p) ? "" : p.catalog === "exclusive" ? p.stock + " 組" : p.catalog === "supermarket" || p.catalog === "costco" ? p.stock + " 件" : p.stock + " 包／盒"}</p>${p.jan ? `<p class="muted">商品條碼（JAN）：${esc(p.jan)}</p>` : ""}${p.catalog === "costco" ? `<section aria-label="商品與保存"><h3>商品與保存</h3><p>成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section>` : p.catalog === "supermarket" ? `<section aria-label="食用與保存"><h3>食用與保存</h3><p>商品搭配方式供您參考；成分、過敏原、保存方式與期限，請以商品包裝標示為準。</p></section><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p>` : p.catalog === "exclusive" && p.id === "EXC002" ? `<section aria-label="保存提醒"><h3>保存提醒</h3><p>保存方式與期限請以實際商品包裝標示為準。</p></section>` : p.catalog === "exclusive" ? `<section aria-label="使用與保存"><h3>使用與注意事項</h3><p>請依商品包裝標示使用。使用前先在衣物不明顯處測試；本品不可用於人體，使用後請清洗衣物並洗淨手部。</p><p><a href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原廠商品資料</a></p></section>` : `<section aria-label="使用與保存"><h3>使用與保存</h3><p>請依商品包裝標示的使用部位、方式與敷用時間使用；使用後避免重複使用同一片。使用時若有不適，請停止使用。</p><p>多片裝開封後請密封保存，避免高溫及陽光直射。完整成分、保存期限與個別注意事項，請以收到的商品包裝標示為準。</p></section>`}${buyButton(p)}`;
+  openDialog($("detail"));
 }
 function checkout() {
   const t = totals();
@@ -223,7 +257,7 @@ function checkout() {
   }
   $("checkoutbody").innerHTML =
     `<p>免會員下單。填完收件資料後直接進入安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（市田柿免運）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往刷卡。</label><button class="btn" type="submit">前往刷卡</button></form>`;
-  $("checkout").showModal();
+  openDialog($("checkout"));
 }
 let orderToken = null;
 document.addEventListener("submit", async e => {
@@ -234,10 +268,8 @@ document.addEventListener("submit", async e => {
   if (button.disabled) return;
   button.disabled = true;
   try {
-    submissionKey ??= crypto.randomUUID();
-    orderToken ??= Array.from(crypto.getRandomValues(new Uint8Array(32)), x =>
-      x.toString(16).padStart(2, "0")
-    ).join("");
+    submissionKey ??= submissionId();
+    orderToken ??= randomHex(32);
     const data = Object.fromEntries(new FormData(form));
     const r = await fetch("/api/line-shop/orders", {
       method: "POST",
@@ -271,7 +303,7 @@ document.addEventListener("submit", async e => {
 function showOrder(d) {
   $("checkoutbody").innerHTML =
     `<div class="success"><h2>${d.status === "paid" ? "付款成功" : d.status === "pending" ? "訂單待付款" : d.status === "expired" ? "付款期限已過" : "付款連結準備中"}</h2><p>訂單：${esc(d.id)}</p><p>商品小計：${money(d.subtotalTwd)}；運費：${d.shippingTwd === null ? "待確認" : money(d.shippingTwd)}</p><p>${d.totalTwd === null ? "請稍後更新付款連結。" : "總額：" + money(d.totalTwd)}</p>${d.checkoutUrl ? `<a class="btn" href="${esc(d.checkoutUrl)}" >前往刷卡付款</a>` : ""}<p>下單後七個工作天內從日本寄出。請保留本頁連結；連結可查詢訂單，請勿公開分享。</p><button class="btn" id="refreshOrder">更新訂單狀態</button></div>`;
-  if (!$("checkout").open) $("checkout").showModal();
+  if (!$("checkout").open) openDialog($("checkout"));
 }
 async function refreshOrder() {
   const q = new URLSearchParams(location.search);
@@ -305,7 +337,7 @@ document.addEventListener("click", e => {
     } else if (b.dataset.tab) showTab(b.dataset.tab);
     else if (b.dataset.add) add(b.dataset.add);
     else if (b.dataset.detail) detail(b.dataset.detail);
-    else if (b.dataset.close) $(b.dataset.close).close();
+    else if (b.dataset.close) closeDialog($(b.dataset.close));
     else if (b.dataset.remove) setQuantity(b.dataset.remove, 0);
     else if (b.dataset.step)
       setQuantity(
