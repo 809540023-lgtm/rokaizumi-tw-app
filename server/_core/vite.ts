@@ -85,7 +85,22 @@ export function serveStatic(app: Express) {
     }
   }
 
-  app.use(express.static(distPath));
+  app.use(
+    express.static(distPath, {
+      setHeaders(res, filePath) {
+        // 商品圖檔名固定、內容不變，可以長期快取；HTML 每次都要驗證，
+        // 否則後台改完使用者還停在舊頁面。
+        if (filePath.includes(`${path.sep}line-shop${path.sep}img${path.sep}`))
+          res.setHeader("Cache-Control", "public, max-age=604800");
+      },
+    })
+  );
+
+  // 商品圖不存在時要老實回 404，不要掉到下面回傳 index.html，
+  // 不然瀏覽器會把 HTML 當成圖片。
+  app.use("/line-shop/img", (_req, res) => {
+    res.status(404).type("text/plain").send("Not found");
+  });
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {

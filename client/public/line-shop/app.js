@@ -146,7 +146,12 @@ function add(id, quantity = 1) {
   )
     throw Error("此商品目前無法加入購物袋");
   const next = (cart.get(id) || 0) + quantity;
-  if (next > p.stock) throw Error("超出這款商品庫存");
+  if (next > p.stock)
+    throw Error(
+      p.stock
+        ? `「${p.name}」最多只能選 ${p.stock} 件`
+        : `「${p.name}」目前沒有現貨`
+    );
   cart.set(id, next);
   saveCart();
   renderCart();
@@ -154,15 +159,21 @@ function add(id, quantity = 1) {
   return totals();
 }
 function setQuantity(id, q) {
-  if (
-    !P.some(
-      p => p.id === id && q <= p.stock && (q === 0 || Number.isFinite(p.price))
-    ) ||
-    !Number.isInteger(q) ||
-    q < 0
-  )
-    throw Error("數量無效");
-  q ? cart.set(id, q) : cart.delete(id);
+  const p = P.find(p => p.id === id);
+  if (!p) throw Error("找不到這款商品，請重新整理頁面");
+  if (!Number.isInteger(q) || q < 0) throw Error("數量無效");
+  if (q === 0) {
+    cart.delete(id);
+  } else {
+    if (p.price === null) throw Error("這款商品價格核對中，暫時無法選購");
+    if (q > p.stock)
+      throw Error(
+        p.stock
+          ? `「${p.name}」最多只能選 ${p.stock} 件`
+          : `「${p.name}」目前沒有現貨`
+      );
+    cart.set(id, q);
+  }
   saveCart();
   renderCart();
 }

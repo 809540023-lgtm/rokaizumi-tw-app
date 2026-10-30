@@ -84,6 +84,7 @@ const excluded = new Set([
   ].map(id => "COSTCO-" + id),
 ]);
 const STOCK_RESET_MIGRATION = "2026-10-14-stock-10";
+const SELF_HOSTED_IMAGES_MIGRATION = "2026-10-30-self-hosted-images";
 let pool: Pool | undefined;
 let initialization: Promise<void> | undefined;
 async function database() {
@@ -136,7 +137,7 @@ async function initialize(db: Pool) {
       "INSERT IGNORE INTO line_shop_products (id,data_json,stock) VALUES ?",
       [products.map(p => [p.id, JSON.stringify(p), p.stock])]
     );
-  await setStoreStockToTen(db);
+  await runShopMigrations(db);
 }
 // 後台改過的品名、說明、圖片等放在 admin_json，只有被改到的欄位才蓋掉目錄檔，
 // 沒改的仍跟著 line-shop-catalog.json 走。
@@ -170,29 +171,36 @@ async function ensureProductContentColumn(db: Pool) {
       "ALTER TABLE line_shop_products ADD COLUMN admin_json JSON NULL"
     );
 }
-async function setStoreStockToTen(db: Pool) {
-  const conn = await db.getConnection();
-  const lockName = "line_shop_stock_reset_2026_10_14";
-  try {
-    const [locks] = await conn.query<RowDataPacket[]>(
-      "SELECT GET_LOCK(?,60) AS acquired",
-      [lockName]
-    );
-    if (Number(locks[0]?.acquired) !== 1)
-      throw new Error("Could not acquire LINE shop stock migration lock");
+type MigrationConn = Pick<
+  PoolConnection,
+  "query" | "execute" | "beginTransaction" | "commit" | "rollback"
+>;
 
+// 一次性資料修正：先取鎖、確認 migration_key 沒套用過，再在交易裡執行。
+// 多個 migration 共用同一條連線，避免開機時把連線池佔滿。
+async function onceWithLock(
+  conn: MigrationConn,
+  lockName: string,
+  migrationKey: string,
+  run: () => Promise<void>
+) {
+  const [locks] = await conn.query<RowDataPacket[]>(
+    "SELECT GET_LOCK(?,60) AS acquired",
+    [lockName]
+  );
+  if (Number(locks[0]?.acquired) !== 1)
+    throw new Error(`Could not acquire LINE shop migration lock ${lockName}`);
+  try {
     await conn.beginTransaction();
     const [applied] = await conn.execute<RowDataPacket[]>(
       "SELECT migration_key FROM line_shop_migrations WHERE migration_key=? FOR UPDATE",
-      [STOCK_RESET_MIGRATION]
+      [migrationKey]
     );
     if (!applied.length) {
-      await conn.execute(
-        "UPDATE line_shop_products SET stock=10 WHERE active=TRUE AND id<>'EXC002'"
-      );
+      await run();
       await conn.execute(
         "INSERT INTO line_shop_migrations (migration_key) VALUES (?)",
-        [STOCK_RESET_MIGRATION]
+        [migrationKey]
       );
     }
     await conn.commit();
@@ -201,6 +209,48 @@ async function setStoreStockToTen(db: Pool) {
     throw error;
   } finally {
     await conn.query("SELECT RELEASE_LOCK(?)", [lockName]);
+  }
+}
+async function runShopMigrations(db: Pool) {
+  const conn = await db.getConnection();
+  try {
+    await onceWithLock(
+      conn,
+      "line_shop_stock_reset_2026_10_14",
+      STOCK_RESET_MIGRATION,
+      async () => {
+        await conn.execute(
+          "UPDATE line_shop_products SET stock=10 WHERE active=TRUE AND id<>'EXC002'"
+        );
+      }
+    );
+    // 商品圖原本外連到別人的測試站，對方關站就會全部失效。圖檔已改放在
+    // 本站 /line-shop/img/，但 catalog() 讀的是資料庫的 data_json，而開機
+    // 時的 INSERT IGNORE 不會更新既有資料列，所以這裡要一次性換掉舊網址。
+    await onceWithLock(
+      conn,
+      "line_shop_self_hosted_images_2026_10_30",
+      SELF_HOSTED_IMAGES_MIGRATION,
+      async () => {
+        const [rows] = await conn.query<RowDataPacket[]>(
+          "SELECT id,data_json FROM line_shop_products"
+        );
+        const localImages = new Map(seed.map(p => [p.id, p.image]));
+        for (const row of rows) {
+          const local = localImages.get(row.id);
+          if (!local || !local.startsWith("/line-shop/img/")) continue;
+          const stored = parsed<ShopProduct>(row.data_json);
+          const image = typeof stored.image === "string" ? stored.image : "";
+          // 只換掉外部圖床與內嵌 base64，後台自己填的網址不動。
+          if (!/chatgpt\.site|^data:image/.test(image)) continue;
+          await conn.execute(
+            "UPDATE line_shop_products SET data_json=? WHERE id=?",
+            [JSON.stringify({ ...stored, image: local }), row.id]
+          );
+        }
+      }
+    );
+  } finally {
     conn.release();
   }
 }
