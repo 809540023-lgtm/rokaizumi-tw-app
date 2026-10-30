@@ -1,5 +1,8 @@
 // ろかいずみ合同会社 Service Worker
-const CACHE_VERSION = 'v2';
+// 換版本會清掉舊快取。v3：HTML 不再內嵌 366KB 的 Manus runtime，
+// 舊快取裡的 / 還是那份 370KB 的舊殼，指到的 asset 也已經被新版本刪掉，
+// 離線時會開不起來，所以升版把舊快取清掉。
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `rokaizumi-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `rokaizumi-dynamic-${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';

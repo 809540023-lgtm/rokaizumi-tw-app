@@ -39,6 +39,13 @@ export type ProductListItem = Pick<
   | 'lowStockThreshold'
 >;
 
+/**
+ * 列表頁（首頁、商品列表、分類頁、相關商品）用不到長描述，
+ * 但 description 佔整包 1619 筆資料的八成（4MB 裡的 3.3MB），
+ * 所以列表一律不帶 description，要看描述請走 products.getById。
+ */
+export type ProductListCard = Omit<ProductListItem, 'description'>;
+
 const publicProductColumns = {
   id: products.id,
   name: products.name,
@@ -55,6 +62,14 @@ const publicProductColumns = {
   stock: products.stock,
   lowStockThreshold: products.lowStockThreshold,
 };
+
+const { description: _descriptionColumn, ...listCardColumns } =
+  publicProductColumns;
+
+function toListCard(product: ProductListItem): ProductListCard {
+  const { description: _description, ...card } = product;
+  return card;
+}
 
 function toPublicProduct(product: Record<string, any>): ProductListItem {
   return {
@@ -256,10 +271,12 @@ export async function createCategory(data: InsertCategory) {
 }
 
 // ========== Products ==========
-export async function getAllProducts(): Promise<ProductListItem[]> {
-  return withFallback<ProductListItem[]>(
-    () => db.select(publicProductColumns).from(products).orderBy(desc(products.createdAt)),
-    async () => (await getFallbackProducts()).map(toPublicProduct)
+export async function getAllProducts(): Promise<ProductListCard[]> {
+  return withFallback<ProductListCard[]>(
+    async () =>
+      (await db.select(listCardColumns).from(products).orderBy(desc(products.createdAt)))
+        .map(toListCard),
+    async () => (await getFallbackProducts()).map(toPublicProduct).map(toListCard)
   );
 }
 

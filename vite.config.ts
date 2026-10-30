@@ -4,10 +4,12 @@ import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "path";
 import { defineConfig } from "vite";
-import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
-
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
+// 注意：不要加回 vite-plugin-manus-runtime。
+// 它會在每一份 HTML 內嵌 366KB 的 Manus 主機橋接程式（runtime_dist/manus-runtime.js），
+// 那是給 Manus 預覽主機用的，本站部署在 Render，完全用不到，
+// 卻讓每次開啟頁面都要多下載並執行 366KB 的 JS（HTML 從 3KB 膨脹到 370KB）。
+const plugins = [react(), tailwindcss(), jsxLocPlugin()];
 
 export default defineConfig({
   plugins,

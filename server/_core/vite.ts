@@ -51,6 +51,24 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
+/**
+ * 靜態檔的 Cache-Control。回傳 null 代表用 express.static 的預設值（max-age=0，
+ * 每次都要回伺服器驗證），HTML 與商品 JSON 就是走這條。
+ */
+export function staticCacheControl(filePath: string): string | null {
+  // 商品圖檔名固定、內容不變，可以長期快取；HTML 每次都要驗證，
+  // 否則後台改完使用者還停在舊頁面。
+  if (filePath.includes(`${path.sep}line-shop${path.sep}img${path.sep}`))
+    return "public, max-age=604800";
+  // /assets/ 底下的檔名都帶內容雜湊，內容一變檔名就變，所以可以永久快取。
+  // 不設的話 express.static 預設是 max-age=0，每次開頁面都要重新驗證四支 JS，
+  // Cloudflare 也不會擺進邊緣快取（cf-cache-status: DYNAMIC）。
+  // sw.js 不在 /assets/ 底下，不受影響，更新才會立即生效。
+  if (filePath.includes(`${path.sep}assets${path.sep}`))
+    return "public, max-age=31536000, immutable";
+  return null;
+}
+
 export function serveStatic(app: Express) {
   // 優先級: dist/public > server/public > client/public
   let distPath = path.resolve(import.meta.dirname, "public");
@@ -88,10 +106,8 @@ export function serveStatic(app: Express) {
   app.use(
     express.static(distPath, {
       setHeaders(res, filePath) {
-        // 商品圖檔名固定、內容不變，可以長期快取；HTML 每次都要驗證，
-        // 否則後台改完使用者還停在舊頁面。
-        if (filePath.includes(`${path.sep}line-shop${path.sep}img${path.sep}`))
-          res.setHeader("Cache-Control", "public, max-age=604800");
+        const cacheControl = staticCacheControl(filePath);
+        if (cacheControl) res.setHeader("Cache-Control", cacheControl);
       },
     })
   );
