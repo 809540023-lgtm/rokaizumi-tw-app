@@ -6,11 +6,14 @@ import mysql, {
 } from "mysql2/promise";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
-import { randomUUID, createHash } from "node:crypto";
+import { randomUUID, randomBytes, createHash } from "node:crypto";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { markCandleOrderPaidByStripeSessionId } from "./candle-orders";
 import { canRemind, reminderText } from "./line-shop-reminders";
 import seed from "./public/line-shop-catalog.json";
 import { sdk } from "./_core/sdk";
+import { getSessionCookieOptions } from "./_core/cookies";
+import { hashPassword, verifyPassword } from "./_core/password";
 import {
   ShopInputError,
   resolveShopItems,
@@ -134,6 +137,24 @@ async function initialize(db: Pool) {
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_migrations (migration_key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`
   );
+  await db.query(
+    `CREATE TABLE IF NOT EXISTS line_shop_stores (
+      id VARCHAR(40) PRIMARY KEY,
+      owner_user_id INT NOT NULL,
+      name VARCHAR(120) NOT NULL,
+      contact_name VARCHAR(100) NOT NULL,
+      phone VARCHAR(40) NOT NULL,
+      email VARCHAR(320) NOT NULL,
+      line_id VARCHAR(100) NOT NULL DEFAULT '',
+      address VARCHAR(500) NOT NULL DEFAULT '',
+      tax_id VARCHAR(20) NOT NULL DEFAULT '',
+      status VARCHAR(20) NOT NULL DEFAULT 'active',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      UNIQUE KEY store_owner (owner_user_id)
+    )`
+  );
+  await ensureStoreColumn(db);
   const products = seed.filter(p => !excluded.has(p.id));
   if (products.length)
     await db.query(
@@ -183,7 +204,8 @@ function imageMime(bytes: Buffer): string | null {
     return "image/gif";
   return null;
 }
-function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {  const [label, max] = CONTENT_LIMITS[field];
+function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {
+  const [label, max] = CONTENT_LIMITS[field];
   if (typeof value !== "string")
     throw new ShopInputError(`${label}格式不正確`);
   const text = value.trim();
@@ -199,6 +221,15 @@ async function ensureProductContentColumn(db: Pool) {
   if (!cols.length)
     await db.query(
       "ALTER TABLE line_shop_products ADD COLUMN admin_json JSON NULL"
+    );
+}
+async function ensureStoreColumn(db: Pool) {
+  const [rows] = await db.query<RowDataPacket[]>(
+    "SELECT COUNT(*) AS n FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='line_shop_orders' AND COLUMN_NAME='store_id'"
+  );
+  if (!Number(rows[0]?.n))
+    await db.query(
+      "ALTER TABLE line_shop_orders ADD COLUMN store_id VARCHAR(40) NULL"
     );
 }
 type MigrationConn = Pick<
@@ -641,10 +672,11 @@ router.post(
     ]);
     const conn = await db.getConnection();
     const id = "RZ-" + randomUUID();
+    const storeId = await primaryStoreId(db);
     try {
       await conn.beginTransaction();
       await conn.execute(
-        "INSERT INTO line_shop_orders (id,request_key,request_hash,token_hash,items_json,customer_json,subtotal,mode) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO line_shop_orders (id,request_key,request_hash,token_hash,items_json,customer_json,subtotal,mode,store_id) VALUES (?,?,?,?,?,?,?,?,?)",
         [
           id,
           req.body.idempotencyKey,
@@ -654,6 +686,7 @@ router.post(
           JSON.stringify(customer),
           resolved.subtotalTwd,
           live() ? "live" : "test",
+          storeId,
         ]
       );
       await conn.commit();
@@ -679,12 +712,466 @@ router.get(
     res.json(summary(order));
   })
 );
+// ========== 商店登錄與後台登入 ==========
+
+function storeText(
+  value: unknown,
+  max: number,
+  label: string,
+  required = true
+) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) {
+    if (required) throw new ShopInputError(`請填寫${label}`);
+    return "";
+  }
+  if (text.length > max) throw new ShopInputError(`${label}不得超過 ${max} 字`);
+  return text;
+}
+
+function storeInput(body: any) {
+  const name = storeText(body?.name, 120, "商店名稱");
+  const contactName = storeText(body?.contactName, 100, "聯絡人");
+  const phone = storeText(body?.phone, 40, "聯絡電話");
+  if (!/^[+\d ()-]{8,40}$/.test(phone))
+    throw new ShopInputError("請填寫有效的聯絡電話");
+  const email = storeText(body?.email, 320, "聯絡 Email").toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    throw new ShopInputError("請填寫有效的聯絡 Email");
+  const lineId = storeText(body?.lineId, 100, "LINE ID", false);
+  const address = storeText(body?.address, 500, "商店地址", false);
+  const taxId = storeText(body?.taxId, 20, "統一編號", false);
+  if (taxId && !/^\d{8}$/.test(taxId))
+    throw new ShopInputError("統一編號為 8 位數字");
+  return { name, contactName, phone, email, lineId, address, taxId };
+}
+
+function storeView(row: RowDataPacket) {
+  return {
+    id: row.id,
+    name: row.name,
+    contactName: row.contact_name,
+    phone: row.phone,
+    email: row.email,
+    lineId: row.line_id,
+    address: row.address,
+    taxId: row.tax_id,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function storeByOwner(db: Pool | PoolConnection, ownerId: number) {
+  const [rows] = await db.execute<RowDataPacket[]>(
+    "SELECT * FROM line_shop_stores WHERE owner_user_id=?",
+    [ownerId]
+  );
+  return rows[0] || null;
+}
+
+/** 目前商店後台預設服務的商店：最早成立且啟用中的一間。 */
+async function primaryStoreId(db: Pool | PoolConnection) {
+  const [rows] = await db.query<RowDataPacket[]>(
+    "SELECT id FROM line_shop_stores WHERE status='active' ORDER BY created_at,id LIMIT 1"
+  );
+  return rows[0]?.id ? String(rows[0].id) : null;
+}
+
+async function shopUser(req: Request) {
+  try {
+    return await sdk.authenticateRequest(req);
+  } catch {
+    return null;
+  }
+}
+
+async function setShopSession(
+  req: Request,
+  res: Response,
+  openId: string,
+  name: string
+) {
+  const token = await sdk.createSessionToken(openId, {
+    name: name || "",
+    expiresInMs: ONE_YEAR_MS,
+  });
+  res.cookie(COOKIE_NAME, token, {
+    ...getSessionCookieOptions(req),
+    maxAge: ONE_YEAR_MS,
+  });
+}
+
+/** 後台登入/註冊的嘗試次數限制，避免被用來暴力猜密碼。 */
+async function allowAuthAttempt(
+  db: Pool,
+  req: Request,
+  action: string,
+  max: number
+) {
+  const sourceIp = process.env.RENDER
+    ? req.get("x-forwarded-for")?.split(",").at(-1)?.trim() || req.ip
+    : req.ip;
+  const bucket = hash(
+    (process.env.JWT_SECRET || key() || "line-shop") +
+      action +
+      sourceIp +
+      Math.floor(Date.now() / 900000)
+  );
+  await db.execute(
+    "INSERT INTO line_shop_limits (bucket,hits,expires_at) VALUES (?,1,?) ON DUPLICATE KEY UPDATE hits=hits+1",
+    [bucket, Date.now() + 900000]
+  );
+  const [rows] = await db.execute<RowDataPacket[]>(
+    "SELECT hits FROM line_shop_limits WHERE bucket=?",
+    [bucket]
+  );
+  await db.execute("DELETE FROM line_shop_limits WHERE expires_at<?", [
+    Date.now(),
+  ]);
+  return Number(rows[0]?.hits || 0) <= max;
+}
+
+async function ordersPayload(db: Pool, storeId?: string) {
+  const params = storeId ? [storeId] : [];
+  const [orders] = await db.query<RowDataPacket[]>(
+    `SELECT o.*, f.status AS fulfillment_status, f.tracking_number, f.shipped_at FROM line_shop_orders o LEFT JOIN line_shop_fulfillment f ON f.order_id=o.id${
+      storeId ? " WHERE o.store_id=?" : ""
+    } ORDER BY o.created_at DESC LIMIT 100`,
+    params
+  );
+  const [mail] = await db.query<RowDataPacket[]>(
+    storeId
+      ? "SELECT m.id,m.order_id,m.kind,m.state,m.created_at FROM line_shop_mail m INNER JOIN line_shop_orders o ON o.id=m.order_id WHERE o.store_id=? ORDER BY m.id DESC LIMIT 200"
+      : "SELECT id,order_id,kind,state,created_at FROM line_shop_mail ORDER BY id DESC LIMIT 200",
+    params
+  );
+  return {
+    orders: orders.map(o => ({
+      ...summary(o),
+      customer: parsed(o.customer_json),
+      createdAt: o.created_at,
+      weightGrams: o.weight_grams,
+      fulfillmentStatus:
+        o.status === "paid"
+          ? o.fulfillment_status || "awaiting_preparation"
+          : "unpaid",
+      trackingNumber: o.tracking_number || "",
+      shippedAt: o.shipped_at,
+    })),
+    mail,
+  };
+}
+
+/** 出貨狀態更新。storeId 有值時，只能操作該商店自己的訂單。 */
+async function applyFulfillment(
+  req: Request,
+  res: Response,
+  storeId?: string
+) {
+  const status = req.body?.status;
+  const tracking = req.body?.trackingNumber ?? "";
+  if (
+    !["preparing", "shipped"].includes(status) ||
+    typeof tracking !== "string" ||
+    tracking.length > 100 ||
+    /[\r\n]/.test(tracking)
+  )
+    throw new ShopInputError("請選擇備貨中或已出貨，物流單號不得超過100字");
+  const db = await database();
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+    const order = await orderById(conn, String(req.params.id), true);
+    if (!order || (storeId && order.store_id !== storeId)) {
+      await conn.rollback();
+      return res.status(404).json({ error: "找不到訂單" });
+    }
+    if (order.status !== "paid") {
+      await conn.rollback();
+      return res.status(409).json({ error: "尚未確認付款，無法安排出貨" });
+    }
+    const [rows] = await conn.execute<RowDataPacket[]>(
+      "SELECT * FROM line_shop_fulfillment WHERE order_id=?",
+      [order.id]
+    );
+    const current = rows[0];
+    if (current?.status === "shipped" && status !== "shipped") {
+      await conn.rollback();
+      return res.status(409).json({ error: "已出貨訂單不能改回備貨中" });
+    }
+    if (status === "shipped" && !current) {
+      await conn.rollback();
+      return res.status(409).json({ error: "請先將訂單設為備貨中" });
+    }
+    await conn.execute(
+      "INSERT INTO line_shop_fulfillment (order_id,status,tracking_number,shipped_at) VALUES (?,?,?,IF(?='shipped',CURRENT_TIMESTAMP,NULL)) ON DUPLICATE KEY UPDATE status=VALUES(status),tracking_number=VALUES(tracking_number),shipped_at=IF(VALUES(status)='shipped',COALESCE(shipped_at,CURRENT_TIMESTAMP),NULL)",
+      [order.id, status, tracking.trim(), status]
+    );
+    await conn.commit();
+    res.json({
+      id: order.id,
+      fulfillmentStatus: status,
+      trackingNumber: tracking.trim(),
+    });
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
+}
+
+router.get(
+  "/auth/me",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.json({ user: null, store: null });
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    res.json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      store: store ? storeView(store) : null,
+    });
+  })
+);
+
+router.post(
+  "/auth/register",
+  handled(async (req, res) => {
+    const db = await database();
+    if (!(await allowAuthAttempt(db, req, "register", 10)))
+      return res.status(429).json({ error: "註冊次數過多，請稍後再試" });
+    const email = String(req.body?.email ?? "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body?.password ?? "");
+    const name = String(req.body?.name ?? "")
+      .trim()
+      .slice(0, 100);
+    if (email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      throw new ShopInputError("請填寫有效的 Email");
+    if (password.length < 8 || password.length > 100)
+      throw new ShopInputError("密碼至少 8 個字");
+    const [existing] = await db.execute<RowDataPacket[]>(
+      "SELECT id FROM users WHERE email=? LIMIT 1",
+      [email]
+    );
+    if (existing.length)
+      return res.status(409).json({ error: "此 Email 已註冊，請直接登入" });
+    const openId = "local:" + randomBytes(12).toString("hex");
+    const [created] = await db.execute<mysql.ResultSetHeader>(
+      "INSERT INTO users (openId,name,email,loginMethod,role,passwordHash) VALUES (?,?,?,?,?,?)",
+      [openId, name || null, email, "local", "user", hashPassword(password)]
+    );
+    await setShopSession(req, res, openId, name);
+    res.status(201).json({
+      ok: true,
+      user: { id: created.insertId, name: name || null, email, role: "user" },
+      store: null,
+    });
+  })
+);
+
+router.post(
+  "/auth/login",
+  handled(async (req, res) => {
+    const db = await database();
+    if (!(await allowAuthAttempt(db, req, "login", 10)))
+      return res.status(429).json({ error: "登入次數過多，請 15 分鐘後再試" });
+    const email = String(req.body?.email ?? "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body?.password ?? "");
+    if (!email || !password) throw new ShopInputError("請輸入 Email 與密碼");
+    const [rows] = await db.execute<RowDataPacket[]>(
+      "SELECT id,openId,name,email,role,passwordHash FROM users WHERE email=? LIMIT 1",
+      [email]
+    );
+    const user = rows[0];
+    if (!user || !verifyPassword(password, user.passwordHash))
+      return res.status(401).json({ error: "Email 或密碼錯誤" });
+    await db.execute(
+      "UPDATE users SET lastSignedIn=CURRENT_TIMESTAMP WHERE id=?",
+      [user.id]
+    );
+    await setShopSession(req, res, user.openId, user.name || "");
+    const store = await storeByOwner(db, user.id);
+    res.json({
+      ok: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      store: store ? storeView(store) : null,
+    });
+  })
+);
+
+router.post(
+  "/auth/logout",
+  handled(async (req, res) => {
+    res.clearCookie(COOKIE_NAME, getSessionCookieOptions(req));
+    res.json({ ok: true });
+  })
+);
+
+router.get(
+  "/store",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    res.json({ store: store ? storeView(store) : null });
+  })
+);
+
+router.post(
+  "/store",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const input = storeInput(req.body);
+    const db = await database();
+    if (await storeByOwner(db, user.id))
+      return res
+        .status(409)
+        .json({ error: "此帳號已登錄商店，請直接編輯商店資料" });
+    // 一般帳號登錄的商店需由管理員審核；管理員自己登錄則直接啟用。
+    const status = user.role === "admin" ? "active" : "pending";
+    const [counts] = await db.query<RowDataPacket[]>(
+      "SELECT COUNT(*) AS n FROM line_shop_stores WHERE status='active'"
+    );
+    const firstActive = status === "active" && Number(counts[0]?.n || 0) === 0;
+    const id = "ST-" + randomUUID();
+    await db.execute(
+      "INSERT INTO line_shop_stores (id,owner_user_id,name,contact_name,phone,email,line_id,address,tax_id,status) VALUES (?,?,?,?,?,?,?,?,?,?)",
+      [
+        id,
+        user.id,
+        input.name,
+        input.contactName,
+        input.phone,
+        input.email,
+        input.lineId,
+        input.address,
+        input.taxId,
+        status,
+      ]
+    );
+    // 第一間啟用中的商店成立時，把先前沒有歸屬的訂單接過來，避免舊訂單消失。
+    if (firstActive)
+      await db.execute(
+        "UPDATE line_shop_orders SET store_id=? WHERE store_id IS NULL",
+        [id]
+      );
+    const [rows] = await db.execute<RowDataPacket[]>(
+      "SELECT * FROM line_shop_stores WHERE id=?",
+      [id]
+    );
+    res.status(201).json({ store: storeView(rows[0]) });
+  })
+);
+
+router.put(
+  "/store",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const input = storeInput(req.body);
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    if (!store) return res.status(404).json({ error: "尚未登錄商店" });
+    await db.execute(
+      "UPDATE line_shop_stores SET name=?,contact_name=?,phone=?,email=?,line_id=?,address=?,tax_id=? WHERE id=?",
+      [
+        input.name,
+        input.contactName,
+        input.phone,
+        input.email,
+        input.lineId,
+        input.address,
+        input.taxId,
+        store.id,
+      ]
+    );
+    const [rows] = await db.execute<RowDataPacket[]>(
+      "SELECT * FROM line_shop_stores WHERE id=?",
+      [store.id]
+    );
+    res.json({ store: storeView(rows[0]) });
+  })
+);
+
+router.get(
+  "/store/orders",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    if (!store) return res.status(403).json({ error: "請先登錄商店" });
+    if (store.status !== "active")
+      return res.status(403).json({ error: "商店仍在審核中，請稍後再試" });
+    res.json(await ordersPayload(db, store.id));
+  })
+);
+
+router.post(
+  "/store/orders/:id/fulfillment",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    if (!store) return res.status(403).json({ error: "請先登錄商店" });
+    if (store.status !== "active")
+      return res.status(403).json({ error: "商店仍在審核中，請稍後再試" });
+    return applyFulfillment(req, res, store.id);
+  })
+);
+
+router.post(
+  "/store/orders/:id/quote",
+  handled(async (req, res) => {
+    const user = await shopUser(req);
+    if (!user) return res.status(401).json({ error: "請先登入" });
+    const db = await database();
+    const store = await storeByOwner(db, user.id);
+    if (!store) return res.status(403).json({ error: "請先登錄商店" });
+    if (store.status !== "active")
+      return res.status(403).json({ error: "商店仍在審核中，請稍後再試" });
+    if (!configured())
+      return res.status(503).json({ error: "Stripe 設定尚未完成" });
+    if (
+      req.body?.supplyConfirmed !== true ||
+      req.body?.shippingAllowedConfirmed !== true
+    )
+      throw new ShopInputError("請先確認供貨與寄送條件");
+    res.json(
+      await preparePayment(
+        String(req.params.id),
+        req.body.packedWeightGrams,
+        store.id
+      )
+    );
+  })
+);
+
 router.use("/admin", async (req, res, next) => {
   try {
     const user = await sdk.authenticateRequest(req);
     if (user.role === "admin") return next();
   } catch {}
-  res.status(401).json({ error: "請先以公司網站管理員帳號登入" });
+  res.status(401).json({ error: "請先以管理員帳號登入" });
 });
 const MAX_PRODUCT_PRICE_TWD = 100000;
 const MAX_PRODUCT_STOCK = 100000;
@@ -883,87 +1370,64 @@ router.post(
 router.get(
   "/admin/orders",
   handled(async (_req, res) => {
+    res.json(await ordersPayload(await database()));
+  })
+);
+router.get(
+  "/admin/stores",
+  handled(async (_req, res) => {
     const db = await database();
-    const [orders] = await db.query<RowDataPacket[]>(
-      "SELECT o.*, f.status AS fulfillment_status, f.tracking_number, f.shipped_at FROM line_shop_orders o LEFT JOIN line_shop_fulfillment f ON f.order_id=o.id ORDER BY o.created_at DESC LIMIT 100"
-    );
-    const [mail] = await db.query<RowDataPacket[]>(
-      "SELECT id,order_id,kind,state,created_at FROM line_shop_mail ORDER BY id DESC LIMIT 200"
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT s.*, u.email AS owner_email FROM line_shop_stores s LEFT JOIN users u ON u.id=s.owner_user_id ORDER BY s.created_at"
     );
     res.json({
-      orders: orders.map(o => ({
-        ...summary(o),
-        customer: parsed(o.customer_json),
-        createdAt: o.created_at,
-        weightGrams: o.weight_grams,
-        fulfillmentStatus:
-          o.status === "paid"
-            ? o.fulfillment_status || "awaiting_preparation"
-            : "unpaid",
-        trackingNumber: o.tracking_number || "",
-        shippedAt: o.shipped_at,
+      stores: rows.map(row => ({
+        ...storeView(row),
+        ownerEmail: row.owner_email,
       })),
-      mail,
     });
   })
 );
 router.post(
-  "/admin/orders/:id/fulfillment",
+  "/admin/stores/:id/status",
   handled(async (req, res) => {
     const status = req.body?.status;
-    const tracking = req.body?.trackingNumber ?? "";
-    if (
-      !["preparing", "shipped"].includes(status) ||
-      typeof tracking !== "string" ||
-      tracking.length > 100 ||
-      /[\r\n]/.test(tracking)
-    )
-      throw new ShopInputError("請選擇備貨中或已出貨，物流單號不得超過100字");
+    if (!["active", "suspended"].includes(status))
+      throw new ShopInputError("請選擇啟用或停用");
     const db = await database();
-    const conn = await db.getConnection();
-    try {
-      await conn.beginTransaction();
-      const order = await orderById(conn, String(req.params.id), true);
-      if (!order) {
-        await conn.rollback();
-        return res.status(404).json({ error: "找不到訂單" });
-      }
-      if (order.status !== "paid") {
-        await conn.rollback();
-        return res.status(409).json({ error: "尚未確認付款，無法安排出貨" });
-      }
-      const [rows] = await conn.execute<RowDataPacket[]>(
-        "SELECT * FROM line_shop_fulfillment WHERE order_id=?",
-        [order.id]
+    const [rows] = await db.execute<RowDataPacket[]>(
+      "SELECT * FROM line_shop_stores WHERE id=?",
+      [String(req.params.id)]
+    );
+    const store = rows[0];
+    if (!store) return res.status(404).json({ error: "找不到商店" });
+    await db.execute("UPDATE line_shop_stores SET status=? WHERE id=?", [
+      status,
+      store.id,
+    ]);
+    if (status === "active" && store.status !== "active") {
+      const [active] = await db.query<RowDataPacket[]>(
+        "SELECT COUNT(*) AS n FROM line_shop_stores WHERE status='active' AND id<>?",
+        [store.id]
       );
-      const current = rows[0];
-      if (current?.status === "shipped" && status !== "shipped") {
-        await conn.rollback();
-        return res.status(409).json({ error: "已出貨訂單不能改回備貨中" });
-      }
-      if (status === "shipped" && !current) {
-        await conn.rollback();
-        return res.status(409).json({ error: "請先將訂單設為備貨中" });
-      }
-      await conn.execute(
-        "INSERT INTO line_shop_fulfillment (order_id,status,tracking_number,shipped_at) VALUES (?,?,?,IF(?='shipped',CURRENT_TIMESTAMP,NULL)) ON DUPLICATE KEY UPDATE status=VALUES(status),tracking_number=VALUES(tracking_number),shipped_at=IF(VALUES(status)='shipped',COALESCE(shipped_at,CURRENT_TIMESTAMP),NULL)",
-        [order.id, status, tracking.trim(), status]
-      );
-      await conn.commit();
-      res.json({
-        id: order.id,
-        fulfillmentStatus: status,
-        trackingNumber: tracking.trim(),
-      });
-    } catch (e) {
-      await conn.rollback();
-      throw e;
-    } finally {
-      conn.release();
+      if (Number(active[0]?.n || 0) === 0)
+        await db.execute(
+          "UPDATE line_shop_orders SET store_id=? WHERE store_id IS NULL",
+          [store.id]
+        );
     }
+    res.json({ store: { ...storeView(store), status } });
   })
 );
-async function preparePayment(id: string, packedWeightGrams?: unknown) {
+router.post(
+  "/admin/orders/:id/fulfillment",
+  handled(async (req, res) => applyFulfillment(req, res))
+);
+async function preparePayment(
+  id: string,
+  packedWeightGrams?: unknown,
+  storeId?: string
+) {
   let quote: {
     shippingTwd: number;
     emsJpy: number | null;
@@ -975,7 +1439,11 @@ async function preparePayment(id: string, packedWeightGrams?: unknown) {
   try {
     await conn.beginTransaction();
     order = (await orderById(conn, id, true))!;
-    if (!order || order.mode !== (live() ? "live" : "test"))
+    if (
+      !order ||
+      order.mode !== (live() ? "live" : "test") ||
+      (storeId && order.store_id !== storeId)
+    )
       throw new ShopInputError("找不到相同模式的訂單");
     if (
       ["pending", "paid", "expired"].includes(order.status) &&

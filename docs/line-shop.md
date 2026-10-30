@@ -23,6 +23,14 @@ Tables are created lazily and populated with INSERT IGNORE, so deployments do no
 
 The one-time `2026-10-14-stock-10` migration sets every active listing's stock to 10. Later checkouts continue to decrement stock, and expired reservations restore it. Seed catalog entries also start at 10 for newly inserted products.
 
+## Shop backend login and store registration
+
+`/line-shop/login.html` is the shop's own email + password entry point (register or sign in) and `/line-shop/store.html` is the store registration and profile page. Both use the existing `users` table and the same session cookie as the rest of the site, so an account created here also works elsewhere. Passwords are stored as scrypt `salt:hash` and login/registration attempts are limited per IP for 15 minutes.
+
+A store registration by a normal account starts as `pending` and cannot read orders until an administrator approves it on `/line-shop/admin.html` (已登錄商店 → 核准啟用). A registration made by an administrator is activated immediately, which keeps first-time setup short. Only one store per account is allowed.
+
+The earliest `active` store is the shop's primary store: new orders are tagged with its `store_id`, and when the first store becomes active the previously unassigned orders are attached to it. Store owners see and fulfil only their own orders; administrators see every order and can suspend a store, which immediately blocks its order list.
+
 ## Operational checks
 
 1. In Stripe test mode, submit recipient details, follow the returned checkout URL, pay with an official test card, and verify the webhook and admin status. Test-mode emails are intentionally suppressed.
@@ -47,7 +55,7 @@ In the administrator page, paid orders start at 待備貨. Select 開始備貨, 
 
 Deactivating a product hides it from the storefront without touching existing orders. A cart that still holds it fails checkout with 商品或數量無效，請重新整理 rather than selling it. Prices must be integers in 1–100000 and stock integers in 0–100000; unknown fields are rejected. Products listed in the code-level `excluded` set never enter the table and cannot be re-activated through the UI, so a legal or supply blocklist stays authoritative.
 
-The same page also edits the customer-facing copy: 品名, 說明, 規格, 日文名, 標籤 and the image URL. Those edits are stored in the lazily added `admin_json` column instead of rewriting `data_json`, because `data_json` is only ever populated by `INSERT IGNORE` at boot and would drift from `server/public/line-shop-catalog.json`. `catalog()` merges `admin_json` over the stored product, and `desc` keeps its existing precedence: an edited description wins, otherwise the catalog file wins over the possibly stale database copy. Clearing a field deletes its override, so the catalog file value comes back. Image URLs must start with `https://` or `/`; uploading files is not supported because the Render filesystem is ephemeral. Price and stock stay in their own columns so the existing checkout stock accounting is untouched.
+The same page also edits the customer-facing copy: 品名, 說明, 規格, 日文名, 標籤 and the image URL. Those edits are stored in the lazily added `admin_json` column instead of rewriting `data_json`, because `data_json` is only ever populated by `INSERT IGNORE` at boot and would drift from `server/public/line-shop-catalog.json`. `catalog()` merges `admin_json` over the stored product, and `desc` keeps its existing precedence: an edited description wins, otherwise the catalog file wins over the possibly stale database copy. Clearing a field deletes its override, so the catalog file value comes back. Image URLs must start with `https://` or `/`; photos can also be uploaded, see below. Price and stock stay in their own columns so the existing checkout stock accounting is untouched.
 
 ### Product images
 

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ROKA IZUMI｜商店登錄</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">ROKA IZUMI<small>商店後台</small></div>
+      <nav>
+        <a href="admin.html" id="orders-link" hidden>訂單管理</a>
+        <a href="index.html">回到商店</a>
+        <a href="#" id="logout">登出</a>
+      </nav>
+    </header>
+    <main>
+      <h1 id="title">登錄商店</h1>
+      <p class="lede" id="lede">
+        填寫商店基本資料，完成後即可在後台查看這間商店的訂單。
+      </p>
+
+      <section class="card">
+        <form id="form" novalidate>
+          <label>
+            商店名稱
+            <input name="name" maxlength="120" required />
+          </label>
+          <label>
+            聯絡人
+            <input name="contactName" maxlength="100" required />
+          </label>
+          <label>
+            聯絡電話
+            <input name="phone" maxlength="40" inputmode="tel" required />
+          </label>
+          <label>
+            聯絡 Email
+            <input name="email" type="email" maxlength="320" required />
+          </label>
+          <label>
+            LINE ID <span class="hint">（選填）</span>
+            <input name="lineId" maxlength="100" />
+          </label>
+          <label>
+            商店地址 <span class="hint">（選填）</span>
+            <input name="address" maxlength="500" />
+          </label>
+          <label>
+            統一編號 <span class="hint">（選填，8 位數字）</span>
+            <input name="taxId" maxlength="20" inputmode="numeric" />
+          </label>
+          <button class="btn" id="submit" type="submit">儲存商店資料</button>
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("form");
+      const status = document.getElementById("status");
+      const submit = document.getElementById("submit");
+      const fields = ["name", "contactName", "phone", "email", "lineId", "address", "taxId"];
+      let existing = null;
+
+      function fail(message) {
+        status.textContent = message;
+        status.classList.add("error");
+      }
+
+      function fill(store) {
+        for (const field of fields) {
+          if (store[field] != null) form.elements[field].value = store[field];
+        }
+      }
+
+      async function load() {
+        try {
+          const response = await fetch("/api/line-shop/auth/me", {
+            cache: "no-store",
+          });
+          const data = await response.json();
+          if (!data.user) {
+            window.location.href = "login.html";
+            return;
+          }
+          existing = data.store;
+          if (existing) {
+            document.getElementById("title").textContent = "商店資料";
+            if (existing.status === "active") {
+              document.getElementById("lede").textContent =
+                "更新商店資料，送出後立即生效。";
+              document.getElementById("orders-link").hidden = false;
+            } else if (existing.status === "suspended") {
+              document.getElementById("lede").textContent =
+                "此商店已被停用，如需恢復請聯絡管理員。";
+            } else {
+              document.getElementById("lede").textContent =
+                "商店資料已送出，正在等待管理員審核。審核通過後即可查看訂單。";
+            }
+            fill(existing);
+          } else if (data.user.email) {
+            form.elements.email.value = data.user.email;
+          }
+          submit.disabled = false;
+        } catch {
+          fail("無法取得登入狀態，請重新整理");
+        }
+      }
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        status.textContent = "";
+        status.classList.remove("error");
+        const payload = {};
+        for (const field of fields) payload[field] = form.elements[field].value.trim();
+        if (!payload.name || !payload.contactName || !payload.phone || !payload.email) {
+          fail("請填寫商店名稱、聯絡人、聯絡電話與 Email");
+          return;
+        }
+        if (payload.taxId && !/^\d{8}$/.test(payload.taxId)) {
+          fail("統一編號為 8 位數字");
+          return;
+        }
+        submit.disabled = true;
+        try {
+          const response = await fetch("/api/line-shop/store", {
+            method: existing ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || "儲存失敗，請稍後再試");
+          if (data.store && data.store.status === "active") {
+            window.location.href = "admin.html";
+            return;
+          }
+          existing = data.store || existing;
+          document.getElementById("title").textContent = "商店資料";
+          document.getElementById("lede").textContent =
+            "商店資料已送出，正在等待管理員審核。審核通過後即可查看訂單。";
+          status.textContent = "已送出，待管理員審核";
+          status.classList.remove("error");
+          submit.disabled = false;
+        } catch (error) {
+          fail(error.message || "儲存失敗，請稍後再試");
+          submit.disabled = false;
+        }
+      });
+
+      document.getElementById("logout").onclick = async event => {
+        event.preventDefault();
+        await fetch("/api/line-shop/auth/logout", {
+          method: "POST",
+          credentials: "same-origin",
+        }).catch(() => {});
+        window.location.href = "login.html";
+      };
+
+      submit.disabled = true;
+      load();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ROKA IZUMI｜商店後台登入</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">ROKA IZUMI<small>商店後台</small></div>
+      <nav><a href="index.html">回到商店</a></nav>
+    </header>
+    <main>
+      <section class="card narrow">
+        <h1 id="title">商店後台登入</h1>
+        <p class="lede" id="lede">使用商店帳號登入，管理商店資料與訂單。</p>
+
+        <div class="tabs" role="tablist">
+          <button type="button" id="tab-login" class="active" role="tab">
+            登入
+          </button>
+          <button type="button" id="tab-register" role="tab">註冊帳號</button>
+        </div>
+
+        <form id="form" novalidate>
+          <label id="name-field" hidden>
+            姓名
+            <input name="name" autocomplete="name" maxlength="100" />
+          </label>
+          <label>
+            Email
+            <input
+              name="email"
+              type="email"
+              autocomplete="username"
+              maxlength="320"
+              required
+            />
+          </label>
+          <label>
+            密碼
+            <input
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              maxlength="100"
+              required
+            />
+            <span class="hint" id="password-hint"></span>
+          </label>
+          <button class="btn block" id="submit" type="submit">登入</button>
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("form");
+      const status = document.getElementById("status");
+      const submit = document.getElementById("submit");
+      const nameField = document.getElementById("name-field");
+      const passwordHint = document.getElementById("password-hint");
+      const tabLogin = document.getElementById("tab-login");
+      const tabRegister = document.getElementById("tab-register");
+      let mode = "login";
+
+      const next = data =>
+        (window.location.href = data.store ? "admin.html" : "store.html");
+
+      function setMode(value) {
+        mode = value;
+        const login = value === "login";
+        tabLogin.classList.toggle("active", login);
+        tabRegister.classList.toggle("active", !login);
+        nameField.hidden = login;
+        submit.textContent = login ? "登入" : "建立帳號";
+        document.getElementById("title").textContent = login
+          ? "商店後台登入"
+          : "註冊商店帳號";
+        document.getElementById("lede").textContent = login
+          ? "使用商店帳號登入，管理商店資料與訂單。"
+          : "先建立帳號，下一步再登錄商店資料。";
+        passwordHint.textContent = login ? "" : "至少 8 個字";
+        form.elements.password.autocomplete = login
+          ? "current-password"
+          : "new-password";
+        status.textContent = "";
+        status.classList.remove("error");
+      }
+
+      tabLogin.onclick = () => setMode("login");
+      tabRegister.onclick = () => setMode("register");
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        status.textContent = "";
+        status.classList.remove("error");
+        const payload = {
+          email: form.elements.email.value.trim(),
+          password: form.elements.password.value,
+        };
+        if (mode === "register") payload.name = form.elements.name.value.trim();
+        if (!payload.email || !payload.password) {
+          status.textContent = "請輸入 Email 與密碼";
+          status.classList.add("error");
+          return;
+        }
+        if (mode === "register" && payload.password.length < 8) {
+          status.textContent = "密碼至少 8 個字";
+          status.classList.add("error");
+          return;
+        }
+        submit.disabled = true;
+        try {
+          const response = await fetch("/api/line-shop/auth/" + mode, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || "登入失敗，請稍後再試");
+          next(data);
+        } catch (error) {
+          status.textContent = error.message || "登入失敗，請稍後再試";
+          status.classList.add("error");
+          submit.disabled = false;
+        }
+      });
+
+      fetch("/api/line-shop/auth/me", { cache: "no-store" })
+        .then(response => response.json())
+        .then(data => {
+          if (data.user) next(data);
+        })
+        .catch(() => {});
+    </script>
+  </body>
+</html>

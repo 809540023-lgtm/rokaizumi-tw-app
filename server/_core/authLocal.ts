@@ -1,7 +1,8 @@
 import type { Express, Request, Response } from "express";
-import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
+import { randomBytes } from "crypto";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./cookies";
+import { hashPassword, verifyPassword } from "./password";
 import { sdk } from "./sdk";
 import * as db from "../db";
 
@@ -10,21 +11,6 @@ import * as db from "../db";
  * 登入/註冊成功後簽發與 OAuth 相同格式的 session cookie，
  * 既有的 sdk.authenticateRequest 會自動驗證、認得使用者。
  */
-
-function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString("hex");
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
-}
-
-function verifyPassword(password: string, stored: string | null | undefined): boolean {
-  if (!stored) return false;
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
-  const calc = scryptSync(password, salt, 64);
-  const orig = Buffer.from(hash, "hex");
-  return calc.length === orig.length && timingSafeEqual(calc, orig);
-}
 
 async function readJsonBody(req: Request): Promise<any> {
   if (req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
