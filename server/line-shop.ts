@@ -214,6 +214,93 @@ function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {
     throw new ShopInputError("圖片網址需以 https:// 或 / 開頭");
   return text;
 }
+export const MAX_PRODUCT_PRICE_TWD = 100000;
+export const MAX_PRODUCT_STOCK = 100000;
+// 驗圖並算出存放位置。後台上傳與 Telegram 機器人共用同一套規則，
+// 才不會出現只有其中一邊擋得住非圖片的漏洞。
+export function shopImage(bytes: Buffer) {
+  if (!bytes.length) throw new ShopInputError("圖片是空的，請重新選擇");
+  if (bytes.length > MAX_IMAGE_BYTES)
+    throw new ShopInputError("圖片不得超過 3MB，請先壓縮再上傳");
+  const mime = imageMime(bytes);
+  if (!mime || !IMAGE_TYPES[mime])
+    throw new ShopInputError("只接受 JPG、PNG、WebP 或 GIF 圖片");
+  const id = createHash("sha256").update(bytes).digest("hex");
+  return { id, mime, url: `/api/line-shop/img/${id}.${IMAGE_TYPES[mime]}` };
+}
+// 沒有既有商品要綁圖時（例如機器人上架）先存圖，拿到網址再一起寫進商品。
+export async function saveShopImage(bytes: Buffer) {
+  const { id, mime, url } = shopImage(bytes);
+  const db = await database();
+  await db.query(
+    "INSERT IGNORE INTO line_shop_images (id,mime,bytes) VALUES (?,?,?)",
+    [id, mime, bytes]
+  );
+  return url;
+}
+// 商店首頁只認這四種 catalog，機器人上架時也必須挑其中一個。
+export const SHOP_CATALOGS = [
+  "shop",
+  "supermarket",
+  "costco",
+  "exclusive",
+] as const;
+export type ShopCatalog = (typeof SHOP_CATALOGS)[number];
+export type NewShopProduct = {
+  name: string;
+  price: number;
+  stock: number;
+  catalog: ShopCatalog;
+  desc: string;
+  image?: string;
+};
+// 給 Telegram 機器人用的新增商品。id 固定用 TG- 開頭，後台一看就知道
+// 是從機器人上架的，不是目錄檔帶進來的。
+export async function createShopProduct(input: NewShopProduct) {
+  const name = contentText("name", input.name);
+  if (!name) throw new ShopInputError("請輸入商品名稱");
+  const desc = contentText("desc", input.desc ?? "");
+  const image = contentText("image", input.image ?? "");
+  if (!SHOP_CATALOGS.includes(input.catalog))
+    throw new ShopInputError("商品分類不正確");
+  if (
+    !Number.isSafeInteger(input.price) ||
+    input.price < 1 ||
+    input.price > MAX_PRODUCT_PRICE_TWD
+  )
+    throw new ShopInputError(`價格需為 1–${MAX_PRODUCT_PRICE_TWD} 的整數`);
+  if (
+    !Number.isSafeInteger(input.stock) ||
+    input.stock < 0 ||
+    input.stock > MAX_PRODUCT_STOCK
+  )
+    throw new ShopInputError(`庫存需為 0–${MAX_PRODUCT_STOCK} 的整數`);
+  const id = `TG-${Date.now().toString(36).toUpperCase()}${randomBytes(2)
+    .toString("hex")
+    .toUpperCase()}`;
+  // 目錄檔沒有的欄位一律給空字串，前台才不會把 undefined 印成文字。
+  // weight 給 null 是既有慣例（199 項裡有 177 項沒有重量），
+  // 前台看到 null 會跳過重量累加，undefined 反而會算出 NaN。
+  const product = {
+    id,
+    name,
+    price: input.price,
+    catalog: input.catalog,
+    spec: "",
+    jp: "",
+    tag: "",
+    category: "",
+    desc,
+    image,
+    weight: null,
+  };
+  const db = await database();
+  await db.query(
+    "INSERT INTO line_shop_products (id,data_json,stock,active) VALUES (?,?,?,TRUE)",
+    [id, JSON.stringify(product), input.stock]
+  );
+  return { ...product, stock: input.stock };
+}
 async function ensureProductContentColumn(db: Pool) {
   const [cols] = await db.query<RowDataPacket[]>(
     "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='line_shop_products' AND COLUMN_NAME='admin_json'"
@@ -1173,8 +1260,6 @@ router.use("/admin", async (req, res, next) => {
   } catch {}
   res.status(401).json({ error: "請先以管理員帳號登入" });
 });
-const MAX_PRODUCT_PRICE_TWD = 100000;
-const MAX_PRODUCT_STOCK = 100000;
 
 // 商品上架管理。價格與庫存改資料庫，商店頁直接讀同一份資料，改完立即生效。
 router.get(
@@ -1320,15 +1405,7 @@ router.post(
         : null;
     if (!match) throw new ShopInputError("請選擇 JPG、PNG、WebP 或 GIF 圖片");
     const bytes = Buffer.from(match[2], "base64");
-    if (!bytes.length) throw new ShopInputError("圖片是空的，請重新選擇");
-    if (bytes.length > MAX_IMAGE_BYTES)
-      throw new ShopInputError("圖片不得超過 3MB，請先壓縮再上傳");
-    const mime = imageMime(bytes);
-    if (!mime || !IMAGE_TYPES[mime])
-      throw new ShopInputError("只接受 JPG、PNG、WebP 或 GIF 圖片");
-
-    const id = createHash("sha256").update(bytes).digest("hex");
-    const url = `/api/line-shop/img/${id}.${IMAGE_TYPES[mime]}`;
+    const { id, mime, url } = shopImage(bytes);
     const productId = String(req.params.id);
     const db = await database();
     const conn = await db.getConnection();

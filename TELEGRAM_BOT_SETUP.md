@@ -1,188 +1,86 @@
-# Telegram 商品上傳機器人設置指南
+# Telegram 上架機器人
 
-## 概述
+用 Telegram 傳一傳就把商品上到 LINE 商店（`/line-shop/`），不用開電腦登入後台。
+機器人跟網站是同一個服務，部署好就一直在線，不需要另外開程式。
 
-本文檔說明如何設置和運行 Telegram 商品上傳機器人。
+## 一、跟 @BotFather 建一個機器人
 
-## 功能特性
+1. 手機或電腦打開 Telegram，搜尋 **@BotFather**（有藍色勾勾那個）。
+2. 傳 `/newbot`。
+3. 問你要 **名字**：隨便取，這是別人看到的名稱，例如 `洛海泉上架`。
+4. 問你要 **帳號**：只能用英文和底線，而且一定要 `bot` 結尾，例如
+   `rokaizumi_shop_bot`。如果被用過就換一個。
+5. 建好後它會回一段：
 
-- ✅ 分類選擇（日本百元商品 / 老人看護器材）
-- ✅ 商品信息填寫（名稱、價格、描述、規格）
-- ✅ 圖片上傳到 S3
-- ✅ 商品確認和提交
-- ✅ 多語言支持（中文、日文、英文）
-
-## 前置要求
-
-1. **Telegram Bot Token**
-   - 在 Telegram 中與 @BotFather 對話
-   - 執行 `/newbot` 命令創建新機器人
-   - 複製生成的 Token
-
-2. **環境變量設置**
-   ```bash
-   TELEGRAM_BOT_TOKEN=your_bot_token_here
-   DATABASE_URL=your_database_url
-   AWS_ACCESS_KEY_ID=your_aws_key
-   AWS_SECRET_ACCESS_KEY=your_aws_secret
-   AWS_S3_BUCKET=your_bucket_name
-   AWS_REGION=ap-northeast-1
+   ```
+   Use this token to access the HTTP API:
+   7123456789:AAHxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    ```
 
-## 安裝依賴
+   那串 `數字:英數字` 就是 **TELEGRAM_BOT_TOKEN**，只給你看，不要貼給別人。
 
-```bash
-pnpm install
-```
+## 二、設定兩個環境變數
 
-已安裝的依賴：
-- `telegraf` - Telegram Bot 框架
-- `axios` - HTTP 請求
-- `dotenv` - 環境變量管理
+到 Render → `rokaizumi-tw` 服務 → **Environment** → Add Environment Variable：
 
-## 啟動機器人
+| Key | Value |
+| --- | --- |
+| `TELEGRAM_BOT_TOKEN` | 上面那串 token |
+| `TELEGRAM_ADMIN_IDS` | 你的 Telegram 數字 ID（下面教你拿） |
 
-### 開發模式
+存檔後按 **Save**，Render 會自動重新部署（約 2 分鐘）。
 
-```bash
-pnpm bot
-```
+### 怎麼知道自己的 Telegram ID
 
-### 生產模式
+兩種方式都可以：
 
-```bash
-TELEGRAM_BOT_TOKEN=your_token NODE_ENV=production node dist/telegram-bot.js
-```
+- 部署後先在 Telegram 對你的機器人傳 `/id`，它會直接回你的 ID。
+- 或先不填 `TELEGRAM_ADMIN_IDS` 就部署，傳 `/start` 給機器人，它會回
+  「還沒設定誰可以用」並把 ID 印出來，把那個號碼填進環境變數再部署一次。
 
-## 使用流程
+> `TELEGRAM_ADMIN_IDS` 是**白名單**。沒填的話機器人只會回覆訊息，不會寫入任何商品；
+> 填了之後只有名單裡的帳號能上架。多個人要用就寫 `11111111,22222222`。
 
-### 用戶交互流程
+## 三、上架流程
 
-1. **開始** - 用戶發送 `/start` 命令
-2. **選擇分類** - 選擇商品分類
-   - 日本百元商品
-   - 老人看護器材
-3. **填寫信息**
-   - 商品名稱
-   - 價格
-   - 描述
-   - 規格
-4. **上傳圖片** - 上傳一張或多張商品圖片
-5. **確認提交** - 確認信息後提交
+1. 對機器人傳 `/start`。
+2. 選分區：**日本選品 / 日本超市 / 好市多 / 獨家**
+   （這四個就是商店首頁的四個頁籤，選錯分類商品不會出現在前台。）
+3. 依序輸入：**商品名稱 → 售價（台幣整數）→ 庫存件數 → 一句話說明**。
+4. 傳 **一張商品照片**（或輸入「跳過」）。
+5. 檢查摘要，按 **✅ 確認上架**。
 
-### API 端點
+上架成功後會回商品編號（`TG-` 開頭），商品立刻出現在
+<https://rokaizumi-tw.jp/line-shop/>，也能在
+<https://rokaizumi-tw.jp/line-shop/admin.html> 再改價格、庫存、上下架。
 
-#### 創建商品
-```
-POST /api/trpc/admin.createProduct
-```
+其他指令：
 
-**請求參數：**
-```json
-{
-  "name": "商品名稱",
-  "price": 1000,
-  "categoryId": 1,
-  "description": "商品描述",
-  "specifications": "商品規格",
-  "images": ["image_url_1", "image_url_2"],
-  "stock": 1,
-  "status": "available"
-}
-```
+| 指令 | 作用 |
+| --- | --- |
+| `/start` | 上架新商品 |
+| `/cancel` | 取消目前這筆 |
+| `/id` | 顯示自己的 Telegram ID |
+| `/help` | 使用說明 |
 
-**分類 ID：**
-- `1` - 日本百元商品
-- `2` - 老人看護器材
+## 四、運作方式
 
-## 文件結構
+- 圖片下載後存進資料庫的 `line_shop_images`，檔名是內容雜湊，由
+  `/api/line-shop/img/<hash>.<ext>` 提供。Render 的檔案系統重開就清空，
+  所以不存檔案。
+- 驗圖規則（JPG / PNG / WebP / GIF、3MB 上限、檔頭比對）跟後台上傳共用
+  `shopImage()`，兩邊不會出現只有一邊擋得住的情況。
+- 商品寫進 `line_shop_products`，`catalog` 只能是那四個分區之一，其餘欄位
+  （規格、日文名、標籤）留空字串，前台缺資料時整行不顯示。
+- 沒傳照片就留空，前台顯示「商品照片準備中」。
+- 對話狀態存在記憶體裡，服務重啟後要重新 `/start`。
 
-```
-server/
-├── telegram-bot.ts          # 機器人主邏輯
-├── start-telegram-bot.ts    # 機器人啟動文件
-└── storage.ts               # S3 存儲集成
-```
+## 五、常見問題
 
-## 機器人命令
-
-| 命令 | 描述 |
-|------|------|
-| `/start` | 開始上傳商品 |
-| `/help` | 顯示幫助信息 |
-| `/cancel` | 取消當前操作 |
-
-## 故障排除
-
-### 問題：機器人無法連接
-
-**解決方案：**
-1. 檢查 `TELEGRAM_BOT_TOKEN` 是否正確
-2. 確保網絡連接正常
-3. 檢查 Telegram API 是否可用
-
-### 問題：圖片上傳失敗
-
-**解決方案：**
-1. 檢查 AWS S3 認證信息
-2. 確保 S3 bucket 存在且可寫
-3. 檢查圖片大小是否超過限制（建議 < 10MB）
-
-### 問題：商品創建失敗
-
-**解決方案：**
-1. 檢查數據庫連接
-2. 驗證分類 ID 是否正確
-3. 檢查必填字段是否完整
-
-## 安全建議
-
-1. **Token 管理**
-   - 不要在代碼中硬編碼 Token
-   - 使用環境變量存儲敏感信息
-   - 定期輪換 Token
-
-2. **權限控制**
-   - 限制機器人只能由授權用戶使用
-   - 實現用戶驗證機制
-   - 記錄所有操作日誌
-
-3. **數據安全**
-   - 使用 HTTPS 傳輸
-   - 加密敏感數據
-   - 定期備份數據庫
-
-## 性能優化
-
-1. **緩存**
-   - 緩存分類信息
-   - 緩存用戶會話
-
-2. **並發**
-   - 支持多用戶同時使用
-   - 使用連接池管理數據庫連接
-
-3. **監控**
-   - 記錄機器人日誌
-   - 監控 API 性能
-   - 設置告警機制
-
-## 擴展功能
-
-### 計劃中的功能
-
-- [ ] 商品編輯功能
-- [ ] 批量上傳支持
-- [ ] 庫存管理
-- [ ] 訂單通知
-- [ ] 統計報表
-- [ ] 用戶權限管理
-
-## 支持
-
-如有問題，請聯繫開發團隊。
-
----
-
-**最後更新：** 2025-12-26
-**版本：** 1.0.0
+| 症狀 | 原因 |
+| --- | --- |
+| 傳訊息都沒反應 | Render 沒設 `TELEGRAM_BOT_TOKEN`，或部署失敗。看 Render 的 Logs 有沒有 `Telegram 上架機器人未啟動`。 |
+| 回「這個機器人只給店主使用」 | 你的 ID 不在 `TELEGRAM_ADMIN_IDS` 裡。用 `/id` 查，補進環境變數。 |
+| 上架成功但前台沒看到 | 選錯分區（前台只有四個頁籤），或庫存是 0（顯示無現貨）。 |
+| 圖片一直失敗 | Telegram 圖太大或下載逾時，換一張再傳。 |
+| 出現 409 Conflict | 同一個 token 有另一個程式在跑，關掉其中一邊。 |

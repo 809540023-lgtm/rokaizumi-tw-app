@@ -8,7 +8,7 @@
  *   這裡的需求是「每隔 N 天／每週某天要做某件事」，用間隔天數描述
  *   比 5 欄位 cron 好懂也好維護；真的需要精準排程時再改用 cron 即可。
  *
- * 通知的部分：本專案已經有 Telegram bot（server/_core/telegramBot.ts），
+ * 通知的部分：本專案已經有 Telegram bot（server/line-shop-telegram.ts），
  * 但需要 TELEGRAM_BOT_TOKEN。沒有 token 時任務仍然會建立，
  * 在後台「面膜作業」頁面上直接看得到。
  */

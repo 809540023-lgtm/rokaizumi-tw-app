@@ -9,7 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerApiNotFound, registerSecurityHeaders } from "./securityHeaders";
-import { initTelegramBot } from "./telegramBot";
+import { initShopTelegramBot } from "../line-shop-telegram";
 import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
 import candleOrdersRouter from "../candle-orders";
@@ -98,8 +98,8 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
   });
 
-  // Initialize Telegram Bot
-  initTelegramBot();
+  // LINE 商店的 Telegram 上架機器人（沒有 TELEGRAM_BOT_TOKEN 就自動跳過）
+  initShopTelegramBot();
   const shopMailTimer = setInterval(() => { void drainShopMail(); }, 60000);
   shopMailTimer.unref();
 }
