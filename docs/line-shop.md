@@ -14,6 +14,8 @@ Use separate secrets from the company's existing Stripe features:
 - `LINE_SHOP_STRIPE_SECRET_KEY` — server-only restricted Stripe key with Checkout Sessions write permission
 - `LINE_SHOP_STRIPE_WEBHOOK_SECRET` — signing secret for this specific endpoint
 - `LINE_SHOP_NOTIFY_EMAIL=rokaizumi@gmail.com`
+- `TELEGRAM_BOT_TOKEN` — token from @BotFather; the listing bot stays off while unset
+- `TELEGRAM_ADMIN_IDS` — comma-separated Telegram user ids allowed to list products; with it unset the bot answers but writes nothing
 
 Reuse existing `DATABASE_URL`, database SSL configuration, administrator auth and `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`. Never commit secrets or place them in client JavaScript. A restricted key has no payout, bank-account or refund access.
 
