@@ -7,7 +7,10 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import { installImageFallback } from "@/lib/imageSrc";
 import { LanguageProvider } from "./contexts/LanguageContext";
+
+installImageFallback();
 
 const queryClient = new QueryClient();
 

@@ -1,25 +1,45 @@
 /**
- * 外部圖床的商品圖改走本站 /api/img 代理，避免對方開防盜連造成破圖，
- * 同時讓 Cloudflare 邊緣快取接手。相對路徑、blob:、data: 一律原樣回傳。
+ * 商品圖幾乎都是外部圖床（kokubo.co.jp、www.yamadakagaku.co.jp、
+ * kaigo.itembox.design）的直連網址。平常直接連對方最快，也吃得到對方的 CDN；
+ * 只有載入失敗時才改走本站 /api/img 代理重試一次，這樣對方哪天開防盜連、
+ * 或擋掉機房 IP，商品圖也不會變成破圖。
+ *
+ * 相對路徑、blob:、data: 一律原樣輸出。
  */
-// kokubo.co.jp 不檢查 Referer，直接連線即可；而且它會擋掉阿里雲新加坡的 IP，
-// 走伺服器代理反而一定 504，所以刻意不列入代理名單。
-const PROXIED_HOSTS = new Set([
-  "www.yamadakagaku.co.jp",
-  "kaigo.itembox.design",
-]);
-
 export function imgSrc(url?: string | null): string {
-  if (!url) return "";
-  if (!/^https?:\/\//i.test(url)) return url;
+  return url ?? "";
+}
 
-  try {
-    const parsed = new URL(url);
-    if (PROXIED_HOSTS.has(parsed.hostname.toLowerCase())) {
-      return `/api/img?url=${encodeURIComponent(url)}`;
-    }
-  } catch {
-    // 解析失敗就照原樣輸出
-  }
-  return url;
+/** 把原始網址轉成本站代理網址。 */
+export function proxySrc(url: string): string {
+  return `/api/img?url=${encodeURIComponent(url)}`;
+}
+
+/**
+ * 全域攔截圖片載入失敗，改成走代理再試一次。
+ *
+ * 圖片載入失敗的 error 事件不會冒泡，所以要在 capture 階段攔。攔到之後
+ * 呼叫 stopPropagation，讓這次失敗不要傳到元件的 onError（否則元件會立刻
+ * 退成文字方塊，代理都還沒試）。代理若也失敗，錯誤會再來一次，那時 src
+ * 已經是相對路徑、不會再被這裡接手，就會正常交給元件顯示替代內容。
+ *
+ * data-img-fallback 記住「哪個原始網址已經重試過」，換成別的圖就會重新
+ * 取得一次救援機會，也避免同一張圖無限重試。
+ */
+export function installImageFallback(): void {
+  if (typeof window === "undefined") return;
+  window.addEventListener(
+    "error",
+    event => {
+      const target = event.target as HTMLImageElement | null;
+      if (!target || target.tagName !== "IMG") return;
+      const src = target.currentSrc || target.src;
+      if (!/^https?:\/\//i.test(src)) return;
+      if (target.dataset.imgFallback === src) return;
+      target.dataset.imgFallback = src;
+      target.src = proxySrc(src);
+      event.stopPropagation();
+    },
+    true
+  );
 }
