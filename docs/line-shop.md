@@ -33,6 +33,8 @@ The earliest `active` store is the shop's primary store: new orders are tagged w
 
 `/line-shop/admin.html` serves both audiences. It reads `/api/line-shop/auth/me` on load: an administrator gets 商品上架管理, every order and 已登錄商店; an owner of an `active` store gets only their own orders from `/api/line-shop/store/orders`; anyone else is redirected to `store.html`, and a signed-out visitor to `login.html`.
 
+The backend pages share the storefront's `style.css` rather than keeping a second stylesheet: `login.html` and `store.html` set `class="formpage"` on `<body>`, which switches on the form layout (soft background, 900px column, stacked labels, tabs).
+
 ## Operational checks
 
 1. In Stripe test mode, submit recipient details, follow the returned checkout URL, pay with an official test card, and verify the webhook and admin status. Test-mode emails are intentionally suppressed.
@@ -62,6 +64,14 @@ The same page also edits the customer-facing copy: 品名, 說明, 規格, 日�
 ### Product images
 
 Product photos live in the repository at `client/public/line-shop/img/<id>.webp` and are served from `/line-shop/img/...` with a one-week `Cache-Control`. They were originally hotlinked to a third party's test site, so one outage there would have blanked the whole shop. `server/public/line-shop-catalog.json` is the source of truth for those paths, and the one-time `2026-10-30-self-hosted-images` migration rewrites `data_json.image` for rows that still hold the old external URL or an inline base64 image; `admin_json` overrides are never touched. `server/line-shop-catalog.test.ts` fails if a catalog image points off-site, uses a `data:` URI, or is missing from disk. Two products (`COSTCO-76872`, `COSTCO-88665`) intentionally have no photo and render the 商品照片準備中 placeholder.
+
+### External image hosts
+
+Most of the catalogue still points at a supplier's own image host (1122 products on `kokubo.co.jp`, 277 on `www.yamadakagaku.co.jp`, 220 on `kaigo.itembox.design`). Self-hosting all of them would add roughly 100MB to the repository, so they stay hotlinked. `imgSrc()` in `client/src/lib/imageSrc.ts` returns those URLs unchanged, so the browser normally talks to the supplier's CDN directly.
+
+`installImageFallback()`, registered once in `client/src/main.tsx`, listens for image `error` events in the capture phase (image errors do not bubble) and retries the same URL through `/api/img?url=…`, then stops propagation so the component does not give up while the retry is in flight. `data-img-fallback` records which original URL was already retried, so each photo gets exactly one rescue attempt and a different photo gets its own. If the proxy also fails the `src` is already relative, the listener ignores it, and the component renders its placeholder.
+
+`server/image-proxy.ts` only forwards `https` requests to an allowlist (`kokubo.co.jp`, `www.kokubo.co.jp`, `www.yamadakagaku.co.jp`, `kaigo.itembox.design`, plus `IMAGE_PROXY_HOSTS`), rejects non-image content types and bodies over 8MB, and caches the response for 30 days. `server/image-src.test.ts` covers the retry, the loop guard and the non-image cases.
 
 ### Uploading a photo
 

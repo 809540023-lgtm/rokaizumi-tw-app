@@ -42,3 +42,25 @@ nav[aria-label="商店分類"]{display:block;padding:14px 20px 18px;background:l
 @media(max-width:850px){nav[aria-label="商店分類"]{padding:12px 16px 15px}.catalog-switch{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.utility-switch{margin-top:8px}}
 @media(max-width:600px){.catalog-switch button{min-height:64px;padding:9px 8px;font-size:15px}.nav-caption{font-size:15px}}
 dialog.fallback-open{display:block;position:fixed;inset:0;margin:auto;z-index:60;max-height:92vh;overflow:auto;background:#fff;box-shadow:0 0 0 100vmax #0b1f2a99}
+
+/* 商店後台的表單頁（login.html / store.html）沿用這份樣式表，
+   只補上表單頁需要的排版，不再另外維護一份 admin.css。 */
+[hidden]{display:none!important}
+body.formpage{background:var(--soft)}
+.formpage .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 20px}
+.formpage .topbar nav{display:flex;align-items:center;gap:14px;width:auto;max-width:none;margin:0;padding:0;overflow:visible;font-size:14px;flex-wrap:wrap}
+.formpage main{max-width:900px;padding-bottom:60px}
+.formpage h1{font-size:26px}
+.formpage .lede{color:#4b6678;font-size:14px;margin:0 0 22px}
+.formpage .card{display:block;padding:24px;margin:0 0 20px}
+.formpage .card.narrow{max-width:460px;margin:40px auto}
+.formpage form{display:grid;gap:14px}
+.formpage label{font-weight:600;gap:6px}
+.formpage .hint{font-size:12px;font-weight:400;color:#5d7788}
+.formpage .status{font-size:14px;min-height:1.4em;margin:0}
+.formpage .status.error{color:#b3261e}
+.formpage .btn.block{width:100%}
+.formpage .tabs{display:flex;background:var(--soft);border-radius:10px;padding:4px;margin:0 0 20px}
+.formpage .tabs button{flex:1;border:0;border-radius:7px;background:none;padding:9px;font-size:14px;font-weight:700;color:#5d7788}
+.formpage .tabs button.active{background:#fff;color:var(--blue);box-shadow:0 1px 4px #102c421f}
+@media(max-width:560px){.formpage main{padding:20px 14px 48px}.formpage .card{padding:18px}}
