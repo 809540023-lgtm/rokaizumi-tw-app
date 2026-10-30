@@ -543,6 +543,99 @@ router.use("/admin", async (req, res, next) => {
   } catch {}
   res.status(401).json({ error: "請先以公司網站管理員帳號登入" });
 });
+const MAX_PRODUCT_PRICE_TWD = 100000;
+const MAX_PRODUCT_STOCK = 100000;
+
+// 商品上架管理。價格與庫存改資料庫，商店頁直接讀同一份資料，改完立即生效。
+router.get(
+  "/admin/products",
+  handled(async (_req, res) => {
+    const db = await database();
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT id,data_json,stock,active FROM line_shop_products ORDER BY id"
+    );
+    res.json({
+      products: rows.map(r => {
+        const product = parsed<ShopProduct>(r.data_json);
+        return {
+          id: r.id,
+          name: product.name,
+          jp: typeof product.jp === "string" ? product.jp : "",
+          spec: typeof product.spec === "string" ? product.spec : "",
+          catalog: product.catalog,
+          price: product.price,
+          stock: Number(r.stock),
+          active: Boolean(r.active),
+          image: typeof product.image === "string" ? product.image : "",
+          // 封存名單寫在程式碼裡（法規或供貨問題），不可用介面重新上架。
+          blocked: excluded.has(r.id),
+        };
+      }),
+    });
+  })
+);
+
+router.patch(
+  "/admin/products/:id",
+  handled(async (req, res) => {
+    const body = req.body ?? {};
+    const keys = Object.keys(body);
+    const editable = ["active", "price", "stock"];
+    if (!keys.length || keys.some(k => !editable.includes(k)))
+      throw new ShopInputError("只能修改上架狀態、價格與庫存");
+
+    const id = String(req.params.id);
+    const db = await database();
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.execute<RowDataPacket[]>(
+        "SELECT id,data_json,stock,active FROM line_shop_products WHERE id=? FOR UPDATE",
+        [id]
+      );
+      const row = rows[0];
+      if (!row) {
+        await conn.rollback();
+        return res.status(404).json({ error: "找不到商品" });
+      }
+      const product = parsed<ShopProduct>(row.data_json);
+      const active = body.active === undefined ? Boolean(row.active) : body.active;
+      if (typeof active !== "boolean")
+        throw new ShopInputError("上架狀態格式不正確");
+      if (active && excluded.has(id))
+        throw new ShopInputError("此商品已封存，不可上架");
+      const price = body.price === undefined ? product.price : body.price;
+      if (
+        !Number.isSafeInteger(price) ||
+        price < 1 ||
+        price > MAX_PRODUCT_PRICE_TWD
+      )
+        throw new ShopInputError(
+          `價格需為 1–${MAX_PRODUCT_PRICE_TWD} 的整數`
+        );
+      const stock = body.stock === undefined ? Number(row.stock) : body.stock;
+      if (
+        !Number.isSafeInteger(stock) ||
+        stock < 0 ||
+        stock > MAX_PRODUCT_STOCK
+      )
+        throw new ShopInputError(`庫存需為 0–${MAX_PRODUCT_STOCK} 的整數`);
+
+      await conn.execute(
+        "UPDATE line_shop_products SET data_json=?, stock=?, active=? WHERE id=?",
+        [JSON.stringify({ ...product, price }), stock, active, id]
+      );
+      await conn.commit();
+      res.json({ id, price, stock, active });
+    } catch (e) {
+      await conn.rollback();
+      throw e;
+    } finally {
+      conn.release();
+    }
+  })
+);
+
 router.get(
   "/admin/orders",
   handled(async (_req, res) => {

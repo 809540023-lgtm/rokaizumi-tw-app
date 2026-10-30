@@ -3,11 +3,95 @@
   <meta charset="utf-8" /><meta
     name="viewport"
     content="width=device-width,initial-scale=1"
-  /><title>ROKA IZUMI｜訂單管理</title
+  /><title>ROKA IZUMI｜LINE 商店後台</title
   ><link rel="stylesheet" href="style.css" />
+  <style>
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 0 0 14px;
+    }
+    .toolbar input[type="search"] {
+      width: 240px;
+    }
+    .toolbar select {
+      width: auto;
+    }
+    .toolbar .count {
+      color: #5b7180;
+      font-size: 14px;
+    }
+    table.products {
+      white-space: normal;
+    }
+    table.products td {
+      vertical-align: top;
+    }
+    table.products input {
+      width: 96px;
+      padding: 6px;
+    }
+    table.products tr.is-off td {
+      opacity: 0.55;
+    }
+    table.products .pname {
+      font-weight: 650;
+      min-width: 200px;
+    }
+    table.products .muted {
+      margin: 2px 0 0;
+      font-size: 12px;
+    }
+    table.products .actions {
+      white-space: nowrap;
+    }
+    table.products .btn {
+      padding: 6px 11px;
+      font-size: 14px;
+    }
+    .btn.ghost {
+      background: #fff;
+      color: var(--ink);
+    }
+    .pill.on {
+      background: #e3f4ec;
+      color: #1c6b45;
+    }
+    .pill.off {
+      background: #f0e9e9;
+      color: #7a4b4b;
+    }
+    .result {
+      display: block;
+      font-size: 13px;
+      color: #5b7180;
+      min-height: 1em;
+    }
+  </style>
   <main>
-    <h1>LINE 商店訂單管理</h1>
+    <h1>LINE 商店後台</h1>
     <p>請先使用公司網站的管理員帳號<a href="/login">登入</a>。</p>
+
+    <h2>商品上架管理</h2>
+    <p>
+      這裡列出商店的全部商品。改價格或庫存後要按該列的「儲存」才會生效；「下架」會讓商品立刻從商店消失，但已成立的訂單不受影響。
+    </p>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="搜尋編號、品名或日文名" />
+      <select id="filter">
+        <option value="all">全部商品</option>
+        <option value="active">上架中</option>
+        <option value="inactive">已下架</option>
+        <option value="out">庫存 0</option>
+      </select>
+      <button class="btn" id="reloadProducts">重新載入商品</button>
+      <span class="count" id="productCount"></span>
+    </div>
+    <div id="products" role="status">載入中…</div>
+
+    <h2>訂單管理</h2>
     <p>
       客人付款成功後，公司會收到已付款通知。已付款訂單可操作「開始備貨」，實際寄出後操作「標記已出貨」，並填寫物流單號。<br />新訂單會自動計算運費並建立
       Stripe
@@ -142,7 +226,113 @@
         b.disabled = false;
       }
     });
+    let allProducts = [];
+    const productBox = document.getElementById("products");
+    const productRow = p => {
+      const sub = [p.spec, p.jp].filter(Boolean).join("｜");
+      return `<tr data-id="${esc(p.id)}" class="${p.active ? "" : "is-off"}">
+        <td><code>${esc(p.id)}</code></td>
+        <td><div class="pname">${esc(p.name)}</div>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}</td>
+        <td><input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" value="${esc(p.price)}"></td>
+        <td><input name="stock" type="number" inputmode="numeric" min="0" max="100000" step="1" value="${esc(p.stock)}"></td>
+        <td><span class="pill ${p.active ? "on" : "off"}">${p.active ? "上架中" : "已下架"}</span></td>
+        <td class="actions"><button class="btn" data-save>儲存</button><button class="btn ghost" data-toggle>${p.active ? "下架" : "上架"}</button><span class="result" role="status"></span></td>
+      </tr>`;
+    };
+    function renderProducts() {
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const filter = document.getElementById("filter").value;
+      const rows = allProducts.filter(p => {
+        if (
+          q &&
+          !`${p.id} ${p.name} ${p.jp} ${p.spec}`.toLowerCase().includes(q)
+        )
+          return false;
+        if (filter === "active") return p.active;
+        if (filter === "inactive") return !p.active;
+        if (filter === "out") return p.stock === 0;
+        return true;
+      });
+      const onSale = allProducts.filter(p => p.active).length;
+      document.getElementById("productCount").textContent =
+        `顯示 ${rows.length} / ${allProducts.length} 件（上架中 ${onSale} 件）`;
+      productBox.innerHTML = rows.length
+        ? `<div class="tablewrap"><table class="products"><thead><tr><th>編號</th><th>商品</th><th>價格 NT$</th><th>庫存</th><th>狀態</th><th>操作</th></tr></thead><tbody>${rows.map(productRow).join("")}</tbody></table></div>`
+        : "<p>沒有符合的商品。</p>";
+    }
+    async function loadProducts() {
+      productBox.textContent = "載入中…";
+      try {
+        const r = await fetch("/api/line-shop/admin/products", {
+          cache: "no-store",
+        });
+        const d = await r.json();
+        if (!r.ok) throw Error(d.error);
+        allProducts = d.products;
+        renderProducts();
+      } catch (e) {
+        productBox.textContent = e.message || "商品載入失敗，請重新載入";
+      }
+    }
+    async function patchProduct(id, body) {
+      const r = await fetch(
+        "/api/line-shop/admin/products/" + encodeURIComponent(id),
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error);
+      const p = allProducts.find(x => x.id === id);
+      if (p) Object.assign(p, { price: d.price, stock: d.stock, active: d.active });
+    }
+    let toastTimer;
+    function toast(message) {
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast";
+        el.className = "toast";
+        document.body.append(el);
+      }
+      el.textContent = message;
+      el.classList.remove("hidden");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add("hidden"), 2200);
+    }
+    productBox.addEventListener("click", async e => {
+      const btn = e.target.closest("button[data-save],button[data-toggle]");
+      if (!btn) return;
+      const tr = btn.closest("tr");
+      const id = tr.dataset.id;
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+      const out = tr.querySelector(".result");
+      const saving = btn.hasAttribute("data-save");
+      const body = saving
+        ? {
+            price: Number(tr.querySelector('input[name="price"]').value),
+            stock: Number(tr.querySelector('input[name="stock"]').value),
+          }
+        : { active: !product.active };
+      btn.disabled = true;
+      out.textContent = "儲存中…";
+      try {
+        await patchProduct(id, body);
+        renderProducts();
+        toast(saving ? "已儲存" : product.active ? "已下架" : "已上架");
+      } catch (error) {
+        out.textContent = error.message || "沒有儲存成功，請重試";
+        btn.disabled = false;
+      }
+    });
+    document.getElementById("q").oninput = renderProducts;
+    document.getElementById("filter").onchange = renderProducts;
+    document.getElementById("reloadProducts").onclick = loadProducts;
     document.getElementById("refresh").onclick = load;
+    loadProducts();
     load();
   </script>
 </html>
