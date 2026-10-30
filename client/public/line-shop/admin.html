@@ -69,6 +69,48 @@
       color: #5b7180;
       min-height: 1em;
     }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #a9bbc6;
+      border-radius: 6px;
+      font: inherit;
+      color: var(--ink);
+      resize: vertical;
+    }
+    #editForm label {
+      margin-bottom: 12px;
+    }
+    #editForm .btn {
+      width: 100%;
+    }
+    .preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #5b7180;
+    }
+    .preview img {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      background: var(--soft);
+      border-radius: 8px;
+    }
+    .preview img.broken {
+      visibility: hidden;
+    }
+    .edited {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 12px;
+      background: #eef3f7;
+      color: #456275;
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
   </style>
   <main>
     <h1>LINE 商店後台</h1>
@@ -104,6 +146,31 @@
     <h2>寄信狀態</h2>
     <div id="mail"></div>
   </main>
+
+  <dialog id="editDialog">
+    <div class="dialoghead">
+      <h2>編輯商品內容</h2>
+      <button class="close" type="button" id="editClose">關閉</button>
+    </div>
+    <p class="muted" id="editMeta"></p>
+    <form id="editForm">
+      <label>品名<input name="name" maxlength="120" required /></label>
+      <div class="field-grid">
+        <label>規格<input name="spec" maxlength="60" /></label>
+        <label>日文名<input name="jp" maxlength="120" /></label>
+        <label>標籤<input name="tag" maxlength="40" /></label>
+      </div>
+      <label>說明<textarea name="desc" rows="5" maxlength="1000"></textarea></label>
+      <label>圖片網址<input name="image" maxlength="500" placeholder="https://…" /></label>
+      <div class="preview" id="editPreview"></div>
+      <p class="muted">
+        任何欄位留空，就會還原成目錄檔（line-shop-catalog.json）的原始值。圖片網址需以
+        https:// 或 / 開頭。
+      </p>
+      <p class="result" role="status"></p>
+      <button class="btn" type="submit">儲存內容</button>
+    </form>
+  </dialog>
   <script>
     const esc = s =>
       String(s ?? "").replace(
@@ -230,13 +297,16 @@
     const productBox = document.getElementById("products");
     const productRow = p => {
       const sub = [p.spec, p.jp].filter(Boolean).join("｜");
+      const edited = (p.overridden || []).length
+        ? '<span class="edited" title="品名／說明／圖片已在後台改過">已改內容</span>'
+        : "";
       return `<tr data-id="${esc(p.id)}" class="${p.active ? "" : "is-off"}">
         <td><code>${esc(p.id)}</code></td>
-        <td><div class="pname">${esc(p.name)}</div>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}</td>
+        <td><div class="pname">${esc(p.name)}${edited}</div>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}</td>
         <td><input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" value="${esc(p.price)}"></td>
         <td><input name="stock" type="number" inputmode="numeric" min="0" max="100000" step="1" value="${esc(p.stock)}"></td>
         <td><span class="pill ${p.active ? "on" : "off"}">${p.active ? "上架中" : "已下架"}</span></td>
-        <td class="actions"><button class="btn" data-save>儲存</button><button class="btn ghost" data-toggle>${p.active ? "下架" : "上架"}</button><span class="result" role="status"></span></td>
+        <td class="actions"><button class="btn" data-save>儲存</button><button class="btn ghost" data-toggle>${p.active ? "下架" : "上架"}</button><button class="btn ghost" data-edit>編輯內容</button><span class="result" role="status"></span></td>
       </tr>`;
     };
     function renderProducts() {
@@ -286,7 +356,8 @@
       const d = await r.json();
       if (!r.ok) throw Error(d.error);
       const p = allProducts.find(x => x.id === id);
-      if (p) Object.assign(p, { price: d.price, stock: d.stock, active: d.active });
+      if (p) Object.assign(p, d);
+      return d;
     }
     let toastTimer;
     function toast(message) {
@@ -303,12 +374,15 @@
       toastTimer = setTimeout(() => el.classList.add("hidden"), 2200);
     }
     productBox.addEventListener("click", async e => {
-      const btn = e.target.closest("button[data-save],button[data-toggle]");
+      const btn = e.target.closest(
+        "button[data-save],button[data-toggle],button[data-edit]"
+      );
       if (!btn) return;
       const tr = btn.closest("tr");
       const id = tr.dataset.id;
       const product = allProducts.find(p => p.id === id);
       if (!product) return;
+      if (btn.hasAttribute("data-edit")) return openEdit(product);
       const out = tr.querySelector(".result");
       const saving = btn.hasAttribute("data-save");
       const body = saving
@@ -323,6 +397,63 @@
         await patchProduct(id, body);
         renderProducts();
         toast(saving ? "已儲存" : product.active ? "已下架" : "已上架");
+      } catch (error) {
+        out.textContent = error.message || "沒有儲存成功，請重試";
+        btn.disabled = false;
+      }
+    });
+
+    const editDialog = document.getElementById("editDialog");
+    const editForm = document.getElementById("editForm");
+    const editPreview = document.getElementById("editPreview");
+    const CONTENT_FIELDS = ["name", "spec", "jp", "tag", "desc", "image"];
+    let editingId = null;
+    let editingProduct = null;
+
+    function showPreview() {
+      const url = editForm.elements.image.value.trim();
+      editPreview.innerHTML = url
+        ? `<img src="${esc(url)}" alt="圖片預覽" referrerpolicy="no-referrer">`
+        : "<span>目前沒有圖片，商店會顯示待補圖。</span>";
+      const img = editPreview.querySelector("img");
+      if (img) img.onerror = () => img.classList.add("broken");
+    }
+    function openEdit(product) {
+      editingId = product.id;
+      editingProduct = product;
+      document.getElementById("editMeta").textContent =
+        `${product.id}｜${product.catalog}｜${product.active ? "上架中" : "已下架"}`;
+      for (const f of CONTENT_FIELDS)
+        editForm.elements[f].value = product[f] ?? "";
+      editForm.querySelector(".result").textContent = "";
+      editForm.querySelector("button.btn").disabled = false;
+      showPreview();
+      editDialog.showModal();
+    }
+    editForm.elements.image.addEventListener("input", showPreview);
+    document.getElementById("editClose").onclick = () => editDialog.close();
+    editForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!editingId) return;
+      const out = editForm.querySelector(".result");
+      const btn = editForm.querySelector("button.btn");
+      const body = {};
+      // 只送真的改過的欄位，沒動的不要被釘成覆寫值，這樣目錄檔之後更新還能生效。
+      for (const f of CONTENT_FIELDS) {
+        const value = editForm.elements[f].value.trim();
+        if (value !== (editingProduct[f] ?? "")) body[f] = value;
+      }
+      if (!Object.keys(body).length) {
+        editDialog.close();
+        return;
+      }
+      btn.disabled = true;
+      out.textContent = "儲存中…";
+      try {
+        await patchProduct(editingId, body);
+        editDialog.close();
+        renderProducts();
+        toast("商品內容已更新");
       } catch (error) {
         out.textContent = error.message || "沒有儲存成功，請重試";
         btn.disabled = false;

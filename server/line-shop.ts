@@ -114,6 +114,7 @@ async function initialize(db: Pool) {
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_products (id VARCHAR(40) PRIMARY KEY, data_json JSON NOT NULL, stock INT NOT NULL, active BOOLEAN NOT NULL DEFAULT TRUE)`
   );
+  await ensureProductContentColumn(db);
   await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_orders (id VARCHAR(40) PRIMARY KEY, request_key VARCHAR(64) UNIQUE NOT NULL, request_hash CHAR(64) NOT NULL, token_hash CHAR(64) NOT NULL, items_json JSON NOT NULL, customer_json JSON NOT NULL, subtotal INT NOT NULL, shipping INT NULL, ems_jpy INT NULL, weight_grams INT NULL, mode VARCHAR(10) NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'awaiting_quote', session_id VARCHAR(255) UNIQUE NULL, payment_intent VARCHAR(255) NULL, checkout_url TEXT NULL, reserved BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`
   );
@@ -136,6 +137,38 @@ async function initialize(db: Pool) {
       [products.map(p => [p.id, JSON.stringify(p), p.stock])]
     );
   await setStoreStockToTen(db);
+}
+// 後台改過的品名、說明、圖片等放在 admin_json，只有被改到的欄位才蓋掉目錄檔，
+// 沒改的仍跟著 line-shop-catalog.json 走。
+const CONTENT_FIELDS = ["name", "desc", "spec", "jp", "tag", "image"] as const;
+type ProductContent = Partial<Record<(typeof CONTENT_FIELDS)[number], string>>;
+const CONTENT_LIMITS: Record<(typeof CONTENT_FIELDS)[number], [string, number]> =
+  {
+    name: ["品名", 120],
+    desc: ["說明", 1000],
+    spec: ["規格", 60],
+    jp: ["日文名", 120],
+    tag: ["標籤", 40],
+    image: ["圖片網址", 500],
+  };
+function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {
+  const [label, max] = CONTENT_LIMITS[field];
+  if (typeof value !== "string")
+    throw new ShopInputError(`${label}格式不正確`);
+  const text = value.trim();
+  if (text.length > max) throw new ShopInputError(`${label}不得超過 ${max} 字`);
+  if (field === "image" && text && !/^https:\/\//.test(text) && !/^\/(?!\/)/.test(text))
+    throw new ShopInputError("圖片網址需以 https:// 或 / 開頭");
+  return text;
+}
+async function ensureProductContentColumn(db: Pool) {
+  const [cols] = await db.query<RowDataPacket[]>(
+    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='line_shop_products' AND COLUMN_NAME='admin_json'"
+  );
+  if (!cols.length)
+    await db.query(
+      "ALTER TABLE line_shop_products ADD COLUMN admin_json JSON NULL"
+    );
 }
 async function setStoreStockToTen(db: Pool) {
   const conn = await db.getConnection();
@@ -173,12 +206,16 @@ async function setStoreStockToTen(db: Pool) {
 }
 async function catalog(db: Pool | PoolConnection) {
   const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT id,data_json,stock FROM line_shop_products WHERE active=TRUE ORDER BY id"
+    "SELECT id,data_json,stock,admin_json FROM line_shop_products WHERE active=TRUE ORDER BY id"
   );
   return rows
     .filter(r => !excluded.has(r.id))
     .map(r => {
-      const product = parsed<ShopProduct>(r.data_json);
+      const stored = parsed<ShopProduct>(r.data_json);
+      const admin: ProductContent = r.admin_json
+        ? parsed<ProductContent>(r.admin_json)
+        : {};
+      const product: ShopProduct = { ...stored, ...admin };
       const publicProduct: ShopProduct = {
         id: product.id,
         name: product.name,
@@ -192,9 +229,9 @@ async function catalog(db: Pool | PoolConnection) {
         weight: product.weight,
         tag: product.tag,
         category: product.category,
-        // Descriptions are maintained in the catalog file. The database uses
-        // INSERT IGNORE for stock initialization, so its product copy can lag.
-        desc: customerDescriptions.get(product.id) ?? product.desc,
+        // 後台改過的說明優先；沒改過才用目錄檔（資料庫那份可能較舊）。
+        desc:
+          admin.desc ?? customerDescriptions.get(product.id) ?? product.desc,
         jan: product.jan,
         image: product.image,
         imageCrop: product.imageCrop,
@@ -552,21 +589,31 @@ router.get(
   handled(async (_req, res) => {
     const db = await database();
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT id,data_json,stock,active FROM line_shop_products ORDER BY id"
+      "SELECT id,data_json,stock,active,admin_json FROM line_shop_products ORDER BY id"
     );
     res.json({
       products: rows.map(r => {
-        const product = parsed<ShopProduct>(r.data_json);
+        const stored = parsed<ShopProduct>(r.data_json);
+        const admin: ProductContent = r.admin_json
+          ? parsed<ProductContent>(r.admin_json)
+          : {};
+        const product: ShopProduct = { ...stored, ...admin };
         return {
           id: r.id,
           name: product.name,
           jp: typeof product.jp === "string" ? product.jp : "",
           spec: typeof product.spec === "string" ? product.spec : "",
+          tag: typeof product.tag === "string" ? product.tag : "",
+          desc:
+            admin.desc ??
+            customerDescriptions.get(product.id) ??
+            (typeof product.desc === "string" ? product.desc : ""),
           catalog: product.catalog,
           price: product.price,
           stock: Number(r.stock),
           active: Boolean(r.active),
           image: typeof product.image === "string" ? product.image : "",
+          overridden: Object.keys(admin),
           // 封存名單寫在程式碼裡（法規或供貨問題），不可用介面重新上架。
           blocked: excluded.has(r.id),
         };
@@ -580,9 +627,9 @@ router.patch(
   handled(async (req, res) => {
     const body = req.body ?? {};
     const keys = Object.keys(body);
-    const editable = ["active", "price", "stock"];
+    const editable = ["active", "price", "stock", ...CONTENT_FIELDS];
     if (!keys.length || keys.some(k => !editable.includes(k)))
-      throw new ShopInputError("只能修改上架狀態、價格與庫存");
+      throw new ShopInputError("只能修改上架狀態、價格、庫存與商品內容");
 
     const id = String(req.params.id);
     const db = await database();
@@ -590,7 +637,7 @@ router.patch(
     try {
       await conn.beginTransaction();
       const [rows] = await conn.execute<RowDataPacket[]>(
-        "SELECT id,data_json,stock,active FROM line_shop_products WHERE id=? FOR UPDATE",
+        "SELECT id,data_json,stock,active,admin_json FROM line_shop_products WHERE id=? FOR UPDATE",
         [id]
       );
       const row = rows[0];
@@ -598,13 +645,17 @@ router.patch(
         await conn.rollback();
         return res.status(404).json({ error: "找不到商品" });
       }
-      const product = parsed<ShopProduct>(row.data_json);
+      const stored = parsed<ShopProduct>(row.data_json);
+      const admin: ProductContent = row.admin_json
+        ? parsed<ProductContent>(row.admin_json)
+        : {};
+
       const active = body.active === undefined ? Boolean(row.active) : body.active;
       if (typeof active !== "boolean")
         throw new ShopInputError("上架狀態格式不正確");
       if (active && excluded.has(id))
         throw new ShopInputError("此商品已封存，不可上架");
-      const price = body.price === undefined ? product.price : body.price;
+      const price = body.price === undefined ? stored.price : body.price;
       if (
         !Number.isSafeInteger(price) ||
         price < 1 ||
@@ -621,12 +672,42 @@ router.patch(
       )
         throw new ShopInputError(`庫存需為 0–${MAX_PRODUCT_STOCK} 的整數`);
 
+      // 留空代表還原成目錄檔的原始值，所以是把覆寫刪掉而不是存空字串。
+      for (const field of CONTENT_FIELDS) {
+        if (!(field in body)) continue;
+        const text = contentText(field, body[field]);
+        if (text) admin[field] = text;
+        else delete admin[field];
+      }
+
       await conn.execute(
-        "UPDATE line_shop_products SET data_json=?, stock=?, active=? WHERE id=?",
-        [JSON.stringify({ ...product, price }), stock, active, id]
+        "UPDATE line_shop_products SET data_json=?, stock=?, active=?, admin_json=? WHERE id=?",
+        [
+          JSON.stringify({ ...stored, price }),
+          stock,
+          active,
+          Object.keys(admin).length ? JSON.stringify(admin) : null,
+          id,
+        ]
       );
       await conn.commit();
-      res.json({ id, price, stock, active });
+      const product: ShopProduct = { ...stored, ...admin, price };
+      res.json({
+        id,
+        name: product.name,
+        spec: typeof product.spec === "string" ? product.spec : "",
+        jp: typeof product.jp === "string" ? product.jp : "",
+        tag: typeof product.tag === "string" ? product.tag : "",
+        desc:
+          admin.desc ??
+          customerDescriptions.get(id) ??
+          (typeof product.desc === "string" ? product.desc : ""),
+        image: typeof product.image === "string" ? product.image : "",
+        price,
+        stock,
+        active,
+        overridden: Object.keys(admin),
+      });
     } catch (e) {
       await conn.rollback();
       throw e;

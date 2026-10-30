@@ -126,20 +126,21 @@ describe("LINE shop product admin", () => {
       body: { price: 250, stock: 7 },
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({
+    expect(await res.json()).toMatchObject({
       id: "M001",
       price: 250,
       stock: 7,
       active: true,
+      overridden: [],
     });
     const update = mocks.execute.mock.calls.find(([sql]) =>
       String(sql).startsWith("UPDATE line_shop_products")
     );
     expect(update).toBeTruthy();
     const [sql, params] = update!;
-    expect(sql).toContain("SET data_json=?, stock=?, active=?");
+    expect(sql).toContain("SET data_json=?, stock=?, active=?, admin_json=?");
     expect(JSON.parse(params[0])).toMatchObject({ id: "M001", price: 250 });
-    expect(params.slice(1)).toEqual([7, true, "M001"]);
+    expect(params.slice(1)).toEqual([7, true, null, "M001"]);
   });
 
   it("takes a product off the shelf", async () => {
@@ -156,6 +157,91 @@ describe("LINE shop product admin", () => {
     expect(JSON.parse(update![1][0])).toMatchObject({ price: 186 });
     expect(update![1][1]).toBe(10);
     expect(update![1][2]).toBe(false);
+  });
+
+  it("stores edited copy in admin_json", async () => {
+    const res = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: {
+        name: "毛穴撫子｜米萃保濕面膜（改）",
+        desc: "新的說明文字",
+        image: "https://example.test/mask.png",
+      },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      name: "毛穴撫子｜米萃保濕面膜（改）",
+      desc: "新的說明文字",
+      image: "https://example.test/mask.png",
+      overridden: ["name", "desc", "image"],
+    });
+    const update = mocks.execute.mock.calls.find(([sql]) =>
+      String(sql).startsWith("UPDATE line_shop_products")
+    );
+    expect(JSON.parse(update![1][3])).toEqual({
+      name: "毛穴撫子｜米萃保濕面膜（改）",
+      desc: "新的說明文字",
+      image: "https://example.test/mask.png",
+    });
+    // 目錄檔那份 data_json 不該被內容編輯改寫。
+    expect(JSON.parse(update![1][0])).toMatchObject({ name: PRODUCT.name });
+  });
+
+  it("clears an override when the field is emptied", async () => {
+    mocks.execute.mockImplementation(async (sql: string) =>
+      String(sql).includes("FOR UPDATE")
+        ? [
+            [
+              {
+                ...ROW,
+                admin_json: JSON.stringify({ name: "改過的品名", desc: "改過的說明" }),
+              },
+            ],
+          ]
+        : [{ affectedRows: 1 }]
+    );
+    const res = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: { desc: "  " },
+    });
+    expect(res.status).toBe(200);
+    expect((await res.json()).overridden).toEqual(["name"]);
+    const update = mocks.execute.mock.calls.find(([sql]) =>
+      String(sql).startsWith("UPDATE line_shop_products")
+    );
+    expect(JSON.parse(update![1][3])).toEqual({ name: "改過的品名" });
+  });
+
+  it("drops admin_json entirely once nothing is overridden", async () => {
+    mocks.execute.mockImplementation(async (sql: string) =>
+      String(sql).includes("FOR UPDATE")
+        ? [[{ ...ROW, admin_json: JSON.stringify({ name: "改過的品名" }) }]]
+        : [{ affectedRows: 1 }]
+    );
+    const res = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: { name: "" },
+    });
+    expect(res.status).toBe(200);
+    const update = mocks.execute.mock.calls.find(([sql]) =>
+      String(sql).startsWith("UPDATE line_shop_products")
+    );
+    expect(update![1][3]).toBeNull();
+  });
+
+  it.each([
+    [{ image: "javascript:alert(1)" }],
+    [{ image: "http://example.test/a.png" }],
+    [{ image: "//example.test/a.png" }],
+    [{ name: "x".repeat(121) }],
+    [{ desc: "x".repeat(1001) }],
+    [{ spec: "x".repeat(61) }],
+    [{ tag: "x".repeat(41) }],
+    [{ jp: "x".repeat(121) }],
+    [{ name: 123 }],
+  ])("rejects invalid content %j", async body => {
+    const res = await call("/admin/products/M001", { method: "PATCH", body });
+    expect(res.status).toBe(400);
   });
 
   it.each([
@@ -179,7 +265,7 @@ describe("LINE shop product admin", () => {
   it("rejects fields it cannot edit", async () => {
     const res = await call("/admin/products/M001", {
       method: "PATCH",
-      body: { name: "改名" },
+      body: { weight: 100 },
     });
     expect(res.status).toBe(400);
   });
@@ -201,5 +287,60 @@ describe("LINE shop product admin", () => {
       body: { stock: 1 },
     });
     expect(res.status).toBe(404);
+  });
+
+  it("reports which fields the admin has overridden", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("FROM line_shop_products")
+        ? [[{ ...ROW, admin_json: JSON.stringify({ name: "後台改的品名" }) }]]
+        : [[]]
+    );
+    const res = await call("/admin/products");
+    const data = await res.json();
+    expect(data.products[0]).toMatchObject({
+      name: "後台改的品名",
+      overridden: ["name"],
+    });
+  });
+
+  it("shows the edited copy on the storefront", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("FROM line_shop_products")
+        ? [
+            [
+              {
+                ...ROW,
+                admin_json: JSON.stringify({
+                  name: "後台改的品名",
+                  desc: "後台改的說明",
+                  image: "https://example.test/mask.png",
+                }),
+              },
+            ],
+          ]
+        : [[]]
+    );
+    const res = await call("/products");
+    expect(res.status).toBe(200);
+    expect((await res.json()).products[0]).toMatchObject({
+      id: "M001",
+      name: "後台改的品名",
+      desc: "後台改的說明",
+      image: "https://example.test/mask.png",
+    });
+  });
+
+  it("keeps the catalog description when nobody edited it", async () => {
+    // data_json 的說明可能落後於目錄檔（INSERT IGNORE 只寫一次），所以未覆寫時
+    // 仍要優先用目錄檔那份。
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("FROM line_shop_products")
+        ? [[{ ...ROW, data_json: JSON.stringify({ ...PRODUCT, desc: "舊的說明" }) }]]
+        : [[]]
+    );
+    const res = await call("/products");
+    const desc = (await res.json()).products[0].desc;
+    expect(desc).not.toBe("舊的說明");
+    expect(desc).toContain("共10片");
   });
 });
