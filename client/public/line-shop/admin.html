@@ -162,10 +162,12 @@
       </div>
       <label>說明<textarea name="desc" rows="5" maxlength="1000"></textarea></label>
       <label>圖片網址<input name="image" maxlength="500" placeholder="https://…" /></label>
+      <label>或上傳圖片（JPG／PNG／WebP／GIF，3MB 以內）<input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+      <p class="muted" id="imageFileNote"></p>
       <div class="preview" id="editPreview"></div>
       <p class="muted">
         任何欄位留空，就會還原成目錄檔（line-shop-catalog.json）的原始值。圖片網址需以
-        https:// 或 / 開頭。
+        https:// 或 / 開頭；上傳的圖存在資料庫，按「儲存內容」後才會生效。
       </p>
       <p class="result" role="status"></p>
       <button class="btn" type="submit">儲存內容</button>
@@ -359,6 +361,19 @@
       if (p) Object.assign(p, d);
       return d;
     }
+    async function uploadProductImage(id, data) {
+      const r = await fetch(
+        "/api/line-shop/admin/products/" + encodeURIComponent(id) + "/image",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data }),
+        }
+      );
+      const d = await r.json();
+      if (!r.ok) throw Error(d.error);
+      return d;
+    }
     let toastTimer;
     function toast(message) {
       let el = document.getElementById("toast");
@@ -427,10 +442,38 @@
         editForm.elements[f].value = product[f] ?? "";
       editForm.querySelector(".result").textContent = "";
       editForm.querySelector("button.btn").disabled = false;
+      pendingImage = null;
+      imageFile.value = "";
+      imageFileNote.textContent = "";
       showPreview();
       editDialog.showModal();
     }
     editForm.elements.image.addEventListener("input", showPreview);
+    // 選檔後先記在記憶體，按「儲存內容」才真的上傳；中途關掉就什麼都不會變。
+    const imageFile = document.getElementById("imageFile");
+    const imageFileNote = document.getElementById("imageFileNote");
+    let pendingImage = null;
+    imageFile.addEventListener("change", () => {
+      pendingImage = null;
+      imageFileNote.textContent = "";
+      const file = imageFile.files?.[0];
+      if (!file) return;
+      if (file.size > 3 * 1024 * 1024) {
+        imageFile.value = "";
+        imageFileNote.textContent = "圖片不得超過 3MB，請先壓縮再上傳。";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingImage = String(reader.result);
+        imageFileNote.textContent = `已選擇 ${file.name}，按「儲存內容」後才會套用。`;
+      };
+      reader.onerror = () => {
+        imageFile.value = "";
+        imageFileNote.textContent = "讀取檔案失敗，請重試。";
+      };
+      reader.readAsDataURL(file);
+    });
     document.getElementById("editClose").onclick = () => editDialog.close();
     editForm.addEventListener("submit", async e => {
       e.preventDefault();
@@ -438,19 +481,35 @@
       const out = editForm.querySelector(".result");
       const btn = editForm.querySelector("button.btn");
       const body = {};
+      btn.disabled = true;
+      let uploaded = null;
+      try {
+        if (pendingImage) {
+          out.textContent = "圖片上傳中…";
+          uploaded = (await uploadProductImage(editingId, pendingImage)).image;
+          editForm.elements.image.value = uploaded;
+        }
+      } catch (error) {
+        out.textContent = error.message || "圖片上傳失敗，請重試";
+        btn.disabled = false;
+        return;
+      }
       // 只送真的改過的欄位，沒動的不要被釘成覆寫值，這樣目錄檔之後更新還能生效。
       for (const f of CONTENT_FIELDS) {
         const value = editForm.elements[f].value.trim();
         if (value !== (editingProduct[f] ?? "")) body[f] = value;
       }
+      if (uploaded) body.image = uploaded;
       if (!Object.keys(body).length) {
         editDialog.close();
         return;
       }
-      btn.disabled = true;
       out.textContent = "儲存中…";
       try {
         await patchProduct(editingId, body);
+        pendingImage = null;
+        imageFile.value = "";
+        imageFileNote.textContent = "";
         editDialog.close();
         renderProducts();
         toast("商品內容已更新");

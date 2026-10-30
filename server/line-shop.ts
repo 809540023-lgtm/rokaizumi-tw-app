@@ -129,6 +129,9 @@ async function initialize(db: Pool) {
     `CREATE TABLE IF NOT EXISTS line_shop_fulfillment (order_id VARCHAR(40) PRIMARY KEY, status VARCHAR(20) NOT NULL, tracking_number VARCHAR(100) NOT NULL DEFAULT '', shipped_at TIMESTAMP NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)`
   );
   await db.query(
+    `CREATE TABLE IF NOT EXISTS line_shop_images (id CHAR(64) PRIMARY KEY, mime VARCHAR(40) NOT NULL, bytes MEDIUMBLOB NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
+  );
+  await db.query(
     `CREATE TABLE IF NOT EXISTS line_shop_migrations (migration_key VARCHAR(100) PRIMARY KEY, applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)`
   );
   const products = seed.filter(p => !excluded.has(p.id));
@@ -152,8 +155,35 @@ const CONTENT_LIMITS: Record<(typeof CONTENT_FIELDS)[number], [string, number]> 
     tag: ["標籤", 40],
     image: ["圖片網址", 500],
   };
-function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {
-  const [label, max] = CONTENT_LIMITS[field];
+// 後台上傳的商品圖存進資料庫（Render 的檔案系統重開就清空，不能存檔案），
+// 由 GET /img/:file 提供。檔名是內容雜湊，換圖就換網址，所以可以永久快取。
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const IMAGE_TYPES: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+// 用檔頭確認副檔名不是隨便填的，免得把非圖片內容當成 image/* 送出去。
+function imageMime(bytes: Buffer): string | null {
+  if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)
+    return "image/jpeg";
+  if (
+    bytes.length > 8 &&
+    bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  )
+    return "image/png";
+  if (
+    bytes.length > 12 &&
+    bytes.subarray(0, 4).toString("latin1") === "RIFF" &&
+    bytes.subarray(8, 12).toString("latin1") === "WEBP"
+  )
+    return "image/webp";
+  if (bytes.length > 6 && bytes.subarray(0, 4).toString("latin1") === "GIF8")
+    return "image/gif";
+  return null;
+}
+function contentText(field: (typeof CONTENT_FIELDS)[number], value: unknown) {  const [label, max] = CONTENT_LIMITS[field];
   if (typeof value !== "string")
     throw new ShopInputError(`${label}格式不正確`);
   const text = value.trim();
@@ -504,12 +534,38 @@ router.get("/config", (_req, res) =>
     termsVersion: TERMS_VERSION,
   })
 );
-router.get(
-  "/products",
-  handled(async (_req, res) => {
+router.get("/products", handled(async (_req, res) => {
     res.json({ products: await catalog(await database()) });
   })
 );
+// 後台上傳的商品圖。公開可讀（前台 <img> 要用），檔名是內容雜湊，
+// 同一張圖永遠是同一個網址，所以可以永久快取。
+router.get("/img/:file", async (req, res) => {
+  const file = String(req.params.file);
+  const id = file.replace(/\.[a-z]+$/, "");
+  if (!/^[0-9a-f]{64}$/.test(id)) {
+    res.status(404).type("text/plain").send("Not found");
+    return;
+  }
+  try {
+    const db = await database();
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT mime, bytes FROM line_shop_images WHERE id=?",
+      [id]
+    );
+    const row = rows[0];
+    if (!row) {
+      res.status(404).type("text/plain").send("Not found");
+      return;
+    }
+    res.setHeader("Content-Type", String(row.mime));
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.end(row.bytes);
+  } catch {
+    res.status(503).type("text/plain").send("Service unavailable");
+  }
+});
 router.use((req, res, next) => {
   if (req.method === "GET") return next();
   let submitted = "";
@@ -758,6 +814,63 @@ router.patch(
         active,
         overridden: Object.keys(admin),
       });
+    } catch (e) {
+      await conn.rollback();
+      throw e;
+    } finally {
+      conn.release();
+    }
+  })
+);
+
+router.post(
+  "/admin/products/:id/image",
+  handled(async (req, res) => {
+    const data = req.body?.data;
+    const match =
+      typeof data === "string"
+        ? /^data:([a-z/+.-]+);base64,([A-Za-z0-9+/=\s]+)$/.exec(data)
+        : null;
+    if (!match) throw new ShopInputError("請選擇 JPG、PNG、WebP 或 GIF 圖片");
+    const bytes = Buffer.from(match[2], "base64");
+    if (!bytes.length) throw new ShopInputError("圖片是空的，請重新選擇");
+    if (bytes.length > MAX_IMAGE_BYTES)
+      throw new ShopInputError("圖片不得超過 3MB，請先壓縮再上傳");
+    const mime = imageMime(bytes);
+    if (!mime || !IMAGE_TYPES[mime])
+      throw new ShopInputError("只接受 JPG、PNG、WebP 或 GIF 圖片");
+
+    const id = createHash("sha256").update(bytes).digest("hex");
+    const url = `/api/line-shop/img/${id}.${IMAGE_TYPES[mime]}`;
+    const productId = String(req.params.id);
+    const db = await database();
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
+      const [rows] = await conn.execute<RowDataPacket[]>(
+        "SELECT id,admin_json FROM line_shop_products WHERE id=? FOR UPDATE",
+        [productId]
+      );
+      const row = rows[0];
+      if (!row) {
+        await conn.rollback();
+        return res.status(404).json({ error: "找不到商品" });
+      }
+      // 內容雜湊當主鍵，重複上傳同一張圖不會長出第二份。
+      await conn.execute(
+        "INSERT IGNORE INTO line_shop_images (id,mime,bytes) VALUES (?,?,?)",
+        [id, mime, bytes]
+      );
+      const admin: ProductContent = row.admin_json
+        ? parsed<ProductContent>(row.admin_json)
+        : {};
+      admin.image = url;
+      await conn.execute(
+        "UPDATE line_shop_products SET admin_json=? WHERE id=?",
+        [JSON.stringify(admin), productId]
+      );
+      await conn.commit();
+      res.json({ id: productId, image: url });
     } catch (e) {
       await conn.rollback();
       throw e;
