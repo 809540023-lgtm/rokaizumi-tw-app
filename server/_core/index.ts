@@ -8,6 +8,7 @@ import { registerLocalAuthRoutes } from "./authLocal";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { registerApiNotFound, registerSecurityHeaders } from "./securityHeaders";
 import { initTelegramBot } from "./telegramBot";
 import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
@@ -39,6 +40,7 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  registerSecurityHeaders(app);
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
   });
@@ -73,6 +75,8 @@ async function startServer() {
       createContext,
     })
   );
+  // 未知的 /api/* 一律回 JSON 404，不要落到 SPA fallback 回傳 index.html。
+  registerApiNotFound(app);
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
