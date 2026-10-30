@@ -31,6 +31,8 @@ A store registration by a normal account starts as `pending` and cannot read ord
 
 The earliest `active` store is the shop's primary store: new orders are tagged with its `store_id`, and when the first store becomes active the previously unassigned orders are attached to it. Store owners see and fulfil only their own orders; administrators see every order and can suspend a store, which immediately blocks its order list.
 
+`/line-shop/admin.html` serves both audiences. It reads `/api/line-shop/auth/me` on load: an administrator gets 商品上架管理, every order and 已登錄商店; an owner of an `active` store gets only their own orders from `/api/line-shop/store/orders`; anyone else is redirected to `store.html`, and a signed-out visitor to `login.html`.
+
 ## Operational checks
 
 1. In Stripe test mode, submit recipient details, follow the returned checkout URL, pay with an official test card, and verify the webhook and admin status. Test-mode emails are intentionally suppressed.

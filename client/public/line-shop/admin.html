@@ -114,7 +114,7 @@
   </style>
   <main>
     <h1>LINE 商店後台</h1>
-    <p>請先使用公司網站的管理員帳號<a href="/login">登入</a>。</p>
+    <p id="whoami">正在確認登入狀態…</p>
     <p>
       <a href="store.html">商店資料</a>｜<a href="index.html">回到商店</a>｜<a
         href="#"
@@ -123,22 +123,24 @@
       >
     </p>
 
-    <h2>商品上架管理</h2>
-    <p>
-      這裡列出商店的全部商品。改價格或庫存後要按該列的「儲存」才會生效；「下架」會讓商品立刻從商店消失，但已成立的訂單不受影響。
-    </p>
-    <div class="toolbar">
-      <input id="q" type="search" placeholder="搜尋編號、品名或日文名" />
-      <select id="filter">
-        <option value="all">全部商品</option>
-        <option value="active">上架中</option>
-        <option value="inactive">已下架</option>
-        <option value="out">庫存 0</option>
-      </select>
-      <button class="btn" id="reloadProducts">重新載入商品</button>
-      <span class="count" id="productCount"></span>
-    </div>
-    <div id="products" role="status">載入中…</div>
+    <section id="productsSection" hidden>
+      <h2>商品上架管理</h2>
+      <p>
+        這裡列出商店的全部商品。改價格或庫存後要按該列的「儲存」才會生效；「下架」會讓商品立刻從商店消失，但已成立的訂單不受影響。
+      </p>
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="搜尋編號、品名或日文名" />
+        <select id="filter">
+          <option value="all">全部商品</option>
+          <option value="active">上架中</option>
+          <option value="inactive">已下架</option>
+          <option value="out">庫存 0</option>
+        </select>
+        <button class="btn" id="reloadProducts">重新載入商品</button>
+        <span class="count" id="productCount"></span>
+      </div>
+      <div id="products" role="status">載入中…</div>
+    </section>
 
     <h2>訂單管理</h2>
     <p>
@@ -217,9 +219,13 @@
       if (o.status !== "paid") return "";
       return `<p><strong>出貨狀態：${esc(fulfillmentLabels[o.fulfillmentStatus] || o.fulfillmentStatus)}</strong>${o.shippedAt ? "｜出貨時間：" + esc(o.shippedAt) : ""}</p><form data-fulfillment="${esc(o.id)}"><label>物流單號（選填）<input name="tracking" maxlength="100" value="${esc(o.trackingNumber)}"></label>${o.fulfillmentStatus === "awaiting_preparation" ? '<button class="btn" name="action" value="preparing">開始備貨</button>' : o.fulfillmentStatus === "preparing" ? '<button class="btn" name="action" value="shipped">標記已出貨</button>' : '<button class="btn" name="action" value="shipped">儲存物流單號</button>'}<p role="status" class="result"></p></form>`;
     }
+    // 管理員看全部訂單，商店帳號只看自己商店的訂單，所以路徑要分開。
+    let isAdmin = false;
+    const orderBase = () =>
+      isAdmin ? "/api/line-shop/admin/orders" : "/api/line-shop/store/orders";
     async function load() {
       try {
-        const r = await fetch("/api/line-shop/admin/orders", {
+        const r = await fetch(orderBase(), {
           cache: "no-store",
         });
         const d = await r.json();
@@ -260,7 +266,8 @@
         b.disabled = true;
         try {
           const r = await fetch(
-            "/api/line-shop/admin/orders/" +
+            orderBase() +
+              "/" +
               encodeURIComponent(f.dataset.fulfillment) +
               "/fulfillment",
             {
@@ -288,7 +295,8 @@
       b.disabled = true;
       try {
         const r = await fetch(
-          "/api/line-shop/admin/orders/" +
+          orderBase() +
+            "/" +
             encodeURIComponent(f.dataset.order) +
             "/quote",
           {
@@ -597,8 +605,31 @@
       load();
       loadStores();
     };
-    loadProducts();
-    load();
-    loadStores();
+    (async () => {
+      try {
+        const r = await fetch("/api/line-shop/auth/me", { cache: "no-store" });
+        const d = await r.json();
+        if (!d.user) {
+          window.location.href = "login.html";
+          return;
+        }
+        isAdmin = d.user.role === "admin";
+        // 商店帳號要審核通過才看得到訂單，還沒過就回去商店資料頁等。
+        if (!isAdmin && d.store?.status !== "active") {
+          window.location.href = "store.html";
+          return;
+        }
+        document.getElementById("whoami").textContent = isAdmin
+          ? `管理員：${d.user.name || d.user.email}`
+          : `商店：${d.store.name}`;
+        document.getElementById("productsSection").hidden = !isAdmin;
+        if (isAdmin) loadProducts();
+        await load();
+        await loadStores();
+      } catch (e) {
+        document.getElementById("orders").textContent =
+          e.message || "無法取得登入狀態，請重新整理。";
+      }
+    })();
   </script>
 </html>
