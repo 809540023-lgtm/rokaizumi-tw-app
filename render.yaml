@@ -10,14 +10,20 @@ services:
     envVars:
       - key: DB_PATH
         value: /data/arb.db
-      - key: SCAN_INTERVAL_HOURS
-        value: "6"
+      - key: SCAN_INTERVAL_MIN
+        value: "30"
+      - key: SEARCH_REFRESH_H
+        value: "168"
+      - key: MIN_CREDITS
+        value: "40"
       - key: FIRECRAWL_API_KEY
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: TELEGRAM_ADMIN_IDS
         sync: false
+      - key: APP_USER
+        value: admin
       - key: APP_PASSWORD
         sync: false
     disk:

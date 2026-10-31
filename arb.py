@@ -167,6 +167,75 @@ def jpy_to_twd(rates):
 
 
 # ---------------------------------------------------------------- 資料抓取
+UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+
+
+def _direct_html(url):
+    """直接 HTTP 抓頁（不經過 Firecrawl，0 credit）。"""
+    req = urllib.request.Request(url, headers={
+        "User-Agent": UA,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "ja-JP,ja;q=0.9",
+    })
+    with urllib.request.urlopen(req, timeout=25) as resp:
+        return resp.read().decode("utf-8", "replace")
+
+
+def _parse_item(url, html):
+    m = re.search(r'"price":(\d+)', html)
+    price = int(m.group(1)) if m else None
+    sold = ('"status":"SOLD"' in html) or ("購入日時" in html) or ("このオークションは終了" in html)
+    end = re.search(r'"endTime":"([^"]+)"', html)
+    bnow = re.search(r'"buyNowPrice":(\d+)', html)
+    t = re.search(r"<title[^>]*>([^<]{1,140})</title>", html)
+    title = t.group(1).strip() if t else ""
+    title = re.sub(r"\s*[-|｜]\s*Yahoo!.*$", "", title)
+    title = re.sub(r"^Yahoo!オークション\s*[-|｜]\s*", "", title).strip()
+    return {
+        "url": url,
+        "price": price,
+        "buy_now": int(bnow.group(1)) if bnow else None,
+        "sold": sold,
+        "end_time": end.group(1) if end else None,
+        "title": title,
+    }
+
+
+def check_item(url, free=True):
+    """盯單一商品頁。free=True 走直抓（0 credit），失敗才退回 Firecrawl（1 credit）。"""
+    if free:
+        try:
+            return _parse_item(url, _direct_html(url))
+        except Exception as exc:
+            print(f"[direct] {url} 失敗：{exc}，改用 Firecrawl", flush=True)
+
+    html = ""
+    if FC_KEY:
+        html = fc_post("/v2/scrape", {
+            "url": url, "formats": ["rawHtml"],
+            "location": {"country": "JP"},
+        })["data"].get("rawHtml") or ""
+    else:
+        html = firecrawl("scrape", url, "--formats", "rawHtml", "--country", "JP")
+    if not html:
+        raise RuntimeError("頁面沒有內容")
+    return _parse_item(url, html)
+
+
+def credits_left():
+    if not FC_KEY:
+        return None
+    try:
+        req = urllib.request.Request(
+            f"{FC_URL}/v2/team/credit-usage",
+            headers={"Authorization": f"Bearer {FC_KEY}"})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.load(resp)["data"]["remainingCredits"]
+    except Exception:
+        return None
+
+
 def jp_listings(keyword, status, sort=None, limit=50):
     opts = {"query": keyword, "status": status, "limit": limit}
     if sort:

@@ -6,7 +6,9 @@ arbweb.py — jp-arb 雲端版：定時比價 + 網頁儀表板 + Telegram 通�
     FIRECRAWL_API_KEY     必填，直接打 Firecrawl REST（不需要 Node）
     TELEGRAM_BOT_TOKEN    選填，有填才會推通知
     TELEGRAM_ADMIN_IDS    選填，逗號分隔的 chat id
-    SCAN_INTERVAL_HOURS   預設 6
+    SCAN_INTERVAL_MIN     預設 30（盯特定商品頁，1 credit／台）
+    SEARCH_REFRESH_H      預設 24（完整搜尋，11 credits／台）
+    MIN_CREDITS           預設 40，剩餘額度低於此就暫停
     DB_PATH               預設 ./data/arb.db
     APP_PASSWORD          選填，設了就開 HTTP Basic 驗證
     APP_USER              預設 admin
@@ -28,21 +30,28 @@ import arb
 
 TZ = timezone(timedelta(hours=8))
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "data", "arb.db"))
-INTERVAL_H = float(os.environ.get("SCAN_INTERVAL_HOURS", "6"))
+INTERVAL_MIN = float(os.environ.get("SCAN_INTERVAL_MIN", "30"))
+SEARCH_REFRESH_H = float(os.environ.get("SEARCH_REFRESH_H", "24"))
+MIN_CREDITS = int(os.environ.get("MIN_CREDITS", "40"))
 TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TG_IDS = [i.strip() for i in os.environ.get("TELEGRAM_ADMIN_IDS", "").split(",") if i.strip()]
 APP_USER = os.environ.get("APP_USER", "admin")
 APP_PASS = os.environ.get("APP_PASSWORD", "").strip()
 
 SCAN_LOCK = threading.Lock()
-STATE = {"scanning": False, "last_run": None, "last_error": None, "progress": ""}
+STATE = {"scanning": False, "last_run": None, "last_error": None, "progress": "",
+         "credits": None, "full": None}
 
 SEED = [
-    # 日本關鍵字 | 台灣關鍵字 | 目標價(円) | 備註
-    ("Jabra Speak2 55", "jabra speak2 55", 13000, "藍芽 + USB-A/C，12h 電池，IP64"),
-    ("Jabra Speak2 40", "jabra speak2 40", 10000, "純 USB，無藍芽"),
-    ("Poly Sync 20", "poly sync 20", 8000, "藍芽 + USB"),
-    ("Jabra Speak2 75", "jabra speak2 75", 26000, "旗艦款"),
+    # 日本關鍵字 | 台灣關鍵字 | 目標價(円) | 備註 | 盯這個商品頁
+    ("Jabra Speak2 55", "jabra speak2 55", 13000, "藍芽 + USB-A/C，12h 電池，IP64",
+     "https://paypayfleamarket.yahoo.co.jp/item/z710320738"),
+    ("Jabra Speak2 40", "jabra speak2 40", 10000, "純 USB，無藍芽",
+     "https://paypayfleamarket.yahoo.co.jp/item/z714251304"),
+    ("Poly Sync 20", "poly sync 20", 8000, "藍芽 + USB",
+     "https://page.auctions.yahoo.co.jp/jp/auction/c1213636713"),
+    ("Jabra Speak2 75", "jabra speak2 75", 26000, "旗艦款",
+     "https://page.auctions.yahoo.co.jp/jp/auction/v1248080179"),
 ]
 
 
@@ -64,7 +73,12 @@ def init_db():
             tw_keyword TEXT,
             target_jpy INTEGER,
             note TEXT,
+            url TEXT,
             active INTEGER DEFAULT 1
+        );
+        CREATE TABLE IF NOT EXISTS meta(
+            key TEXT PRIMARY KEY,
+            value TEXT
         );
         CREATE TABLE IF NOT EXISTS snapshots(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,8 +112,24 @@ def init_db():
         """)
         if conn.execute("SELECT COUNT(*) FROM items").fetchone()[0] == 0:
             conn.executemany(
-                "INSERT INTO items(keyword, tw_keyword, target_jpy, note) VALUES(?,?,?,?)", SEED)
+                "INSERT INTO items(keyword, tw_keyword, target_jpy, note, url) "
+                "VALUES(?,?,?,?,?)", SEED)
+        # 舊資料沒有 url 的，用 SEED 補上
+        for kw, _tw, _tgt, _note, url in SEED:
+            conn.execute("UPDATE items SET url=? WHERE keyword=? AND (url IS NULL OR url='')",
+                         (url, kw))
         conn.commit()
+
+
+def meta_get(conn, key, default=None):
+    row = conn.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()
+    return row["value"] if row else default
+
+
+def meta_set(conn, key, value):
+    conn.execute("INSERT INTO meta(key, value) VALUES(?,?) "
+                 "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, str(value)))
+    conn.commit()
 
 
 def now_str():
@@ -128,10 +158,28 @@ def telegram(text):
 
 # ---------------------------------------------------------------- 掃描
 def scan_one(keyword, tw_kw):
+    """完整搜尋（貴：11 credits）— 更新台灣價、成交行情、找更好的在售品。"""
     try:
         return arb.evaluate(keyword, tw_kw or keyword)
     except Exception as exc:
         return {"keyword": keyword, "note": f"掃描失敗：{str(exc)[:160]}"}
+
+
+def check_one(item):
+    """盯單一商品頁（便宜：1 credit）。"""
+    try:
+        res = arb.check_item(item["url"])
+    except Exception as exc:
+        return {"keyword": item["keyword"], "note": f"檢查失敗：{str(exc)[:120]}"}
+    return {
+        "keyword": item["keyword"],
+        "pick_id": item["url"].rsplit("/", 1)[-1],
+        "pick_url": item["url"],
+        "pick_title": res.get("title") or "",
+        "cost_jpy": None if res["sold"] else res["price"],
+        "sold": res["sold"],
+        "note": "已售出" if res["sold"] else None,
+    }
 
 
 def record(conn, row, target):
@@ -139,9 +187,24 @@ def record(conn, row, target):
     prev = conn.execute(
         "SELECT * FROM snapshots WHERE keyword=? ORDER BY ts DESC LIMIT 1", (kw,)).fetchone()
     price = row.get("cost_jpy")
+    sold = row.get("sold")
     alerts = []
 
-    if row.get("note") and not price:
+    # 便宜模式只帶價格，其餘沿用上一次的估值
+    carry = {}
+    if prev:
+        for k in ("tw_median", "tw_min", "cost_twd", "sell_twd", "net_twd",
+                  "margin_pct", "roi_pct", "risk", "jp_sold_avg"):
+            if row.get(k) is None:
+                carry[k] = prev[k]
+    merged = {**{k: row.get(k) for k in
+                 ("tw_median", "tw_min", "cost_twd", "sell_twd", "net_twd",
+                  "margin_pct", "roi_pct", "risk", "jp_sold_avg")}, **carry}
+
+    if sold:
+        alerts.append(("gone", f"⚠️ 已售出（原價 ¥{prev['jp_price']:,}）" if prev and prev["jp_price"]
+                       else "⚠️ 已售出", row.get("pick_url")))
+    elif row.get("note") and not price:
         alerts.append(("error", row["note"], None))
     else:
         if target and price and price <= target:
@@ -151,17 +214,17 @@ def record(conn, row, target):
                 alerts.append(("lower", f"📉 新低價 ¥{price:,}（上次 ¥{prev['jp_price']:,}）", row.get("pick_url")))
             elif price > prev["jp_price"]:
                 alerts.append(("higher", f"📈 漲價 ¥{price:,}（上次 ¥{prev['jp_price']:,}）", row.get("pick_url")))
-        if prev and prev["jp_price"] and not price:
-            alerts.append(("gone", f"⚠️ 商品消失（上次 ¥{prev['jp_price']:,}）", None))
 
     conn.execute("""INSERT INTO snapshots(keyword, ts, jp_price, jp_cond, jp_url, jp_id,
                     jp_sold_avg, tw_median, tw_min, cost_twd, sell_twd, net_twd,
                     margin_pct, roi_pct, risk, note)
                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
-        kw, now_str(), price, row.get("pick_condition"), row.get("pick_url"), row.get("pick_id"),
-        row.get("jp_sold_avg_jpy"), row.get("tw_median"), row.get("tw_min"),
-        row.get("cost_twd"), row.get("sell_twd"), row.get("net_twd"),
-        row.get("margin_pct"), row.get("roi_pct"), row.get("risk"), row.get("note")))
+        kw, now_str(), price, row.get("pick_condition") or (prev["jp_cond"] if prev else None),
+        row.get("pick_url") or (prev["jp_url"] if prev else None),
+        row.get("pick_id") or (prev["jp_id"] if prev else None),
+        merged["jp_sold_avg"], merged["tw_median"], merged["tw_min"],
+        merged["cost_twd"], merged["sell_twd"], merged["net_twd"],
+        merged["margin_pct"], merged["roi_pct"], merged["risk"], row.get("note")))
     for kind, msg, url in alerts:
         conn.execute("INSERT INTO alerts(ts, keyword, kind, message, url) VALUES(?,?,?,?,?)",
                      (now_str(), kw, kind, msg, url))
@@ -169,21 +232,48 @@ def record(conn, row, target):
     return alerts
 
 
-def run_scan(trigger="auto"):
+def run_scan(trigger="auto", full=None):
     if not SCAN_LOCK.acquire(blocking=False):
         return {"ok": False, "error": "掃描中，請稍後"}
     try:
         STATE.update(scanning=True, last_error=None, progress="")
         init_db()
+
         with closing(db()) as conn:
             items = conn.execute("SELECT * FROM items WHERE active=1").fetchall()
+            last_full = meta_get(conn, "last_full_search")
+            if full is None:
+                due = (not last_full) or (
+                    time.time() - float(last_full) > SEARCH_REFRESH_H * 3600)
+                full = due
+            # 盯商品頁是免費的（直抓），只有完整搜尋才需要額度
+            if full:
+                left = arb.credits_left()
+                if left is not None and left < MIN_CREDITS:
+                    msg = f"Firecrawl 額度不足（剩 {left}），本次跳過完整搜尋，只盯商品頁"
+                    STATE["last_error"] = msg
+                    conn.execute("INSERT INTO alerts(ts, keyword, kind, message) VALUES(?,?,?,?)",
+                                 (now_str(), "-", "error", msg))
+                    conn.commit()
+                    full = False
             all_alerts = []
             for idx, it in enumerate(items, 1):
                 STATE["progress"] = f"{idx}/{len(items)} {it['keyword']}"
-                row = scan_one(it["keyword"], it["tw_keyword"])
+                has_val = conn.execute(
+                    "SELECT 1 FROM snapshots WHERE keyword=? AND tw_median IS NOT NULL LIMIT 1",
+                    (it["keyword"],)).fetchone()
+                if full or not it["url"] or not has_val:
+                    row = scan_one(it["keyword"], it["tw_keyword"])
+                else:
+                    row = check_one(it)
                 all_alerts += [(it["keyword"],) + a for a in record(conn, row, it["target_jpy"])]
+            if full:
+                meta_set(conn, "last_full_search", time.time())
+            meta_set(conn, "last_scan", time.time())
 
         STATE["last_run"] = now_str()
+        STATE["credits"] = arb.credits_left()
+        STATE["full"] = bool(full)
 
         if all_alerts:
             lines = [f"<b>jp-arb 比價通知</b>（{trigger}）", ""]
@@ -195,7 +285,8 @@ def run_scan(trigger="auto"):
             with closing(db()) as conn:
                 conn.execute("UPDATE alerts SET sent=1 WHERE sent=0")
                 conn.commit()
-        return {"ok": True, "alerts": len(all_alerts)}
+        return {"ok": True, "alerts": len(all_alerts), "full": bool(full),
+                "credits": STATE["credits"]}
     except Exception as exc:
         STATE["last_error"] = str(exc)[:300]
         return {"ok": False, "error": str(exc)[:300]}
@@ -211,7 +302,7 @@ def scheduler():
             run_scan("排程")
         except Exception as exc:
             print(f"[scheduler] {exc}", flush=True)
-        time.sleep(INTERVAL_H * 3600)
+        time.sleep(INTERVAL_MIN * 60)
 
 
 # ---------------------------------------------------------------- 網頁
@@ -315,7 +406,7 @@ def render():
 
     scanning = STATE["scanning"]
     status = (f'掃描中 {html.escape(STATE["progress"])}' if scanning
-              else f'上次掃描：{STATE["last_run"] or "尚未執行"}　每 {INTERVAL_H:g} 小時自動掃描')
+              else f'上次掃描：{STATE["last_run"] or "尚未執行"}　每 {INTERVAL_MIN:g} 分鐘盯一次（每 {SEARCH_REFRESH_H:g} 小時做一次完整搜尋）')
     err = f'<div class="neg" style="font-size:13px">{html.escape(STATE["last_error"])}</div>' if STATE["last_error"] else ""
 
     return f"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
