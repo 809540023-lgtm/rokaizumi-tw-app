@@ -99,3 +99,30 @@ SONY WH-1000XM5 | sony wh-1000xm5
 - 匯率：open.er-api.com（快取 12 小時，存於 `~/.cache/jp-arb/rates.json`）
 
 價格為掃描當下快照，下單前務必點連結複查。
+
+---
+
+## 雲端版（Render）
+
+線上部屬：`https://jp-arb.onrender.com`（自訂網域 `2th.rokaizumi-tw.jp` 待 DNS 生效）
+
+- 程式在 `rokaizumi-tw-app` 的 **`jp-arb` 分支**（獨立分支，`main` 主站不受影響）
+- 服務 ID：`srv-dbik14142hec73an767g`，方案 Starter，1GB 持久磁碟掛在 `/data`
+- 背景排程每 6 小時掃一次，結果寫入 SQLite，網頁可即時查看
+- 網頁有 HTTP Basic 驗證（帳密見 `.deploy-notes.txt`）
+
+環境變數（Render Dashboard → jp-arb → Environment）：
+
+| 變數 | 說明 |
+|---|---|
+| `FIRECRAWL_API_KEY` | Firecrawl API key（伺服器走 REST，不需要 Node） |
+| `TELEGRAM_BOT_TOKEN` | 選填，填了才會推 Telegram |
+| `TELEGRAM_ADMIN_IDS` | 選填，逗號分隔 chat id |
+| `APP_PASSWORD` | 網頁登入密碼 |
+| `SCAN_INTERVAL_HOURS` | 預設 6 |
+
+手動重新部署：
+
+```bash
+render deploys create srv-dbik14142hec73an767g --confirm --wait
+```
