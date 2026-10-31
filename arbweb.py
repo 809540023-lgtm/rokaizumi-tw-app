@@ -195,13 +195,17 @@ def record(conn, row, target):
     sold = row.get("sold")
     alerts = []
 
-    # 便宜模式只帶價格，其餘沿用上一次的估值
+    # 便宜模式只帶價格，其餘沿用最近一次「有估值」的紀錄
     carry = {}
-    if prev:
+    val_prev = conn.execute(
+        """SELECT * FROM snapshots
+           WHERE keyword=? AND tw_median IS NOT NULL AND net_twd IS NOT NULL
+           ORDER BY ts DESC, id DESC LIMIT 1""", (kw,)).fetchone()
+    if val_prev:
         for k in ("tw_median", "tw_min", "cost_twd", "sell_twd", "net_twd",
                   "margin_pct", "roi_pct", "risk", "jp_sold_avg"):
             if row.get(k) is None:
-                carry[k] = prev[k]
+                carry[k] = val_prev[k]
     merged = {**{k: row.get(k) for k in
                  ("tw_median", "tw_min", "cost_twd", "sell_twd", "net_twd",
                   "margin_pct", "roi_pct", "risk", "jp_sold_avg")}, **carry}

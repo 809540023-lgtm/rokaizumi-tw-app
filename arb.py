@@ -186,7 +186,10 @@ def _parse_item(url, html):
     m = re.search(r'"price":(\d+)', html)
     price = int(m.group(1)) if m else None
     sold = ('"status":"SOLD"' in html) or ("購入日時" in html) or ("このオークションは終了" in html)
-    end = re.search(r'"endTime":"([^"]+)"', html)
+    # 商品頁第一個 endTime 常是「當日 23:59:59」佔位值，要跳過
+    ends = [e for e in re.findall(r'"endTime":"([^"]+)"', html)
+            if not e.startswith("0001") and not e.endswith("T23:59:59+09:00")]
+    end = re.match(r"(.+)", ends[0]) if ends else None
     bnow = re.search(r'"buyNowPrice":(\d+)', html)
     t = re.search(r"<title[^>]*>([^<]{1,140})</title>", html)
     title = t.group(1).strip() if t else ""
