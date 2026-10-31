@@ -2,6 +2,7 @@ import express, { Router, type Request, type Response } from "express";
 import mysql, {
   type Pool,
   type PoolConnection,
+  type ResultSetHeader,
   type RowDataPacket,
 } from "mysql2/promise";
 import Stripe from "stripe";
@@ -1448,6 +1449,25 @@ router.patch(
     } finally {
       conn.release();
     }
+  })
+);
+
+// 刪除商品。只給「建錯了要收回」用；正常下架請改 active=false，
+// 這樣已成立的訂單與歷史都還查得到商品資料。
+router.delete(
+  "/admin/products/:id",
+  handled(async (req, res) => {
+    const id = String(req.params.id);
+    const db = await database();
+    const [result] = await db.query<ResultSetHeader>(
+      "DELETE FROM line_shop_products WHERE id=?",
+      [id]
+    );
+    if (!result.affectedRows) {
+      res.status(404).json({ error: "找不到商品" });
+      return;
+    }
+    res.json({ id, deleted: true });
   })
 );
 

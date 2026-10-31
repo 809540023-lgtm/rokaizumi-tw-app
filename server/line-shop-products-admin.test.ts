@@ -467,3 +467,38 @@ describe("LINE shop product creation", () => {
     expect((await missing.json()).error).toContain("分類");
   });
 });
+
+describe("LINE shop product deletion", () => {
+  it("deletes an existing product", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).startsWith("DELETE FROM line_shop_products")
+          ? [{ affectedRows: 1 }]
+          : [[]]
+    );
+    const res = await call("/admin/products/TEST-1", { method: "DELETE" });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ id: "TEST-1", deleted: true });
+  });
+
+  it("returns 404 when the product is gone", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).startsWith("DELETE FROM line_shop_products")
+          ? [{ affectedRows: 0 }]
+          : [[]]
+    );
+    const res = await call("/admin/products/NOPE", { method: "DELETE" });
+    expect(res.status).toBe(404);
+  });
+
+  it("requires administrator access", async () => {
+    const res = await call("/admin/products/TEST-1", {
+      method: "DELETE",
+      admin: false,
+    });
+    expect(res.status).toBe(401);
+  });
+});
