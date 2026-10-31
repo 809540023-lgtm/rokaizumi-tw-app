@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: jp-arb
+    runtime: docker
+    plan: starter
+    branch: jp-arb
+    region: singapore
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: DB_PATH
+        value: /data/arb.db
+      - key: SCAN_INTERVAL_HOURS
+        value: "6"
+      - key: FIRECRAWL_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_ADMIN_IDS
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
+    disk:
+      name: arb-data
+      mountPath: /data
+      sizeGB: 1
