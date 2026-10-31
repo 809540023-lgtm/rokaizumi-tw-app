@@ -110,6 +110,11 @@ def init_db():
             sent INTEGER DEFAULT 0
         );
         """)
+        # 舊版資料表缺欄位時自動補上
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(items)")}
+        for col, decl in (("url", "TEXT"), ("active", "INTEGER DEFAULT 1")):
+            if col not in cols:
+                conn.execute(f"ALTER TABLE items ADD COLUMN {col} {decl}")
         if conn.execute("SELECT COUNT(*) FROM items").fetchone()[0] == 0:
             conn.executemany(
                 "INSERT INTO items(keyword, tw_keyword, target_jpy, note, url) "
