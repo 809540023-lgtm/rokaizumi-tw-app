@@ -78,10 +78,12 @@
       color: var(--ink);
       resize: vertical;
     }
-    #editForm label {
+    #editForm label,
+    #newForm label {
       margin-bottom: 12px;
     }
-    #editForm .btn {
+    #editForm .btn,
+    #newForm .btn {
       width: 100%;
     }
     .preview {
@@ -137,6 +139,7 @@
           <option value="out">庫存 0</option>
         </select>
         <button class="btn" id="reloadProducts">重新載入商品</button>
+        <button class="btn ghost" id="newProduct">新增商品</button>
         <span class="count" id="productCount"></span>
       </div>
       <div id="products" role="status">載入中…</div>
@@ -187,6 +190,45 @@
       </p>
       <p class="result" role="status"></p>
       <button class="btn" type="submit">儲存內容</button>
+    </form>
+  </dialog>
+
+  <dialog id="newDialog">
+    <div class="dialoghead">
+      <h2>新增商品</h2>
+      <button class="close" type="button" id="newClose">關閉</button>
+    </div>
+    <form id="newForm">
+      <label>商品編號<input name="id" maxlength="40" required placeholder="例如 COSTCO-15192" /></label>
+      <p class="muted">
+        英數、點、底線與減號，長度 2–40。這個編號之後就是拍照系統對應的依據，建立後不可更改。
+      </p>
+      <label>
+        分類
+        <select name="catalog" required>
+          <option value="shop">日本選品</option>
+          <option value="supermarket">日本超市</option>
+          <option value="costco">好市多</option>
+          <option value="exclusive">專屬賣場</option>
+          <option value="ai">AI PC 周邊</option>
+        </select>
+      </label>
+      <label>品名<input name="name" maxlength="120" required /></label>
+      <div class="field-grid">
+        <label>規格<input name="spec" maxlength="60" /></label>
+        <label>日文名<input name="jp" maxlength="120" /></label>
+        <label>標籤<input name="tag" maxlength="40" /></label>
+      </div>
+      <label>說明<textarea name="desc" rows="4" maxlength="1000"></textarea></label>
+      <div class="field-grid">
+        <label>售價 NT$<input name="price" type="number" min="1" max="100000" step="1" required /></label>
+        <label>庫存<input name="stock" type="number" min="0" max="100000" step="1" required value="0" /></label>
+      </div>
+      <label>圖片網址<input name="image" maxlength="500" placeholder="https://…" /></label>
+      <label>或上傳圖片（JPG／PNG／WebP／GIF，3MB 以內）<input type="file" id="newImageFile" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
+      <p class="muted" id="newImageNote"></p>
+      <p class="result" role="status"></p>
+      <button class="btn" type="submit">建立並上架</button>
     </form>
   </dialog>
   <script>
@@ -632,6 +674,88 @@
     document.getElementById("q").oninput = renderProducts;
     document.getElementById("filter").onchange = renderProducts;
     document.getElementById("reloadProducts").onclick = loadProducts;
+
+    // 新增商品：先 POST 建立，再把選好的圖上傳並補回 image 欄位。
+    // 圖片端點綁在既有商品上，所以順序不能顛倒。
+    const newDialog = document.getElementById("newDialog");
+    const newForm = document.getElementById("newForm");
+    const newImageFile = document.getElementById("newImageFile");
+    const newImageNote = document.getElementById("newImageNote");
+    let newImageData = null;
+    newImageFile.addEventListener("change", () => {
+      newImageData = null;
+      newImageNote.textContent = "";
+      const file = newImageFile.files?.[0];
+      if (!file) return;
+      if (file.size > 3 * 1024 * 1024) {
+        newImageFile.value = "";
+        newImageNote.textContent = "圖片不得超過 3MB，請先壓縮再上傳。";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        newImageData = String(reader.result);
+        newImageNote.textContent = `已選擇 ${file.name}，按「建立並上架」後才會上傳。`;
+      };
+      reader.onerror = () => {
+        newImageData = null;
+        newImageNote.textContent = "讀取檔案失敗，請重試。";
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById("newProduct").onclick = () => {
+      newForm.reset();
+      newImageData = null;
+      newImageNote.textContent = "";
+      newForm.querySelector(".result").textContent = "";
+      newForm.querySelector("button.btn").disabled = false;
+      newDialog.showModal();
+    };
+    document.getElementById("newClose").onclick = () => newDialog.close();
+    newForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const out = newForm.querySelector(".result");
+      const btn = newForm.querySelector("button.btn");
+      const body = {};
+      for (const f of [
+        "id",
+        "catalog",
+        "name",
+        "spec",
+        "jp",
+        "tag",
+        "desc",
+        "image",
+      ]) {
+        const value = newForm.elements[f].value.trim();
+        if (value) body[f] = value;
+      }
+      body.price = Number(newForm.elements.price.value);
+      body.stock = Number(newForm.elements.stock.value);
+      btn.disabled = true;
+      out.textContent = "建立中…";
+      try {
+        const r = await fetch("/api/line-shop/admin/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const created = await r.json();
+        if (!r.ok) throw Error(created.error);
+        if (newImageData) {
+          out.textContent = "圖片上傳中…";
+          const image = (await uploadProductImage(created.id, newImageData)).image;
+          await patchProduct(created.id, { image });
+        }
+        newDialog.close();
+        await loadProducts();
+        toast(`已建立商品 ${created.id}`);
+      } catch (error) {
+        out.textContent = error.message || "沒有建立成功，請重試";
+        btn.disabled = false;
+      }
+    });
+
     document.getElementById("refresh").onclick = () => {
       load();
       loadStores();
