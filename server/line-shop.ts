@@ -248,15 +248,33 @@ export const SHOP_CATALOGS = [
 ] as const;
 export type ShopCatalog = (typeof SHOP_CATALOGS)[number];
 export type NewShopProduct = {
+  // 外部系統（拍照雷達）會帶自己的商品編號進來，沒帶才由商店自動產生。
+  id?: string;
   name: string;
   price: number;
   stock: number;
   catalog: ShopCatalog;
   desc: string;
   image?: string;
+  spec?: string;
+  jp?: string;
+  tag?: string;
 };
-// 給 Telegram 機器人用的新增商品。id 固定用 TG- 開頭，後台一看就知道
-// 是從機器人上架的，不是目錄檔帶進來的。
+// 外部帶進來的編號要能安全放進網址與 SQL 參數，也必須看得出是哪個系統建的。
+const NEW_PRODUCT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{1,39}$/;
+function newProductId(input: string | undefined) {
+  if (input === undefined) {
+    return `TG-${Date.now().toString(36).toUpperCase()}${randomBytes(2)
+      .toString("hex")
+      .toUpperCase()}`;
+  }
+  const id = typeof input === "string" ? input.trim() : "";
+  if (!NEW_PRODUCT_ID.test(id))
+    throw new ShopInputError("商品編號只能用英數、點、底線與減號，長度 2–40");
+  return id;
+}
+// 給 Telegram 機器人與拍照雷達用的新增商品。沒帶 id 時固定用 TG- 開頭，
+// 後台一看就知道是從機器人上架的，不是目錄檔帶進來的。
 export async function createShopProduct(input: NewShopProduct) {
   const name = contentText("name", input.name);
   if (!name) throw new ShopInputError("請輸入商品名稱");
@@ -276,9 +294,8 @@ export async function createShopProduct(input: NewShopProduct) {
     input.stock > MAX_PRODUCT_STOCK
   )
     throw new ShopInputError(`庫存需為 0–${MAX_PRODUCT_STOCK} 的整數`);
-  const id = `TG-${Date.now().toString(36).toUpperCase()}${randomBytes(2)
-    .toString("hex")
-    .toUpperCase()}`;
+  const id = newProductId(input.id);
+  if (excluded.has(id)) throw new ShopInputError("此商品已封存，不可上架");
   // 目錄檔沒有的欄位一律給空字串，前台才不會把 undefined 印成文字。
   // weight 給 null 是既有慣例（199 項裡有 177 項沒有重量），
   // 前台看到 null 會跳過重量累加，undefined 反而會算出 NaN。
@@ -287,15 +304,22 @@ export async function createShopProduct(input: NewShopProduct) {
     name,
     price: input.price,
     catalog: input.catalog,
-    spec: "",
-    jp: "",
-    tag: "",
+    spec: contentText("spec", input.spec ?? ""),
+    jp: contentText("jp", input.jp ?? ""),
+    tag: contentText("tag", input.tag ?? ""),
     category: "",
     desc,
     image,
     weight: null,
   };
   const db = await database();
+  // 編號是主鍵，重複時 INSERT 會拋錯；先查一次才能回「編號已存在」而不是 503。
+  const [existing] = await db.query<RowDataPacket[]>(
+    "SELECT id FROM line_shop_products WHERE id=?",
+    [id]
+  );
+  if (existing.length)
+    throw new ShopInputError(`商品編號「${id}」已經存在，請改用 PATCH 更新`);
   await db.query(
     "INSERT INTO line_shop_products (id,data_json,stock,active) VALUES (?,?,?,TRUE)",
     [id, JSON.stringify(product), input.stock]
@@ -1263,6 +1287,37 @@ router.use("/admin", async (req, res, next) => {
 });
 
 // 商品上架管理。價格與庫存改資料庫，商店頁直接讀同一份資料，改完立即生效。
+router.post(
+  "/admin/products",
+  handled(async (req, res) => {
+    const body = req.body ?? {};
+    const editable = ["id", "catalog", "price", "stock", ...CONTENT_FIELDS];
+    const keys = Object.keys(body);
+    if (!keys.length || keys.some(k => !editable.includes(k)))
+      throw new ShopInputError(
+        "只能指定商品編號、分類、價格、庫存與商品內容"
+      );
+    const product = await createShopProduct({
+      id: body.id,
+      name: body.name,
+      desc: body.desc,
+      spec: body.spec,
+      jp: body.jp,
+      tag: body.tag,
+      image: body.image,
+      catalog: body.catalog,
+      price: body.price,
+      stock: body.stock,
+    });
+    res.status(201).json({
+      ...product,
+      active: true,
+      overridden: [],
+      blocked: false,
+    });
+  })
+);
+
 router.get(
   "/admin/products",
   handled(async (_req, res) => {

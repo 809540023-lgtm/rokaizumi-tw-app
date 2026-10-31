@@ -344,3 +344,126 @@ describe("LINE shop product admin", () => {
     expect(desc).toContain("共10片");
   });
 });
+
+describe("LINE shop product creation", () => {
+  const NEW_PRODUCT = {
+    id: "COSTCO-15192",
+    name: "コストコ 有機エキストラバージンオリーブオイル",
+    desc: "2L 大容量",
+    catalog: "costco",
+    price: 899,
+    stock: 5,
+  };
+
+  function insertCalls() {
+    return mocks.query.mock.calls.filter(([sql]) =>
+      String(sql).startsWith("INSERT INTO line_shop_products")
+    );
+  }
+
+  it("creates a product with the caller supplied id", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).includes("SELECT id FROM line_shop_products")
+          ? [[]]
+          : [[]]
+    );
+    const res = await call("/admin/products", {
+      method: "POST",
+      body: NEW_PRODUCT,
+    });
+    expect(res.status).toBe(201);
+    expect(await res.json()).toMatchObject({
+      id: "COSTCO-15192",
+      name: NEW_PRODUCT.name,
+      price: 899,
+      stock: 5,
+      active: true,
+      overridden: [],
+      blocked: false,
+    });
+
+    const [sql, params] = insertCalls()[0]!;
+    expect(String(sql)).toContain("line_shop_products");
+    const stored = JSON.parse((params as any[])[1]);
+    expect(stored).toMatchObject({
+      id: "COSTCO-15192",
+      catalog: "costco",
+      price: 899,
+      desc: "2L 大容量",
+      spec: "",
+      jp: "",
+      tag: "",
+      weight: null,
+    });
+    expect((params as any[])[2]).toBe(5);
+  });
+
+  it("generates a TG- id when the caller omits one", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).includes("SELECT id FROM line_shop_products")
+          ? [[]]
+          : [[]]
+    );
+    const { id: _ignored, ...body } = NEW_PRODUCT;
+    const res = await call("/admin/products", { method: "POST", body });
+    expect(res.status).toBe(201);
+    expect((await res.json()).id).toMatch(/^TG-/);
+  });
+
+  it("rejects an id that already exists", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).includes("SELECT id FROM line_shop_products")
+          ? [[{ id: "COSTCO-15192" }]]
+          : [[]]
+    );
+    const res = await call("/admin/products", {
+      method: "POST",
+      body: NEW_PRODUCT,
+    });
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toContain("已經存在");
+    expect(insertCalls()).toHaveLength(0);
+  });
+
+  it("rejects ids with characters that break urls", async () => {
+    for (const id of ["../etc/passwd", "a", "有機-1", "x".repeat(41)]) {
+      const res = await call("/admin/products", {
+        method: "POST",
+        body: { ...NEW_PRODUCT, id },
+      });
+      expect(res.status).toBe(400);
+      expect((await res.json()).error).toContain("商品編號");
+    }
+  });
+
+  it("requires administrator access", async () => {
+    const res = await call("/admin/products", {
+      method: "POST",
+      body: NEW_PRODUCT,
+      admin: false,
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("rejects unknown fields and a missing catalog", async () => {
+    const extra = await call("/admin/products", {
+      method: "POST",
+      body: { ...NEW_PRODUCT, freeShipping: true },
+    });
+    expect(extra.status).toBe(400);
+
+    const { catalog: _c, ...noCatalog } = NEW_PRODUCT;
+    const missing = await call("/admin/products", {
+      method: "POST",
+      body: noCatalog,
+    });
+    expect(missing.status).toBe(400);
+    expect((await missing.json()).error).toContain("分類");
+  });
+});
