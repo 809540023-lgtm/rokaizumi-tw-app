@@ -9,6 +9,7 @@ import {
 const products = [
   { id: "M001", name: "面膜", price: 500, stock: 10, catalog: "shop" },
   { id: "EXC002", name: "市田柿", price: 799, stock: 120, catalog: "exclusive", freeShipping: true },
+  { id: "AIPC001", name: "Jabra Speak2 55 MS", price: 4500, stock: 5, catalog: "ai", freeShipping: true },
 ] as ShopProduct[];
 describe("LINE shop server prices and minimum", () => {
   it("ignores a forged browser price and enforces the product subtotal", () => {
@@ -41,6 +42,36 @@ describe("LINE shop server prices and minimum", () => {
       { productId: "EXC002", quantity: 1 },
     ], products)).toThrow("2,000");
   });
+  it("does not add postage to a free-shipping AI accessory", () => {
+    // AIPC001 免運：單買就是售價，不會多收 NT$220。
+    expect(
+      resolveShopItems([{ productId: "AIPC001", quantity: 1 }], products)
+    ).toMatchObject({
+      subtotalTwd: 4500,
+      shippingSubtotalTwd: 0,
+      items: [{ freeShipping: true }],
+    });
+    // 混搭一般商品時，免運商品不計入運費門檻，只看一般商品小計。
+    expect(
+      resolveShopItems(
+        [
+          { productId: "AIPC001", quantity: 1 },
+          { productId: "M001", quantity: 4 },
+        ],
+        products
+      ).shippingSubtotalTwd
+    ).toBe(2000);
+    expect(() =>
+      resolveShopItems(
+        [
+          { productId: "AIPC001", quantity: 1 },
+          { productId: "M001", quantity: 1 },
+        ],
+        products
+      )
+    ).toThrow("2,000");
+  });
+
   it("rejects duplicate, removed, fractional and out of stock items", () => {
     for (const items of [
       [{ productId: "missing", quantity: 3 }],

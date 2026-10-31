@@ -197,7 +197,7 @@ function renderGrocery() {
   )
     .map(
       p =>
-        `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · 運費另計`}</p>${buyButton(p)}</div></article>`
+        `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · ${p.freeShipping ? "此商品免運" : "運費另計"}`}</p>${buyButton(p)}</div></article>`
     )
     .join("");
   $("supermarket-count").textContent =
@@ -211,7 +211,7 @@ function renderGrocery() {
 function renderCostco() {
   $("costco-products").innerHTML = COSTCO.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · 運費另計`}</p>${buyButton(p)}</div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">好市多商品編號：${esc(p.costcoItemNumber || String(p.id).replace(/^COSTCO-/, ""))}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · ${p.freeShipping ? "此商品免運" : "運費另計"}`}</p>${buyButton(p)}</div></article>`
   ).join("");
 }
 function renderExclusive() {
@@ -223,16 +223,16 @@ function renderExclusive() {
 function renderAi() {
   $("ai-products").innerHTML = AI.map(
     p =>
-      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "AI PC 周邊")}</span></div><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · 運費另計`}</p>${buyButton(p)}</div></article>`
+      `<article class="card"><button class="pack" data-detail="${p.id}" aria-label="查看${esc(p.name)}詳情">${packImage(p)}</button><div class="card-body"><span class="meta">${p.id} · ${esc(p.spec)}</span><h3><button class="textbtn" data-detail="${p.id}">${esc(p.name)}</button></h3><div><span class="tag">${esc(p.tag || "AI PC 周邊")}</span></div><p class="price">${money(price(p))}</p><p class="muted">${soldOut(p) ? "目前無現貨" : `可選數量上限：${p.stock} 件 · ${p.freeShipping ? "此商品免運" : "運費另計"}`}</p>${buyButton(p)}</div></article>`
   ).join("");
 }
 function sumHtml(t) {
-  const rule = t.hasFreeShipping ? (t.shippingSubtotal ? "市田柿免運；其他商品依一般運費規則計算。" : "市田柿此商品免運。") : "一般商品滿 NT$2,000 可下單，運費 NT$220；滿 NT$5,000 免運。";
+  const rule = t.hasFreeShipping ? (t.shippingSubtotal ? "免運商品不另收運費；其他商品依一般運費規則計算。" : "購物袋內只有免運商品，不另收運費。") : "一般商品滿 NT$2,000 可下單，運費 NT$220；滿 NT$5,000 免運。";
   return `<div class="summary"><div class="sumrow"><span>商品小計（${t.count}件）</span><strong>${money(t.subtotal)}</strong></div><div class="sumrow"><span>${t.shippingSubtotal ? "一般商品 EMS 運費" : "運費"}${t.shippingSubtotal >= 5000 ? "（免運）" : ""}</span><strong>${money(t.shipping)}</strong></div><p class="muted">${rule}</p><div class="sumrow total"><span>總額</span><span>${money(t.total)}</span></div></div>`;
 }
 function shippingOptions(t) {
   return t.hasFreeShipping
-    ? `<div class="shipping-options"><strong>市田柿 NT$799｜此商品免運</strong><p class="muted">${t.shippingSubtotal ? "購物袋內的其他一般商品仍依一般運費規則計算。" : "單買市田柿不受一般商品運費門檻限制，結帳金額 NT$799。"}</p></div>`
+    ? `<div class="shipping-options"><strong>免運商品｜不另收運費</strong><p class="muted">${t.shippingSubtotal ? "購物袋內的其他一般商品仍依一般運費規則計算（滿 NT$2,000 可下單，NT$2,000～4,999 運費 NT$220，滿 NT$5,000 免運）。" : "購物袋內只有免運商品，不受一般商品運費門檻限制，結帳金額即商品售價。"}</p></div>`
     : `<div class="shipping-options"><strong>日本郵政 EMS｜滿 NT$5,000 免運</strong><p class="muted">一般商品 NT$2,000～4,999 運費 NT$220。填寫收件資料後直接刷卡付款，下單後七個工作天內從日本寄出。</p></div>`;
 }
 function renderCart() {
@@ -258,7 +258,7 @@ function renderCart() {
         .join("") +
       shippingOptions(t) +
       sumHtml(t) +
-      `<button class="btn" id="startCheckout" ${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "一般商品還差 " + money(MIN_ORDER_TWD - t.shippingSubtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">${t.hasFreeShipping ? "市田柿 NT$799 免運；一般商品仍須達 NT$2,000 才可下單。" : "一般商品小計須滿 NT$2,000 才可下單（不含運費）。"}填寫收件資料後直接前往刷卡。</p>`
+      `<button class="btn" id="startCheckout" ${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "disabled" : ""}>${t.shippingSubtotal > 0 && t.shippingSubtotal < MIN_ORDER_TWD ? "一般商品還差 " + money(MIN_ORDER_TWD - t.shippingSubtotal) + " 可結帳" : "填寫收件資料・前往付款"}</button><p class="muted">${t.hasFreeShipping ? "免運商品不計入運費門檻；一般商品仍須滿 NT$2,000 才可下單。" : "一般商品小計須滿 NT$2,000 才可下單（不含運費）。"}填寫收件資料後直接前往刷卡。</p>`
     : `<div class="empty"><h2>購物袋還是空的</h2><p>選好商品後可加入購物袋，查看商品金額與運費。</p><button class="btn" data-tab="shop">繼續挑選</button></div>`;
 }
 function detail(id) {
@@ -278,7 +278,7 @@ function checkout() {
     return;
   }
   $("checkoutbody").innerHTML =
-    `<p>免會員下單。填完收件資料後直接進入安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（市田柿免運）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往刷卡。</label><button class="btn" type="submit">前往刷卡</button></form>`;
+    `<p>免會員下單。填完收件資料後直接進入安全付款頁，確認總額後刷卡。下單後七個工作天內從日本寄出，送達時間另計。</p><p>商品小計：<strong>${money(t.subtotal)}</strong>；運費：<strong>${money(t.shipping)}</strong>${t.hasFreeShipping ? "（含免運商品）" : "（一般商品滿 NT$5,000 免運）"}。</p><form id="orderForm"><label>收件姓名<input name="name" required maxlength="100" autocomplete="name"></label><label>Email<input name="email" type="email" required maxlength="320" autocomplete="email"></label><label>台灣收件電話<input name="phone" type="tel" required maxlength="40" autocomplete="tel"></label><label>郵遞區號<input name="postalCode" required inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label><label>台灣完整地址<input name="address" required maxlength="500" autocomplete="street-address"></label><label class="test-consent"><input name="consent" type="checkbox" required>我已閱讀<a href="policies.html" target="_blank">購物與隱私說明</a>，同意店家處理訂單資料。同意顯示的商品金額與運費，並前往刷卡。</label><button class="btn" type="submit">前往刷卡</button></form>`;
   openDialog($("checkout"));
 }
 let orderToken = null;
@@ -388,4 +388,12 @@ renderExclusive();
 renderAi();
 renderCart();
 showTab(currentCatalog);
+// 後台每一列都有「前台商品頁」連結，指向 ?p=<編號>；帶這個參數就直接切到
+// 該商品所屬分區並打開詳情，客人與店主看到的內容完全一樣。
+const linked = new URLSearchParams(location.search).get("p");
+const linkedProduct = linked ? P.find(p => p.id === linked) : null;
+if (linkedProduct) {
+  showTab(linkedProduct.catalog);
+  detail(linkedProduct.id);
+}
 window.addEventListener("hashchange", () => showTab(catalogFromHash()));

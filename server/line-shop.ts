@@ -89,6 +89,7 @@ const excluded = new Set([
 ]);
 const STOCK_RESET_MIGRATION = "2026-10-14-stock-10";
 const SELF_HOSTED_IMAGES_MIGRATION = "2026-10-30-self-hosted-images";
+const FREE_SHIPPING_MIGRATION = "2026-10-31-free-shipping-products";
 let pool: Pool | undefined;
 let initialization: Promise<void> | undefined;
 async function database() {
@@ -167,7 +168,12 @@ async function initialize(db: Pool) {
 // 後台改過的品名、說明、圖片等放在 admin_json，只有被改到的欄位才蓋掉目錄檔，
 // 沒改的仍跟著 line-shop-catalog.json 走。
 const CONTENT_FIELDS = ["name", "desc", "spec", "jp", "tag", "image"] as const;
-type ProductContent = Partial<Record<(typeof CONTENT_FIELDS)[number], string>>;
+type ProductContent = Partial<
+  Record<(typeof CONTENT_FIELDS)[number], string>
+> & {
+  // 免運是布林值，不放在 CONTENT_FIELDS 裡，才不會被 contentText 當字串驗證。
+  freeShipping?: boolean;
+};
 const CONTENT_LIMITS: Record<(typeof CONTENT_FIELDS)[number], [string, number]> =
   {
     name: ["品名", 120],
@@ -260,6 +266,7 @@ export type NewShopProduct = {
   spec?: string;
   jp?: string;
   tag?: string;
+  freeShipping?: boolean;
 };
 // 外部帶進來的編號要能安全放進網址與 SQL 參數，也必須看得出是哪個系統建的。
 const NEW_PRODUCT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{1,39}$/;
@@ -312,6 +319,8 @@ export async function createShopProduct(input: NewShopProduct) {
     desc,
     image,
     weight: null,
+    // 免運商品不計入 NT$2,000 門檻，單買也能直接結帳。
+    freeShipping: input.freeShipping === true,
   };
   const db = await database();
   // 編號是主鍵，重複時 INSERT 會拋錯；先查一次才能回「編號已存在」而不是 503。
@@ -420,6 +429,32 @@ async function runShopMigrations(db: Pool) {
           await conn.execute(
             "UPDATE line_shop_products SET data_json=? WHERE id=?",
             [JSON.stringify({ ...stored, image: local }), row.id]
+          );
+        }
+      }
+    );
+    // freeShipping 只存在 data_json，開機的 INSERT IGNORE 不會更新既有資料列，
+    // 所以目錄檔後來才標成免運的商品（AIPC001）要一次性補進去。
+    await onceWithLock(
+      conn,
+      "line_shop_free_shipping_2026_10_31",
+      FREE_SHIPPING_MIGRATION,
+      async () => {
+        const freeIds = seed
+          .filter(p => p.freeShipping === true)
+          .map(p => p.id);
+        for (const id of freeIds) {
+          const [rows] = await conn.query<RowDataPacket[]>(
+            "SELECT id,data_json FROM line_shop_products WHERE id=?",
+            [id]
+          );
+          const row = rows[0];
+          if (!row) continue;
+          const stored = parsed<ShopProduct>(row.data_json);
+          if (stored.freeShipping === true) continue;
+          await conn.execute(
+            "UPDATE line_shop_products SET data_json=? WHERE id=?",
+            [JSON.stringify({ ...stored, freeShipping: true }), id]
           );
         }
       }
@@ -1292,7 +1327,14 @@ router.post(
   "/admin/products",
   handled(async (req, res) => {
     const body = req.body ?? {};
-    const editable = ["id", "catalog", "price", "stock", ...CONTENT_FIELDS];
+    const editable = [
+      "id",
+      "catalog",
+      "price",
+      "stock",
+      "freeShipping",
+      ...CONTENT_FIELDS,
+    ];
     const keys = Object.keys(body);
     if (!keys.length || keys.some(k => !editable.includes(k)))
       throw new ShopInputError(
@@ -1309,6 +1351,7 @@ router.post(
       catalog: body.catalog,
       price: body.price,
       stock: body.stock,
+      freeShipping: body.freeShipping,
     });
     res.status(201).json({
       ...product,
@@ -1348,6 +1391,7 @@ router.get(
           stock: Number(r.stock),
           active: Boolean(r.active),
           image: typeof product.image === "string" ? product.image : "",
+          freeShipping: product.freeShipping === true,
           overridden: Object.keys(admin),
           // 封存名單寫在程式碼裡（法規或供貨問題），不可用介面重新上架。
           blocked: excluded.has(r.id),
@@ -1362,7 +1406,13 @@ router.patch(
   handled(async (req, res) => {
     const body = req.body ?? {};
     const keys = Object.keys(body);
-    const editable = ["active", "price", "stock", ...CONTENT_FIELDS];
+    const editable = [
+      "active",
+      "price",
+      "stock",
+      "freeShipping",
+      ...CONTENT_FIELDS,
+    ];
     if (!keys.length || keys.some(k => !editable.includes(k)))
       throw new ShopInputError("只能修改上架狀態、價格、庫存與商品內容");
 
@@ -1407,6 +1457,15 @@ router.patch(
       )
         throw new ShopInputError(`庫存需為 0–${MAX_PRODUCT_STOCK} 的整數`);
 
+      if ("freeShipping" in body) {
+        if (typeof body.freeShipping !== "boolean")
+          throw new ShopInputError("免運設定格式不正確");
+        // 與目錄檔一致時不留下覆寫，之後改目錄檔還能生效。
+        if (body.freeShipping === (stored.freeShipping === true))
+          delete admin.freeShipping;
+        else admin.freeShipping = body.freeShipping;
+      }
+
       // 留空代表還原成目錄檔的原始值，所以是把覆寫刪掉而不是存空字串。
       for (const field of CONTENT_FIELDS) {
         if (!(field in body)) continue;
@@ -1441,6 +1500,7 @@ router.patch(
         price,
         stock,
         active,
+        freeShipping: product.freeShipping === true,
         overridden: Object.keys(admin),
       });
     } catch (e) {

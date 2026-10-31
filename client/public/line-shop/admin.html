@@ -113,6 +113,34 @@
       border-radius: 4px;
       padding: 1px 6px;
     }
+    #editForm label.check,
+    #newForm label.check {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+    #editForm label.check input,
+    #newForm label.check input {
+      width: auto;
+      margin: 0;
+    }
+    .frontlink {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      word-break: break-all;
+      max-width: 24ch;
+    }
+    .freeship {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 12px;
+      background: #e7f4ee;
+      color: #1d6144;
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
   </style>
   <main>
     <h1>LINE 商店後台</h1>
@@ -179,6 +207,10 @@
         <label>日文名<input name="jp" maxlength="120" /></label>
         <label>標籤<input name="tag" maxlength="40" /></label>
       </div>
+      <label class="check"
+        ><input type="checkbox" name="freeShipping" />此商品免運（不計入
+        NT$2,000 運費門檻，單買也能直接結帳）</label
+      >
       <label>說明<textarea name="desc" rows="5" maxlength="1000"></textarea></label>
       <label>圖片網址<input name="image" maxlength="500" placeholder="https://…" /></label>
       <label>或上傳圖片（JPG／PNG／WebP／GIF，3MB 以內）<input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp,image/gif" /></label>
@@ -220,6 +252,10 @@
         <label>標籤<input name="tag" maxlength="40" /></label>
       </div>
       <label>說明<textarea name="desc" rows="4" maxlength="1000"></textarea></label>
+      <label class="check"
+        ><input type="checkbox" name="freeShipping" />此商品免運（不計入
+        NT$2,000 運費門檻，單買也能直接結帳）</label
+      >
       <div class="field-grid">
         <label>售價 NT$<input name="price" type="number" min="1" max="100000" step="1" required /></label>
         <label>庫存<input name="stock" type="number" min="0" max="100000" step="1" required value="0" /></label>
@@ -424,13 +460,18 @@
       const edited = (p.overridden || []).length
         ? '<span class="edited" title="品名／說明／圖片已在後台改過">已改內容</span>'
         : "";
+      const free = p.freeShipping
+        ? '<span class="freeship" title="不計入 NT$2,000 運費門檻">免運</span>'
+        : "";
+      // 前台商品頁就是商店首頁加上 ?p=<編號>，點開會切到該分區並打開詳情。
+      const front = `${location.origin}/line-shop/?p=${encodeURIComponent(p.id)}`;
       return `<tr data-id="${esc(p.id)}" class="${p.active ? "" : "is-off"}">
         <td><code>${esc(p.id)}</code></td>
-        <td><div class="pname">${esc(p.name)}${edited}</div>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}</td>
+        <td><div class="pname">${esc(p.name)}${edited}${free}</div>${sub ? `<p class="muted">${esc(sub)}</p>` : ""}</td>
         <td><input name="price" type="number" inputmode="numeric" min="1" max="100000" step="1" value="${esc(p.price)}"></td>
         <td><input name="stock" type="number" inputmode="numeric" min="0" max="100000" step="1" value="${esc(p.stock)}"></td>
         <td><span class="pill ${p.active ? "on" : "off"}">${p.active ? "上架中" : "已下架"}</span></td>
-        <td class="actions"><button class="btn" data-save>儲存</button><button class="btn ghost" data-toggle>${p.active ? "下架" : "上架"}</button><button class="btn ghost" data-edit>編輯內容</button><span class="result" role="status"></span></td>
+        <td class="actions"><button class="btn" data-save>儲存</button><button class="btn ghost" data-toggle>${p.active ? "下架" : "上架"}</button><button class="btn ghost" data-edit>編輯內容</button><span class="result" role="status"></span><a class="frontlink" href="${esc(front)}" target="_blank" rel="noopener" title="在新視窗開啟前台商品頁">${esc(front)}</a></td>
       </tr>`;
     };
     function renderProducts() {
@@ -583,6 +624,7 @@
         `${product.id}｜${catalogName}｜${product.active ? "上架中" : "已下架"}`;
       for (const f of CONTENT_FIELDS)
         editForm.elements[f].value = product[f] ?? "";
+      editForm.elements.freeShipping.checked = product.freeShipping === true;
       editForm.querySelector(".result").textContent = "";
       editForm.querySelector("button.btn").disabled = false;
       clearPendingImage();
@@ -655,6 +697,9 @@
         const value = editForm.elements[f].value.trim();
         if (value !== (editingProduct[f] ?? "")) body[f] = value;
       }
+      const freeShipping = editForm.elements.freeShipping.checked;
+      if (freeShipping !== (editingProduct.freeShipping === true))
+        body.freeShipping = freeShipping;
       if (uploaded) body.image = uploaded;
       if (!Object.keys(body).length) {
         editDialog.close();
@@ -732,6 +777,7 @@
       }
       body.price = Number(newForm.elements.price.value);
       body.stock = Number(newForm.elements.stock.value);
+      body.freeShipping = newForm.elements.freeShipping.checked;
       btn.disabled = true;
       out.textContent = "建立中…";
       try {

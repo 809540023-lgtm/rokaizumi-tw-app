@@ -451,10 +451,87 @@ describe("LINE shop product creation", () => {
     expect(res.status).toBe(401);
   });
 
+  it("creates a free-shipping product from the back office", async () => {
+    mocks.query.mockImplementation(async (sql: string) =>
+      String(sql).includes("GET_LOCK")
+        ? [[{ acquired: 1 }]]
+        : String(sql).includes("FROM line_shop_products")
+          ? [[]]
+          : [[]]
+    );
+    const res = await call("/admin/products", {
+      method: "POST",
+      body: { ...NEW_PRODUCT, freeShipping: true },
+    });
+    expect(res.status).toBe(201);
+    expect((await res.json()).freeShipping).toBe(true);
+    const insert = mocks.query.mock.calls.find(([sql]) =>
+      String(sql).startsWith("INSERT INTO line_shop_products")
+    );
+    // 免運要寫進 data_json，結帳時 resolveShopItems 才看得到。
+    expect(JSON.parse(insert![1][1]).freeShipping).toBe(true);
+  });
+
+  it("toggles free shipping without rewriting the catalog copy", async () => {
+    const on = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: { freeShipping: true },
+    });
+    expect(on.status).toBe(200);
+    expect(await on.json()).toMatchObject({
+      id: "M001",
+      freeShipping: true,
+      overridden: ["freeShipping"],
+    });
+    const update = mocks.execute.mock.calls.find(([sql]) =>
+      String(sql).startsWith("UPDATE line_shop_products")
+    );
+    // 目錄檔那份 data_json 不動，免運記在 admin_json。
+    expect(JSON.parse(update![1][0]).freeShipping).toBeUndefined();
+    expect(JSON.parse(update![1][3])).toEqual({ freeShipping: true });
+  });
+
+  it("drops the free-shipping override when it matches the catalog", async () => {
+    mocks.execute.mockImplementation(async (sql: string) =>
+      String(sql).includes("FOR UPDATE")
+        ? [
+            [
+              {
+                ...ROW,
+                data_json: JSON.stringify({ ...PRODUCT, freeShipping: true }),
+                admin_json: JSON.stringify({ name: "改過的品名" }),
+              },
+            ],
+          ]
+        : [{ affectedRows: 1 }]
+    );
+    const res = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: { freeShipping: true },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      freeShipping: true,
+      overridden: ["name"],
+    });
+    const update = mocks.execute.mock.calls.find(([sql]) =>
+      String(sql).startsWith("UPDATE line_shop_products")
+    );
+    expect(JSON.parse(update![1][3])).toEqual({ name: "改過的品名" });
+  });
+
+  it("rejects a non-boolean free-shipping value", async () => {
+    const res = await call("/admin/products/M001", {
+      method: "PATCH",
+      body: { freeShipping: "yes" },
+    });
+    expect(res.status).toBe(400);
+  });
+
   it("rejects unknown fields and a missing catalog", async () => {
     const extra = await call("/admin/products", {
       method: "POST",
-      body: { ...NEW_PRODUCT, freeShipping: true },
+      body: { ...NEW_PRODUCT, weight: 500 },
     });
     expect(extra.status).toBe(400);
 
