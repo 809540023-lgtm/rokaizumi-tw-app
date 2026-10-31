@@ -52,7 +52,7 @@ describe("parseStock", () => {
 });
 
 describe("CATALOG_LABELS", () => {
-  it("商店首頁的四個分區都有對應名稱", () => {
+  it("商店首頁的每個分區都有對應名稱", () => {
     expect(Object.keys(CATALOG_LABELS).sort()).toEqual([...SHOP_CATALOGS].sort());
   });
 });

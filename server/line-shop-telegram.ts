@@ -11,12 +11,13 @@ import {
 } from "./line-shop";
 import { ShopInputError } from "./line-shop-pricing";
 
-// 商店首頁把商品分四區，機器人上架時只能挑這四種，否則前台不會顯示。
+// 商店首頁把商品分區，機器人上架時只能挑這幾種，否則前台不會顯示。
 export const CATALOG_LABELS: Record<ShopCatalog, string> = {
   shop: "日本選品",
   supermarket: "日本超市",
   costco: "好市多",
   exclusive: "獨家",
+  ai: "AI PC 周邊",
 };
 
 export type Draft = {
@@ -77,6 +78,7 @@ const catalogKeyboard = Markup.inlineKeyboard([
     Markup.button.callback(CATALOG_LABELS.costco, "cat:costco"),
     Markup.button.callback(CATALOG_LABELS.exclusive, "cat:exclusive"),
   ],
+  [Markup.button.callback(CATALOG_LABELS.ai, "cat:ai")],
 ]);
 const confirmKeyboard = Markup.inlineKeyboard([
   [

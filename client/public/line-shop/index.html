@@ -7,14 +7,14 @@
     <title>ROKA IZUMI｜日本嚴選商店</title>
     <meta
       name="description"
-      content="日本大阪出貨的嚴選商店。面膜、日本超市、日本好市多與專屬賣場商品，查看商品與介紹。"
+      content="日本出貨的嚴選商店。面膜、日本超市、日本好市多、專屬賣場與 AI PC 周邊商品，查看商品與介紹。"
     />
     <link
       rel="icon"
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23102c42'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-size='23' font-family='serif'%3ER%3C/text%3E%3C/svg%3E"
     />
-    <link rel="stylesheet" href="style.css?v=20261030-telegram-listing-1" />
+    <link rel="stylesheet" href="style.css?v=20261031-ai-pc-1" />
   </head>
   <body>
     <div class="notice">
@@ -28,7 +28,7 @@
       <nav aria-label="商店分類">
         <span class="nav-caption">選擇商品分類</span>
         <div class="catalog-switch">
-          <button class="active" data-tab="costco" aria-label="日本好市多">日本好市多<small>28 款</small></button><button data-tab="supermarket" aria-label="日本超市必買">日本超市必買<small>101 款</small></button><button data-tab="shop" aria-label="面膜選物">面膜選物<small>68 款</small></button><button data-tab="exclusive" aria-label="專屬賣場">專屬賣場<small>2 款</small></button>
+          <button class="active" data-tab="costco" aria-label="日本好市多">日本好市多<small>28 款</small></button><button data-tab="supermarket" aria-label="日本超市必買">日本超市必買<small>101 款</small></button><button data-tab="shop" aria-label="面膜選物">面膜選物<small>68 款</small></button><button data-tab="exclusive" aria-label="專屬賣場">專屬賣場<small>2 款</small></button><button data-tab="ai" aria-label="AI PC 周邊">AI PC 周邊<small>1 款</small></button>
         </div>
         <div class="utility-switch">
           <button data-tab="bag">購物袋 <span id="bagcount">0</span></button
@@ -90,6 +90,17 @@
         </div>
         <div id="products" class="grid"></div>
       </section>
+      <section id="ai" class="hidden">
+        <div class="intro">
+          <p class="edition">AI PC PERIPHERALS / VOL. 01</p>
+          <h1>AI PC 周邊</h1>
+          <p>AI PC 與遠距工作需要的會議設備、周邊配件。</p>
+          <p class="muted">
+            售價與可選數量請見商品詳情。填寫收件資料後直接刷卡付款。
+          </p>
+        </div>
+        <div id="ai-products" class="grid"></div>
+      </section>
       <section id="bag" class="hidden">
         <p class="edition">YOUR SELECTION</p>
         <h1>購物袋</h1>
@@ -99,7 +110,7 @@
         <h1>購物說明</h1>
         <div class="panel">
           <p>
-            面膜、日本超市、好市多與專屬賣場商品可合併選購。商品小計需滿
+            面膜、日本超市、好市多、專屬賣場與 AI PC 周邊商品可合併選購。商品小計需滿
             NT$2,000，不含運費。
           </p>
           <p>
@@ -116,7 +127,7 @@
       </section>
       <p><a href="policies.html">商店資料・購物條款與隱私說明</a></p>
       <footer>
-        ろかいずみ合同会社（ROKA IZUMI）<br />日本面膜・日本超市必買・日本好市多・專屬賣場
+        ろかいずみ合同会社（ROKA IZUMI）<br />日本面膜・日本超市必買・日本好市多・專屬賣場・AI PC 周邊
         · 日本嚴選商店<br /><a href="mailto:info@rokaizumi-tw.jp"
           >info@rokaizumi-tw.jp</a
         ><br /><a href="admin.html">商店管理登入</a>
@@ -171,11 +182,13 @@
           window.EXCLUSIVE_PRODUCTS = d.products.filter(
             p => p.catalog === "exclusive"
           );
+          window.AI_PRODUCTS = d.products.filter(p => p.catalog === "ai");
           for (const [tab, key] of [
             ["shop", "PRODUCTS"],
             ["supermarket", "SUPERMARKET_PRODUCTS"],
             ["costco", "COSTCO_PRODUCTS"],
             ["exclusive", "EXCLUSIVE_PRODUCTS"],
+            ["ai", "AI_PRODUCTS"],
           ]) {
             document.querySelector(
               '[data-tab="' + tab + '"] small'
@@ -190,7 +203,7 @@
             document.querySelector(".notice").textContent =
               "Stripe 測試環境｜不會實際扣款";
           const js = document.createElement("script");
-          js.src = "app.js?v=20261030-telegram-listing-1";
+          js.src = "app.js?v=20261031-ai-pc-1";
           document.body.appendChild(js);
         } catch {
           document.querySelector(".notice").textContent =

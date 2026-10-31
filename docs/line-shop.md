@@ -2,7 +2,7 @@
 
 The independent storefront is `/line-shop/`. Customers select products and enter recipient details without signing in. The server reserves stock once, computes fixed buyer postage and creates a Stripe Checkout session immediately. The browser redirects directly to Stripe; no administrator quote is required. Existing pending sessions retain their original amounts and can be resumed from email.
 
-Prices come from the preserved 197-product published catalog, including earlier exclusions. The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. The storefront, checkout, order notifications and policies state that orders ship from Japan within seven business days after ordering; delivery time is separate. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Operators maintain inventory and arrange fulfillment.
+Prices come from the preserved 197-product published catalog, including earlier exclusions, plus the AI PC 周邊 (`ai`) section that lists AI PC peripherals separately (first item: `AIPC001` Jabra Speak2 55 MS at NT$4,500, seeded from `server/public/line-shop-catalog.json`). The minimum product subtotal is NT$2,000. Buyer postage is NT$220 for product subtotals from NT$2,000 through NT$4,999, and free from NT$5,000. Thresholds exclude postage. The storefront, checkout, order notifications and policies state that orders ship from Japan within seven business days after ordering; delivery time is separate. Packed weight still validates the EMS 30 kg maximum and records carrier cost. Estimated product weights shown in the cart do not determine the charged postage. Operators maintain inventory and arrange fulfillment.
 
 ## Render environment
 
@@ -87,7 +87,7 @@ Two environment variables gate it. `TELEGRAM_BOT_TOKEN` from @BotFather turns it
 
 The bot reuses the same code as the admin page rather than duplicating rules: `shopImage()` validates the bytes (magic-byte sniff, 3MB cap) and `saveShopImage()` writes the row to `line_shop_images`, so a photo sent in Telegram ends up on the same content-addressed `/api/line-shop/img/<sha>.<ext>` URL. `createShopProduct()` applies the same `contentText()` limits and the same 1–100000 price / 0–100000 stock bounds as `PATCH /admin/products/:id`, and prefixes the id with `TG-` so bot-created rows are recognisable in the back office.
 
-`catalog` is restricted to the four storefront tabs (`shop`, `supermarket`, `costco`, `exclusive`) because `client/public/line-shop/index.html` buckets products by that field — anything else would be invisible. Bot products leave `spec`, `jp` and `tag` empty, so the storefront renders 商品規格 and 查看原廠商品資料 only when those fields exist instead of printing an empty line or `href="undefined"`.
+`catalog` is restricted to the storefront tabs (`shop`, `supermarket`, `costco`, `exclusive`, `ai`) because `client/public/line-shop/index.html` buckets products by that field — anything else would be invisible. Bot products leave `spec`, `jp` and `tag` empty, so the storefront renders 商品規格 and 查看原廠商品資料 only when those fields exist instead of printing an empty line or `href="undefined"`.
 
 ## One-time unpaid reminder
 

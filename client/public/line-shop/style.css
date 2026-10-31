@@ -64,3 +64,7 @@ body.formpage{background:var(--soft)}
 .formpage .tabs button{flex:1;border:0;border-radius:7px;background:none;padding:9px;font-size:14px;font-weight:700;color:#5d7788}
 .formpage .tabs button.active{background:#fff;color:var(--blue);box-shadow:0 1px 4px #102c421f}
 @media(max-width:560px){.formpage main{padding:20px 14px 48px}.formpage .card{padding:18px}}
+
+/* 分類增加到五個後，最後一個會單獨佔半排，改成整列排滿。 */
+@media(min-width:851px){.catalog-switch{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:850px){.catalog-switch{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-switch button:last-child{grid-column:span 2}}

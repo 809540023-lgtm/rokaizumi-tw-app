@@ -238,12 +238,13 @@ export async function saveShopImage(bytes: Buffer) {
   );
   return url;
 }
-// 商店首頁只認這四種 catalog，機器人上架時也必須挑其中一個。
+// 商店首頁只認這幾種 catalog，機器人上架時也必須挑其中一個。
 export const SHOP_CATALOGS = [
   "shop",
   "supermarket",
   "costco",
   "exclusive",
+  "ai",
 ] as const;
 export type ShopCatalog = (typeof SHOP_CATALOGS)[number];
 export type NewShopProduct = {
