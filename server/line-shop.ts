@@ -46,12 +46,17 @@ const requestOrigin = (req: Request) =>
   req.get("origin") ||
   (req.get("referer") ? new URL(req.get("referer")!).origin : "");
 const live = () => process.env.LINE_SHOP_MODE === "live";
-const key = () => process.env.LINE_SHOP_STRIPE_SECRET_KEY || "";
+// 環境變數從 Render 介面貼上時常夾帶頭尾空白或換行。簽章驗證對密鑰是逐字比對，
+// 多一個空白就會讓 Stripe 每一筆通知都回 400，連續失敗幾天後端點會被自動停用。
+// 所以讀取時一律去掉頭尾空白。
+const key = () => (process.env.LINE_SHOP_STRIPE_SECRET_KEY || "").trim();
+const webhookSecret = () =>
+  (process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET || "").trim();
 const configured = () =>
   process.env.LINE_SHOP_ENABLED === "true" &&
   Boolean(
     process.env.DATABASE_URL &&
-      process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET &&
+      webhookSecret() &&
       new RegExp("^(sk|rk)_" + (live() ? "live" : "test") + "_").test(key()) &&
       process.env.SMTP_HOST &&
       process.env.SMTP_USER &&
@@ -1322,6 +1327,33 @@ router.use("/admin", async (req, res, next) => {
   res.status(401).json({ error: "請先以管理員帳號登入" });
 });
 
+// Stripe 把端點停用後，用這支確認 Render 上的簽章密鑰跟 Stripe 後台該端點的
+// 密鑰是不是同一個。只回傳比對結果與端點狀態，不會回傳任何密鑰內容。
+router.get(
+  "/admin/stripe/webhook-check",
+  handled(async (_req, res) => {
+    if (!key()) return res.status(503).json({ error: "未設定 Stripe 金鑰" });
+    const raw = process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET || "";
+    const secret = webhookSecret();
+    const endpoints = await new Stripe(key()).webhookEndpoints.list({
+      limit: 100,
+    });
+    res.json({
+      envSecretConfigured: Boolean(secret),
+      envSecretLength: secret.length,
+      envSecretHasWhitespace: raw !== raw.trim(),
+      endpoints: endpoints.data.map(e => ({
+        id: e.id,
+        url: e.url,
+        status: e.status,
+        livemode: e.livemode,
+        enabledEvents: e.enabled_events,
+        secretMatchesEnv: Boolean(secret) && e.secret === secret,
+      })),
+    });
+  })
+);
+
 // 商品上架管理。價格與庫存改資料庫，商店頁直接讀同一份資料，改完立即生效。
 router.post(
   "/admin/products",
@@ -1816,17 +1848,36 @@ router.get(
     });
   })
 );
+/**
+ * 已經無法補救的錯誤（訂單不存在、金額不符等）。這類錯誤再重試一萬次也一樣，
+ * 若一直回 5xx，Stripe 會在連續失敗幾天後把整個端點停用，連正常訂單的通知也收不到。
+ * 所以記錄下來、回 200 讓 Stripe 停止重試，改由人工處理。
+ */
+class WebhookPermanentError extends Error {}
+
 export async function lineShopWebhook(req: Request, res: Response) {
-  if (!key() || !process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET)
+  const secret = webhookSecret();
+  if (!key() || !secret)
     return res.status(503).json({ error: "Webhook not configured" });
   let event: Stripe.Event;
   try {
     event = new Stripe(key()).webhooks.constructEvent(
       req.body,
       req.get("stripe-signature") || "",
-      process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET
+      secret
     );
-  } catch {
+  } catch (error) {
+    // 這裡是「Stripe 停用端點」最常見的原因：Render 上的
+    // LINE_SHOP_STRIPE_WEBHOOK_SECRET 與 Stripe 後台該端點的簽章密鑰不一致。
+    // 記錄密鑰長度與是否有前後空白，方便比對（不會印出密鑰本身）。
+    const raw = process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET || "";
+    console.error(
+      "LINE shop webhook signature verification failed:",
+      (error as Error).message,
+      `secretLength=${secret.length}`,
+      `rawLength=${raw.length}`,
+      `hasWhitespace=${raw !== raw.trim()}`
+    );
     return res.status(400).json({ error: "Invalid signature" });
   }
   if (event.livemode !== live())
@@ -1848,8 +1899,11 @@ export async function lineShopWebhook(req: Request, res: Response) {
       )
         await markCandleOrderPaidByStripeSessionId(session);
       return res.json({ received: true });
-    } catch {
-      console.error("Candle payment confirmation needs retry");
+    } catch (error) {
+      console.error(
+        "Candle payment confirmation needs retry:",
+        (error as Error).message
+      );
       return res
         .status(500)
         .json({ error: "Candle payment confirmation pending" });
@@ -1866,9 +1920,9 @@ export async function lineShopWebhook(req: Request, res: Response) {
       !order ||
       !["quoting", "pending", "paid", "expired"].includes(order.status)
     )
-      throw new Error("Unknown order");
+      throw new WebhookPermanentError("Unknown order");
     if (order.session_id && order.session_id !== session.id)
-      throw new Error("Session mismatch");
+      throw new WebhookPermanentError("Session mismatch");
     if (event.type === "checkout.session.expired") {
       if (order.status !== "paid" && order.status !== "expired") {
         if (order.reserved)
@@ -1887,7 +1941,7 @@ export async function lineShopWebhook(req: Request, res: Response) {
         !validPaidSession(session, order as any) ||
         order.status === "expired"
       )
-        throw new Error("Payment amount or state mismatch");
+        throw new WebhookPermanentError("Payment amount or state mismatch");
       await conn.execute(
         "UPDATE line_shop_orders SET status='paid',session_id=?,payment_intent=? WHERE id=?",
         [
@@ -1929,9 +1983,23 @@ export async function lineShopWebhook(req: Request, res: Response) {
     await conn.commit();
     res.json({ received: true });
     void drainShopMail();
-  } catch {
+  } catch (error) {
     if (conn) await conn.rollback();
-    console.error("LINE shop payment confirmation needs retry");
+    if (error instanceof WebhookPermanentError) {
+      console.error(
+        "LINE shop webhook ignored a permanent failure:",
+        error.message,
+        `event=${event.id}`,
+        `type=${event.type}`,
+        `order=${session.metadata.line_shop_order}`
+      );
+      return res.json({ received: true, ignored: error.message });
+    }
+    console.error(
+      "LINE shop payment confirmation needs retry:",
+      (error as Error).message,
+      `event=${event.id}`
+    );
     res.status(500).json({ error: "Payment confirmation pending" });
   } finally {
     conn?.release();
