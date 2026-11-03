@@ -211,3 +211,13 @@ for (const button of document.querySelectorAll('[data-copy]')) {
     }
   });
 }
+
+// Stripe returns here after a card payment: /candles/?payment=success&session_id=…
+if (new URLSearchParams(location.search).get('payment') === 'success') {
+  const notice = document.createElement('div');
+  notice.className = 'paid-notice';
+  notice.setAttribute('role', 'status');
+  notice.innerHTML = '<div class="wrap"><h2>Payment received · thank you</h2><p>Your card payment of A$99.00 has gone through and your receipt is on its way by email. We start making your five candles right away and will send your courier tracking number within 3 business days. There is nothing more you need to do.</p></div>';
+  document.getElementById('top').prepend(notice);
+  window.scrollTo({ top: 0 });
+}

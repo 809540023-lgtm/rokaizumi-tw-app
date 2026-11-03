@@ -137,3 +137,13 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     button.disabled = false;
   }
 });
+
+// Stripe 刷卡完成後回到 /candles-tw/?payment=success&session_id=…
+if (new URLSearchParams(location.search).get('payment') === 'success') {
+  const notice = document.createElement('div');
+  notice.className = 'paid-notice';
+  notice.setAttribute('role', 'status');
+  notice.innerHTML = '<div class="wrap"><h2>已收到您的付款 · 謝謝</h2><p>信用卡付款 NT$1,499 已完成，收據已寄到您的信箱。我們會立即開始製作您的五款蠟燭，並在 3 個工作天內提供快遞追蹤編號。您不需要再做任何事。</p></div>';
+  document.getElementById('top').prepend(notice);
+  window.scrollTo({ top: 0 });
+}

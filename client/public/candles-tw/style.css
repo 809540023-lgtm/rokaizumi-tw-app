@@ -72,3 +72,6 @@
 .order-help input,.order-help textarea{display:block;width:100%;padding:12px;margin:0 0 15px;font:1rem/1.5 system-ui,sans-serif;color:#302a29;background:#fff;border:1px solid #ad9995;border-radius:3px}.order-help textarea{min-height:90px}.order-help input:focus-visible,.order-help textarea:focus-visible{outline:3px solid #bd7d97;outline-offset:3px}.order-help .honey{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}.order-help #order-status{color:#61333b;margin:12px 0}.order-help #order-success{padding:20px;background:#faf4ed;border:1px solid #e2d3c9}.order-help #order-success p{color:#302a29}.order-help #submit-order:disabled{opacity:.6;cursor:wait}
 
 .order-help .import-confirm{display:flex;align-items:flex-start;gap:10px;font-weight:500;line-height:1.45;margin:14px 0 18px}.order-help .import-confirm input{width:20px;height:20px;flex:none;margin:2px 0 0;accent-color:#744347}
+.paid-notice{background:#edf5ec;color:#2f4a31;border-bottom:1px solid #c7dcc5;padding:22px 0}
+.paid-notice h2{font:500 1.35rem "Noto Serif TC",Georgia,serif;margin:0 0 8px}
+.paid-notice p{margin:0;line-height:1.7;max-width:52em}

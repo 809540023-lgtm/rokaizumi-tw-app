@@ -159,3 +159,6 @@ body{background:#faf7f1}
  .order{padding:48px 0 54px}
  .brand-story{padding:45px 0}
 }
+.paid-notice{background:#edf5ec;color:#2f4a31;border-bottom:1px solid #c7dcc5;padding:22px 0}
+.paid-notice h2{font:500 1.35rem Georgia,"Noto Serif TC",serif;margin:0 0 8px}
+.paid-notice p{margin:0;line-height:1.7;max-width:52em}
