@@ -75,3 +75,4 @@
 .paid-notice{background:#edf5ec;color:#2f4a31;border-bottom:1px solid #c7dcc5;padding:22px 0}
 .paid-notice h2{font:500 1.35rem "Noto Serif TC",Georgia,serif;margin:0 0 8px}
 .paid-notice p{margin:0;line-height:1.7;max-width:52em}
+.card.focused { outline:2px solid #8a6d4f; outline-offset:4px; border-radius:14px; }

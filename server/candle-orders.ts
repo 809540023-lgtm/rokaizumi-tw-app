@@ -4,9 +4,28 @@ import { randomUUID } from "node:crypto";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
 import { sdk } from "./_core/sdk";
+import { DEFAULT_PRICES, activeCandleIds, candlePrices, listCandleProducts } from "./candle-products";
 
 const router = Router();
-const allowed = new Set([1, 2, 3, 5, 7, 8, 9, 10, 13, 14, 15, 16, 17, 20, 21, 25, 27, 28, 29, 30]);
+// 資料庫讀不到商品時的後備名單，維持原本寫死的 20 款。
+const fallbackAllowed = new Set([1, 2, 3, 5, 7, 8, 9, 10, 13, 14, 15, 16, 17, 20, 21, 25, 27, 28, 29, 30]);
+let prices = { ...DEFAULT_PRICES };
+const staticSku = (n: number) => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")}`;
+let skuOverrides: Record<number, string> = {};
+
+/** 後台改過的商品與售價以資料庫為準，讀不到時沿用程式內的預設值。 */
+async function refreshCatalog(db: mysql.Pool) {
+  try {
+    prices = await candlePrices(db);
+    const products = await listCandleProducts(db);
+    skuOverrides = {};
+    for (const p of products) {
+      candleNames[p.id] = p.name;
+      if (p.sku) skuOverrides[p.id] = p.sku;
+    }
+  } catch { /* 保持上一份可用的資料 */ }
+  return activeCandleIds(db);
+}
 const field = (value: unknown, max: number) =>
   typeof value === "string" && value.trim().length > 0 && value.trim().length <= max ? value.trim() : null;
 
@@ -46,13 +65,15 @@ type CandleOrder = {
 type CandlePaymentMethod = "bank_transfer" | "card";
 
 const audPayment = {
-  method: "bank_transfer", currency: "AUD", amount: 99, shipping: 0,
+  method: "bank_transfer", currency: "AUD", amount: DEFAULT_PRICES.aud, shipping: 0,
   bank: { accountHolder: "ろかいずみ合同会社", bsb: "774-001", accountNumber: "250413129", bankName: "Wise Australia Pty Ltd" },
 };
 
 const candlePrice = (market: "AU" | "TW") => market === "TW"
-  ? { currency: "twd", amount: 1499, label: "ROKA IZUMI · 任選五款手作蠟燭" }
-  : { currency: "aud", amount: 99, label: "ROKA IZUMI · Five handmade candles" };
+  ? { currency: "twd", amount: prices.twd, label: "ROKA IZUMI · 任選五款手作蠟燭" }
+  : { currency: "aud", amount: prices.aud, label: "ROKA IZUMI · Five handmade candles" };
+const audLabel = () => `A$${prices.aud}`;
+const twdLabel = () => `NT$${prices.twd.toLocaleString("en-US")}`;
 
 async function createCandleCheckout(order: CandleOrder, market: "AU" | "TW") {
   const key = process.env.STRIPE_SECRET_KEY || process.env.LINE_SHOP_STRIPE_SECRET_KEY;
@@ -104,11 +125,11 @@ function orderNotificationText(order: CandleOrder) {
     `Email：${order.email}`,
     `電話：${order.phone}`,
     `地址：${order.street}, ${order.suburb}, ${order.state} ${order.postcode}`,
-    `選擇商品：${order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")}`).join(", ")}`,
+    `選擇商品：${order.items.map(n => skuOverrides[n] || staticSku(n)).join(", ")}`,
     `備註：${order.note || "無"}`,
     order.market === "TW"
-      ? `市場與金額：台灣 NT$1,499。客人可選擇 Stripe 信用卡或銀行轉帳；目前${paymentStatus}。`
-      : `市場與金額：澳洲 A$99（含運）。客人可選擇 Stripe 信用卡或 Wise AUD 銀行轉帳；目前${paymentStatus}。轉帳附言：${order.id}。請確認款項狀態後再開始製作並回信確認。`,
+      ? `市場與金額：台灣 ${twdLabel()}。客人可選擇 Stripe 信用卡或銀行轉帳；目前${paymentStatus}。`
+      : `市場與金額：澳洲 ${audLabel()}（含運）。客人可選擇 Stripe 信用卡或 Wise AUD 銀行轉帳；目前${paymentStatus}。轉帳附言：${order.id}。請確認款項狀態後再開始製作並回信確認。`,
     `訂單管理：https://rokaizumi-tw.jp/${order.market === "TW" ? "candles-tw" : "candles"}/orders/`,
   ].join("\n");
 }
@@ -174,8 +195,8 @@ export function customerConfirmationText(order: CandleOrder, paymentMethod: Cand
   if (order.market === "TW") return [
     `${order.name} 您好：`, "", "謝謝您訂購 ROKA IZUMI 手作蠟燭！",
     `已收到訂單 ${order.id}。目前尚待付款，本信不是付款收據。`,
-    "", "您選擇的五款", ...order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`),
-    "", "總金額：NT$1,499，包含寄送至台灣的運費。",
+    "", "您選擇的五款", ...order.items.map(n => `${skuOverrides[n] || staticSku(n)} · ${candleNames[n] ?? staticSku(n)}`),
+    "", `總金額：${twdLabel()}，包含寄送至台灣的運費。`,
     paymentMethod === "card"
       ? "請在下單後開啟的 Stripe 結帳頁完成信用卡／金融卡付款，無須另外銀行轉帳。"
       : "您選擇銀行轉帳；我們會另以 Email 提供付款資料。收到付款資料前請勿自行匯款。",
@@ -191,16 +212,16 @@ export function customerConfirmationText(order: CandleOrder, paymentMethod: Cand
     `Hi ${order.name},`, "", "Thank you for choosing ROKA IZUMI handmade candles!",
     `We have received your order ${order.id}. Your order is awaiting payment — this email is not a payment receipt.`,
     "", "YOUR FIVE DESIGNS",
-    ...order.items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`),
-    "", "TOTAL: A$99.00", "Delivery to Australia is included. No additional shipping fee.",
+    ...order.items.map(n => `${skuOverrides[n] || staticSku(n)} · ${candleNames[n] ?? staticSku(n)}`),
+    "", `TOTAL: A$${prices.aud.toFixed(2)}`, "Delivery to Australia is included. No additional shipping fee.",
     "", "HOW TO PAY",
     ...(paymentMethod === "card" ? [
-      "Your card payment is processed securely by Stripe. Complete the Stripe checkout page to pay A$99.00. Do not make a separate bank transfer.",
+      `Your card payment is processed securely by Stripe. Complete the Stripe checkout page to pay A$${prices.aud.toFixed(2)}. Do not make a separate bank transfer.`,
     ] : [
       "Use a local bank transfer from your Australian banking app. No Wise account is needed.",
       "You can copy and paste the account holder, BSB, account number and transfer reference below.",
       `Account holder: ${bank.accountHolder}`, `BSB: ${bank.bsb}`, `Account number: ${bank.accountNumber}`,
-      `Bank: ${bank.bankName}`, "Amount: A$99.00", `Transfer reference: ${order.id}`,
+      `Bank: ${bank.bankName}`, `Amount: A$${prices.aud.toFixed(2)}`, `Transfer reference: ${order.id}`,
       "Please include your order number as the transfer reference so we can match your payment.",
     ]),
     "", "DELIVERY DETAILS", order.name, order.street, `${order.suburb}, ${order.state} ${order.postcode}`, "Australia",
@@ -339,14 +360,14 @@ export async function retryPaidCandleEmails() {
         if (rows.length !== 1) continue;
         const row = rows[0];
         const items: number[] = typeof row.items === "string" ? JSON.parse(row.items) : row.items;
-        const designs = items.map(n => `RZ-C${String(n === 20 ? 26 : n).padStart(3, "0")} · ${candleNames[n]}`).join("\n");
+        const designs = items.map(n => `${skuOverrides[n] || staticSku(n)} · ${candleNames[n] ?? staticSku(n)}`).join("\n");
         const merchant = mail.kind === "merchant";
         const text = market === "TW" ? [
-          `訂單 ${row.id}：付款成功`, "已確認 Stripe 付款 NT$1,499，含寄送台灣運費。", designs,
+          `訂單 ${row.id}：付款成功`, `已確認 Stripe 付款 ${twdLabel()}，含寄送台灣運費。`, designs,
           "確認款項後開始製作，3個工作日內完成並提供快遞單號，運送時間另計。",
           ...(merchant ? [`客戶：${row.customer_name}`, `Email：${row.customer_email}`, `電話：${row.customer_phone}`, `地址：${row.postcode} ${row.suburb}${row.state}${row.street_address}`, `備註：${row.note || "無"}`] : ["如需更正收件資料，請回覆本信並註明訂單編號。"]),
         ].join("\n") : [
-          `Order ${row.id}: payment confirmed`, "Your Stripe payment of A$99.00 is confirmed. Delivery to Australia is included.", designs,
+          `Order ${row.id}: payment confirmed`, `Your Stripe payment of A$${prices.aud.toFixed(2)} is confirmed. Delivery to Australia is included.`, designs,
           "Production begins after payment. We will complete your set and provide a courier tracking number within 3 business days. Delivery time is additional.",
           ...(merchant ? [`Customer: ${row.customer_name}`, `Email: ${row.customer_email}`, `Phone: ${row.customer_phone}`, `Address: ${row.street_address}, ${row.suburb}, ${row.state} ${row.postcode}`, `Note: ${row.note || "None"}`] : ["Reply to this email with your order number if you need to correct your delivery details."]),
         ].join("\n");
@@ -378,11 +399,13 @@ router.post("/", async (req, res) => {
   const note = body.note === "" || body.note === undefined ? "" : field(body.note, 1000);
   const paymentMethod: CandlePaymentMethod = body.paymentMethod === "card" ? "card" : "bank_transfer";
   const items = body.items;
+  const db = database();
+  if (!db) return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });
+  const activeIds = await refreshCatalog(db);
+  const allowed = activeIds.size ? activeIds : fallbackAllowed;
   if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !phone || !street || !suburb || !state || !["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"].includes(state.toUpperCase()) || !/^\d{4}$/.test(postcode ?? "") || note === null || body.importConfirmed !== "on" || !Array.isArray(items) || items.length !== 5 || !items.every((n: unknown) => Number.isInteger(n) && allowed.has(n as number)) || new Set(items).size !== 5) {
     return res.status(400).json({ error: "Please check your five designs and all required delivery details." });
   }
-  const db = database();
-  if (!db) return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });
   const id = `RI-${randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
   try {
     await db.query(`CREATE TABLE IF NOT EXISTS candle_orders (
@@ -416,7 +439,7 @@ router.post("/", async (req, res) => {
     if (notificationSent) {
       try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
     }
-    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, checkoutUrl, payment: { ...audPayment, method: paymentMethod, reference: id, status: "awaiting_payment" } });
+    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, checkoutUrl, payment: { ...audPayment, amount: prices.aud, method: paymentMethod, reference: id, status: "awaiting_payment" } });
   } catch (error) {
     console.error("Could not save candle order", error);
     return res.status(503).json({ error: "Orders are temporarily unavailable. Please try again later." });
@@ -463,11 +486,13 @@ router.post("/tw", async (req, res) => {
   const note = body.note === "" || body.note === undefined ? "" : field(body.note, 1000);
   const paymentMethod: CandlePaymentMethod = body.paymentMethod === "card" ? "card" : "bank_transfer";
   const items = body.items;
+  const db = database();
+  if (!db) return res.status(503).json({ error: "暫時無法收單，請稍後再試。" });
+  const activeIds = await refreshCatalog(db);
+  const allowed = activeIds.size ? activeIds : fallbackAllowed;
   if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !phone || !street || !city || !region || !/^\d{3}(\d{2})?$/.test(postcode ?? "") || note === null || body.importConfirmed !== "on" || !Array.isArray(items) || items.length !== 5 || !items.every((n: unknown) => Number.isInteger(n) && allowed.has(n as number)) || new Set(items).size !== 5) {
     return res.status(400).json({ error: "請檢查五款商品與台灣收件資料。" });
   }
-  const db = database();
-  if (!db) return res.status(503).json({ error: "暫時無法收單，請稍後再試。" });
   const id = `RI-TW-${randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
   try {
     await ensureTaiwanTable(db);
@@ -494,7 +519,7 @@ router.post("/tw", async (req, res) => {
     if (notificationSent) {
       try { await recordNotification(id); } catch (error) { console.error("Could not record candle notification", error); }
     }
-    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, checkoutUrl, payment: { method: paymentMethod, currency: "TWD", amount: 1499, status: "awaiting_payment" } });
+    return res.status(201).json({ orderNumber: id, notificationSent, customerEmailSent, checkoutUrl, payment: { method: paymentMethod, currency: "TWD", amount: prices.twd, status: "awaiting_payment" } });
   } catch (error) {
     console.error("Could not save Taiwan candle order", error);
     return res.status(503).json({ error: "暫時無法收單，請稍後再試。" });

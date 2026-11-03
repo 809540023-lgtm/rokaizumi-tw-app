@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>蠟燭商品後台｜ROKA IZUMI</title>
+<style>
+  :root { --ink:#26221f; --muted:#6f665f; --line:#e2dbd3; --bg:#faf7f3; --accent:#8a6d4f; --ok:#2f6b45; --warn:#a63d2f; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 "Hiragino Sans","Noto Sans TC",system-ui,sans-serif; }
+  header { background:#fff; border-bottom:1px solid var(--line); padding:16px 20px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
+  h1 { margin:0; font-size:18px; letter-spacing:.02em; }
+  h2 { font-size:16px; margin:0 0 12px; }
+  main { max-width:1120px; margin:0 auto; padding:20px; display:grid; gap:20px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px; }
+  label { display:block; font-size:13px; color:var(--muted); margin-bottom:4px; }
+  input, select { width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff; }
+  button { font:inherit; cursor:pointer; border-radius:8px; border:1px solid var(--line); background:#fff; padding:8px 14px; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.danger { color:var(--warn); border-color:#e7c9c3; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+  .row > * { flex:1 1 160px; }
+  .row > .tight { flex:0 0 auto; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  th { font-size:12px; color:var(--muted); font-weight:600; }
+  td img { width:56px; height:56px; object-fit:cover; border-radius:8px; background:#eee; display:block; }
+  .muted { color:var(--muted); font-size:12px; }
+  .pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; border:1px solid var(--line); }
+  .pill.on { background:#edf5ec; border-color:#cfe3cd; color:var(--ok); }
+  .pill.off { background:#f7f0ee; border-color:#e7c9c3; color:var(--warn); }
+  .hidden { display:none !important; }
+  #toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#26221f; color:#fff; padding:10px 18px; border-radius:999px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:9; }
+  #toast.show { opacity:1; }
+  .login { max-width:380px; margin:12vh auto; }
+  .actions { display:flex; gap:6px; flex-wrap:wrap; }
+  .actions button { padding:6px 10px; font-size:13px; }
+  dialog { border:1px solid var(--line); border-radius:14px; padding:0; width:min(560px,92vw); }
+  dialog::backdrop { background:rgba(38,34,31,.45); }
+  .dialog-body { padding:20px; display:grid; gap:12px; }
+  .dialog-foot { display:flex; gap:10px; justify-content:flex-end; padding:0 20px 20px; }
+  .links a { color:var(--accent); margin-right:14px; font-size:13px; }
+  @media (max-width:720px) { .scroll { overflow-x:auto; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>蠟燭商品後台</h1>
+  <div class="links">
+    <a href="/candles/" target="_blank" rel="noopener">澳洲前台 ↗</a>
+    <a href="/candles-tw/" target="_blank" rel="noopener">台灣前台 ↗</a>
+    <a href="/candles/orders/" target="_blank" rel="noopener">澳洲訂單 ↗</a>
+    <a href="/candles-tw/orders/" target="_blank" rel="noopener">台灣訂單 ↗</a>
+    <button id="logout" class="hidden" type="button">登出</button>
+  </div>
+</header>
+
+<main>
+  <section id="login-card" class="login">
+    <h2>管理員登入</h2>
+    <form id="login-form" style="display:grid;gap:12px">
+      <div><label for="login-email">Email</label><input id="login-email" name="email" type="email" autocomplete="username" required></div>
+      <div><label for="login-password">密碼</label><input id="login-password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="primary" type="submit">登入</button>
+      <p class="muted" id="login-status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <div id="admin" class="hidden" style="display:grid;gap:20px">
+    <section>
+      <h2>售價（任選五款）</h2>
+      <form id="price-form" class="row">
+        <div><label for="price-aud">澳洲售價（AUD）</label><input id="price-aud" name="aud" type="number" min="1" max="10000" step="1" required></div>
+        <div><label for="price-twd">台灣售價（TWD）</label><input id="price-twd" name="twd" type="number" min="1" max="100000" step="1" required></div>
+        <button class="primary tight" type="submit">儲存售價</button>
+      </form>
+      <p class="muted">前台價格文字、訂單金額與刷卡金額都以此為準。</p>
+    </section>
+
+    <section>
+      <h2>新增商品</h2>
+      <form id="create-form" style="display:grid;gap:12px">
+        <div class="row">
+          <div><label for="new-name">英文品名（澳洲前台）</label><input id="new-name" name="name" maxlength="120" required></div>
+          <div><label for="new-name-tw">中文品名（台灣前台）</label><input id="new-name-tw" name="nameTw" maxlength="120"></div>
+        </div>
+        <div class="row">
+          <div><label for="new-sku">商品編號（留空自動產生）</label><input id="new-sku" name="sku" maxlength="40"></div>
+          <div><label for="new-sort">排序（小的在前）</label><input id="new-sort" name="sortOrder" type="number" min="0" max="9999" value="99"></div>
+          <button class="primary tight" type="submit">新增商品</button>
+        </div>
+        <p class="muted">商品編號會出現在前台卡片與訂單通知；照片請在新增後按「換照片」上傳。</p>
+      </form>
+    </section>
+
+    <section>
+      <h2>商品清單</h2>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>照片</th><th>編號</th><th>英文品名</th><th>中文品名</th><th>排序</th><th>狀態</th><th>前台預覽</th><th></th></tr></thead>
+          <tbody id="product-rows"><tr><td colspan="8" class="muted">載入中…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="edit-dialog">
+  <form id="edit-form" class="dialog-body" method="dialog">
+    <h2 style="margin:0">編輯商品 <span class="muted" id="edit-id"></span></h2>
+    <div><label for="edit-name">英文品名</label><input id="edit-name" name="name" maxlength="120" required></div>
+    <div><label for="edit-name-tw">中文品名</label><input id="edit-name-tw" name="nameTw" maxlength="120"></div>
+    <div class="row">
+      <div><label for="edit-sku">商品編號</label><input id="edit-sku" name="sku" maxlength="40"></div>
+      <div><label for="edit-sort">排序</label><input id="edit-sort" name="sortOrder" type="number" min="0" max="9999"></div>
+    </div>
+    <div><label for="edit-active">狀態</label><select id="edit-active" name="active"><option value="1">上架中</option><option value="0">已下架</option></select></div>
+  </form>
+  <div class="dialog-foot">
+    <button type="button" id="edit-cancel">取消</button>
+    <button type="button" class="primary" id="edit-save">儲存</button>
+  </div>
+</dialog>
+
+<input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden">
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const state = { products: [], prices: { aud: 99, twd: 1499 }, editing: null, photoFor: null };
+const $ = id => document.getElementById(id);
+const toast = (message, ms = 2600) => {
+  const el = $('toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.classList.remove('show'), ms);
+};
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    credentials: 'same-origin',
+    ...options,
+    headers: options.body ? { 'content-type': 'application/json' } : options.headers,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error || `HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+}
+
+function showLogin(message = '') {
+  $('admin').classList.add('hidden');
+  $('login-card').classList.remove('hidden');
+  $('logout').classList.add('hidden');
+  $('login-status').textContent = message;
+}
+
+function thumbnail(product) {
+  if (product.lit) return product.lit;
+  return `/candles/images/lit-${String(product.id).padStart(2, '0')}.jpeg`;
+}
+
+function previewLink(market, product) {
+  if (!product.active) return '';
+  const base = market === 'au' ? '/candles/' : '/candles-tw/';
+  const label = market === 'au' ? '澳洲' : '台灣';
+  return `<a href="${base}?product=${product.id}#products" target="_blank" rel="noopener">${label} ↗</a>`;
+}
+
+function renderProducts() {
+  const body = $('product-rows');
+  if (!state.products.length) {
+    body.innerHTML = '<tr><td colspan="8" class="muted">還沒有商品，請先新增。</td></tr>';
+    return;
+  }
+  body.innerHTML = state.products.map(product => `
+    <tr data-id="${product.id}">
+      <td><img src="${escapeHtml(thumbnail(product))}" alt="" loading="lazy"></td>
+      <td>${escapeHtml(product.sku)}</td>
+      <td>${escapeHtml(product.name)}</td>
+      <td>${escapeHtml(product.nameTw || '')}</td>
+      <td>${product.sortOrder}</td>
+      <td><span class="pill ${product.active ? 'on' : 'off'}">${product.active ? '上架中' : '已下架'}</span></td>
+      <td class="muted">${previewLink('au', product)} ${previewLink('tw', product)}</td>
+      <td class="actions">
+        <button type="button" data-act="edit">編輯</button>
+        <button type="button" data-act="photo">換照片</button>
+        <button type="button" data-act="toggle">${product.active ? '下架' : '上架'}</button>
+        <button type="button" class="danger" data-act="delete">刪除</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadProducts() {
+  try {
+    const data = await api('/api/candles/admin/products');
+    state.products = data.products || [];
+    if (data.prices) state.prices = data.prices;
+    $('price-aud').value = state.prices.aud;
+    $('price-twd').value = state.prices.twd;
+    renderProducts();
+  } catch (error) {
+    if (error.status === 401 || error.status === 403) return showLogin('請先登入管理員帳號。');
+    toast(error.message);
+  }
+}
+
+async function showAdmin() {
+  $('login-card').classList.add('hidden');
+  $('admin').classList.remove('hidden');
+  $('logout').classList.remove('hidden');
+  await loadProducts();
+}
+
+$('login-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector('button');
+  const fields = Object.fromEntries(new FormData(form));
+  button.disabled = true;
+  $('login-status').textContent = '登入中…';
+  try {
+    await api('/api/line-shop/auth/login', { method: 'POST', body: JSON.stringify(fields) });
+    form.reset();
+    $('login-status').textContent = '';
+    await showAdmin();
+  } catch (error) {
+    $('login-status').textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$('logout').addEventListener('click', async () => {
+  try { await api('/api/line-shop/auth/logout', { method: 'POST', body: '{}' }); } catch { /* 已登出 */ }
+  state.products = [];
+  showLogin('已登出。');
+});
+
+$('price-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const fields = Object.fromEntries(new FormData(event.currentTarget));
+  try {
+    const data = await api('/api/candles/admin/settings', {
+      method: 'PUT',
+      body: JSON.stringify({ aud: Number(fields.aud), twd: Number(fields.twd) }),
+    });
+    state.prices = data.prices || state.prices;
+    toast(`售價已更新：A$${state.prices.aud} / NT$${state.prices.twd.toLocaleString('en-US')}`);
+  } catch (error) {
+    toast(error.message);
+  }
+});
+
+$('create-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const fields = Object.fromEntries(new FormData(form));
+  try {
+    await api('/api/candles/admin/products', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: fields.name,
+        nameTw: fields.nameTw,
+        sku: fields.sku,
+        sortOrder: Number(fields.sortOrder) || 0,
+      }),
+    });
+    form.reset();
+    $('new-sort').value = 99;
+    toast('商品已新增，記得幫它上傳照片。');
+    await loadProducts();
+  } catch (error) {
+    toast(error.message);
+  }
+});
+
+$('product-rows').addEventListener('click', async event => {
+  const button = event.target.closest('button[data-act]');
+  if (!button) return;
+  const id = Number(button.closest('tr').dataset.id);
+  const product = state.products.find(item => item.id === id);
+  if (!product) return;
+  const act = button.dataset.act;
+  if (act === 'edit') {
+    state.editing = id;
+    $('edit-id').textContent = product.sku;
+    $('edit-name').value = product.name;
+    $('edit-name-tw').value = product.nameTw || '';
+    $('edit-sku').value = product.sku;
+    $('edit-sort').value = product.sortOrder;
+    $('edit-active').value = product.active ? '1' : '0';
+    $('edit-dialog').showModal();
+    return;
+  }
+  if (act === 'photo') {
+    state.photoFor = id;
+    $('photo-input').value = '';
+    $('photo-input').click();
+    return;
+  }
+  if (act === 'toggle') {
+    try {
+      await api(`/api/candles/admin/products/${id}`, { method: 'PATCH', body: JSON.stringify({ active: !product.active }) });
+      toast(product.active ? '商品已下架。' : '商品已上架。');
+      await loadProducts();
+    } catch (error) { toast(error.message); }
+    return;
+  }
+  if (act === 'delete') {
+    if (!confirm(`確定要刪除「${product.name}」嗎？刪除後無法復原。`)) return;
+    try {
+      await api(`/api/candles/admin/products/${id}`, { method: 'DELETE' });
+      toast('商品已刪除。');
+      await loadProducts();
+    } catch (error) { toast(error.message); }
+  }
+});
+
+$('edit-cancel').addEventListener('click', () => $('edit-dialog').close());
+$('edit-save').addEventListener('click', async () => {
+  const id = state.editing;
+  if (!id) return;
+  const body = {
+    name: $('edit-name').value,
+    nameTw: $('edit-name-tw').value,
+    sku: $('edit-sku').value,
+    sortOrder: Number($('edit-sort').value) || 0,
+    active: $('edit-active').value === '1',
+  };
+  try {
+    await api(`/api/candles/admin/products/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+    $('edit-dialog').close();
+    toast('已儲存。');
+    await loadProducts();
+  } catch (error) { toast(error.message); }
+});
+
+$('photo-input').addEventListener('change', async event => {
+  const file = event.target.files?.[0];
+  const id = state.photoFor;
+  if (!file || !id) return;
+  if (file.size > 3 * 1024 * 1024) return toast('照片請小於 3MB。');
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('讀取檔案失敗'));
+    reader.readAsDataURL(file);
+  });
+  try {
+    toast('上傳中…', 8000);
+    await api(`/api/candles/admin/products/${id}/image`, { method: 'POST', body: JSON.stringify({ data: dataUrl }) });
+    toast('照片已更新。');
+    await loadProducts();
+  } catch (error) { toast(error.message); }
+});
+
+showAdmin().catch(() => showLogin());
+</script>
+</body>
+</html>

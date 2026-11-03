@@ -12,6 +12,7 @@ import { registerApiNotFound, registerSecurityHeaders } from "./securityHeaders"
 import { initShopTelegramBot } from "../line-shop-telegram";
 import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
+import candleProductsRouter from "../candle-products";
 import candleOrdersRouter from "../candle-orders";
 import { registerAiRoutes } from "./ai";
 import { registerImageProxy } from "../image-proxy";
@@ -55,6 +56,8 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use("/api/line-shop", lineShopRouter);
   app.use("/api/candles/orders", candleOrdersRouter);
+  // 蠟燭商品目錄與後台上架（商品、照片、售價）
+  app.use("/api/candles", candleProductsRouter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // 本站帳密登入。先前未註冊，導致 /api/auth/register 與 /api/auth/login

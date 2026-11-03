@@ -48,21 +48,56 @@ if (readyScentOptions.length === 5) {
   orderForm.insertBefore(scentHelp, noteLabel);
 }
 orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
-document.querySelector('#order .order-grid > div:first-child p').textContent = 'Choose five designs for A$99, with delivery to Australia included. Pay by card or Australian bank transfer; we begin making your set after payment. Your tracking number is provided within 3 business days of payment. Delivery time is additional.';
-document.querySelector('#order-help > p').textContent = 'Delivery to Australia · A$99 total. Choose card payment or bank transfer after entering your details.';
-document.querySelector('#order .selected > small').textContent = 'No sign-up. A$99 total, including delivery. Choose card payment or bank transfer.';
-document.getElementById('submit-order').textContent = 'Continue to secure payment · A$99';
-paymentOptions.addEventListener('change', () => {
-  document.getElementById('submit-order').textContent = paymentOptions.querySelector('input:checked').value === 'card' ? 'Continue to secure payment · A$99' : 'Place order · A$99';
-});
+let priceLabel = 'A$99';
+const priceNodes = [];
+function collectPriceNodes(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    if (/A\$[\d,]/.test(node.nodeValue)) priceNodes.push(node);
+    return;
+  }
+  if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE') return;
+  for (const child of node.childNodes) collectPriceNodes(child);
+}
+function applyPrice() {
+  document.querySelector('#order .order-grid > div:first-child p').textContent = `Choose five designs for ${priceLabel}, with delivery to Australia included. Pay by card or Australian bank transfer; we begin making your set after payment. Your tracking number is provided within 3 business days of payment. Delivery time is additional.`;
+  document.querySelector('#order-help > p').textContent = `Delivery to Australia · ${priceLabel} total. Choose card payment or bank transfer after entering your details.`;
+  document.querySelector('#order .selected > small').textContent = `No sign-up. ${priceLabel} total, including delivery. Choose card payment or bank transfer.`;
+  setSubmitLabel();
+  priceNodes.length = 0;
+  collectPriceNodes(document.body);
+  for (const node of priceNodes) {
+    node.nodeValue = node.nodeValue.replace(/A\$[\d,]+(?:\.\d{2})?/g, match => {
+      const cents = /\.\d{2}$/.test(match) ? match.slice(match.lastIndexOf('.')) : '';
+      return priceLabel + cents;
+    });
+  }
+  document.title = document.title.replace(/A\$[\d,]+(?:\.\d{2})?/g, match => {
+    const cents = /\.\d{2}$/.test(match) ? match.slice(match.lastIndexOf('.')) : '';
+    return priceLabel + cents;
+  });
+}
+function setSubmitLabel() {
+  document.getElementById('submit-order').textContent = paymentOptions.querySelector('input:checked').value === 'card' ? `Continue to secure payment · ${priceLabel}` : `Place order · ${priceLabel}`;
+}
+applyPrice();
+paymentOptions.addEventListener('change', setSubmitLabel);
 let activePhoto = null;
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const staticImages = n => {
+  const num = String(n).padStart(2, '0');
+  const suffix = n === 29 ? '-v2' : '';
+  return {
+    lit: `images/lit-${num}${suffix}.jpeg`,
+    studio: `images/studio-${num}${suffix}.jpeg`,
+    original: `images/candle-${num}.jpeg`,
+    box: n === 20 ? 'images/box-20.jpeg' : null,
+  };
+};
 function showScene(scene) {
   if (!activePhoto) return;
-  const [n, name] = activePhoto;
-  const num = String(n).padStart(2, '0');
   const img = document.getElementById('dialog-image');
-  img.src = `images/${scene}-${num}${n === 29 ? "-v2" : ""}.jpeg`;
-  img.alt = `${scene === 'lit' ? 'Illustrative lit scene' : 'Clean-background illustrative image'} of ${name}`;
+  img.src = scene === 'studio' ? (activePhoto.studio || activePhoto.lit) : activePhoto.lit;
+  img.alt = `${scene === 'lit' ? 'Illustrative lit scene' : 'Clean-background illustrative image'} of ${activePhoto.name}`;
   document.getElementById('dialog-media').classList.toggle('studio', scene === 'studio');
   for (const button of dialog.querySelectorAll('[data-scene]'))
     button.setAttribute('aria-pressed', String(button.dataset.scene === scene));
@@ -71,24 +106,24 @@ for (const button of dialog.querySelectorAll('[data-scene]'))
   button.addEventListener('click', () => showScene(button.dataset.scene));
 dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-for (const [n, name, customSku] of data) {
-  const sku = customSku || `RZ-C${String(n).padStart(3, '0')}`;
-  const num = String(n).padStart(2, '0');
+function addCard(product) {
+  const { n, name, sku, lit, original, box } = product;
+  const safeName = escapeHtml(name);
   const card = document.createElement('article');
   card.className = 'card';
   card.dataset.id = String(n);
-  card.innerHTML = `<button class="photo-trigger" type="button" aria-label="Enlarge photos of ${name}"><img class="photo lit" src="images/lit-${num}${n === 29 ? "-v2" : ""}.jpeg" alt="Illustrative lit scene of ${name}" loading="lazy"></button>
-    <div class="card-body"><div class="sku">${sku}</div><div class="name">${name}</div>
-      <button class="pick" type="button" aria-pressed="false" aria-label="Select ${name}">Add to my five</button>
+  card.innerHTML = `<button class="photo-trigger" type="button" aria-label="Enlarge photos of ${safeName}"><img class="photo lit" src="${lit}" alt="Illustrative lit scene of ${safeName}" loading="lazy"></button>
+    <div class="card-body"><div class="sku">${escapeHtml(sku)}</div><div class="name">${safeName}</div>
+      <button class="pick" type="button" aria-pressed="false" aria-label="Select ${safeName}">Add to my five</button>
     </div>`;
   card.querySelector('.photo-trigger').addEventListener('click', () => {
-    activePhoto = [n, name];
+    activePhoto = product;
     document.getElementById('dialog-title').textContent = `${sku} · ${name}`;
-    document.getElementById('dialog-original').href = n === 29 ? 'images/studio-29-v2.jpeg' : `images/candle-${num}.jpeg`;
+    document.getElementById('dialog-original').href = n === 29 ? product.studio : original;
     document.getElementById('dialog-original').textContent = n === 29 ? 'View unlit set illustration ↗' : 'View original photo ↗';
     const boxLink = document.getElementById('dialog-box');
-    boxLink.hidden = n !== 20;
-    if (n === 20) boxLink.href = 'images/box-20.jpeg';
+    boxLink.hidden = !box;
+    if (box) boxLink.href = box;
     showScene('lit');
     dialog.showModal();
   });
@@ -101,6 +136,8 @@ for (const [n, name, customSku] of data) {
   });
   grid.append(card);
 }
+for (const [n, name, customSku] of data)
+  addCard({ n, name, sku: customSku || `RZ-C${String(n).padStart(3, '0')}`, ...staticImages(n) });
 function update() {
   document.getElementById('order-help').hidden = true;
   document.getElementById('inline-count').textContent = `${selected.size} / 5`;
@@ -217,7 +254,46 @@ if (new URLSearchParams(location.search).get('payment') === 'success') {
   const notice = document.createElement('div');
   notice.className = 'paid-notice';
   notice.setAttribute('role', 'status');
-  notice.innerHTML = '<div class="wrap"><h2>Payment received · thank you</h2><p>Your card payment of A$99.00 has gone through and your receipt is on its way by email. We start making your five candles right away and will send your courier tracking number within 3 business days. There is nothing more you need to do.</p></div>';
+  const paidLabel = `${priceLabel}.00`;
+  notice.innerHTML = `<div class="wrap"><h2>Payment received · thank you</h2><p>Your card payment of ${paidLabel} has gone through and your receipt is on its way by email. We start making your five candles right away and will send your courier tracking number within 3 business days. There is nothing more you need to do.</p></div>`;
   document.getElementById('top').prepend(notice);
   window.scrollTo({ top: 0 });
 }
+function focusRequestedProduct() {
+  const id = new URLSearchParams(location.search).get('product');
+  if (!id) return;
+  const card = grid.querySelector(`.card[data-id="${id.replace(/[^0-9]/g, '')}"]`);
+  if (!card) return;
+  card.classList.add('focused');
+  card.scrollIntoView({ block: 'center' });
+}
+
+// 後台新增／改名的商品與售價以 /api/candles/products 為準；讀不到時沿用上方寫死的內容。
+fetch('/api/candles/products', { headers: { accept: 'application/json' } })
+  .then(response => (response.ok ? response.json() : null))
+  .then(catalog => {
+    if (!catalog || !Array.isArray(catalog.products) || !catalog.products.length || selected.size) return;
+    if (catalog.prices?.aud) {
+      priceLabel = `A$${catalog.prices.aud}`;
+      applyPrice();
+    }
+    data.length = 0;
+    grid.replaceChildren();
+    for (const product of catalog.products) {
+      const fallback = staticImages(product.id);
+      data.push([product.id, product.name, product.sku]);
+      addCard({
+        n: product.id,
+        name: product.name,
+        sku: product.sku,
+        lit: product.lit || fallback.lit,
+        studio: product.studio || fallback.studio,
+        original: product.original || fallback.original,
+        box: product.box || fallback.box,
+      });
+    }
+    update();
+    focusRequestedProduct();
+  })
+  .catch(() => { /* 保持寫死的商品清單 */ });
+focusRequestedProduct();
