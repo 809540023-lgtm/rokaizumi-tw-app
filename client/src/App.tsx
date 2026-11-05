@@ -9,6 +9,8 @@ import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { NetworkStatusBanner } from "./components/NetworkStatusBanner";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const PortalHome = lazy(() => import("./pages/PortalHome"));
+const Women = lazy(() => import("./pages/Women"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const Products = lazy(() => import("./pages/Products"));
@@ -56,7 +58,9 @@ function Router() {
       <Route path={"/admin-panel"} component={AdminPanel} />
       <Route path={"/admin/financial"} component={FinancialDashboard} />
       <Route path={"/admin"} component={AdminDashboard} />
-      <Route path={"/"} component={HomePage} />
+      <Route path={"/"} component={PortalHome} />
+      <Route path={"/home"} component={HomePage} />
+      <Route path={"/women"} component={Women} />
       <Route path={"/koku"} component={Koku} />
       <Route path={"/yama"} component={Yamada} />
       <Route path={"/guides/:slug"} component={GuideDetail} />
