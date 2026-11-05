@@ -68,3 +68,38 @@ body.formpage{background:var(--soft)}
 /* 分類增加到五個後，最後一個會單獨佔半排，改成整列排滿。 */
 @media(min-width:851px){.catalog-switch{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:850px){.catalog-switch{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-switch button:last-child{grid-column:span 2}}
+
+/* Compact mobile storefront: keep product browsing ahead of navigation. */
+@media (max-width:600px){
+  body:not(.formpage) header{position:static}
+  body:not(.formpage) .top{padding:10px 12px;gap:8px}
+  body:not(.formpage) .brand{font-size:17px;letter-spacing:.04em;white-space:nowrap}
+  body:not(.formpage) .brand small{font-size:11px;margin-top:2px}
+  body:not(.formpage) .top .pill{font-size:11px;padding:4px 7px;white-space:nowrap}
+  body:not(.formpage) .notice{font-size:12px;padding:6px 12px}
+  nav[aria-label="商店分類"]{padding:4px 12px 8px}
+  .nav-caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .catalog-switch{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;padding:3px 2px 7px;scroll-padding-inline:2px}
+  .catalog-switch button,.catalog-switch button:last-child{flex:0 0 auto;grid-column:auto;min-height:44px;flex-direction:row;gap:6px;padding:8px 12px;font-size:14px;white-space:nowrap;border-radius:10px;box-shadow:none}
+  .catalog-switch button:hover{transform:none}
+  .catalog-switch small{margin:0;padding:2px 6px;font-size:11px}
+  .utility-switch{margin-top:0;gap:8px}
+  .utility-switch button{min-height:44px;padding:8px;font-size:13px;white-space:nowrap}
+  body:not(.formpage) main{padding:12px 12px calc(88px + env(safe-area-inset-bottom,0px))}
+  .intro{margin-bottom:12px}
+  .intro h1{font-size:22px;margin-bottom:4px}
+  .intro .edition,.intro .muted{display:none}
+  .intro p{font-size:13px;margin:4px 0}
+  .shipping-rules{padding:10px 12px;margin:0 0 12px;font-size:12px}
+  .shipping-rules h2{font-size:14px;margin-bottom:4px}
+  .shipping-rules li{margin:2px 0}
+  .shipping-rules p{margin-top:5px}
+  .cartbar-inner{padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));gap:8px}
+  #bartext{flex:1;min-width:0;font-size:12px;line-height:1.35}
+  .cartbar button{flex:none;min-height:44px;padding:8px 12px;font-size:14px;white-space:nowrap}
+  .catalog-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}
+  .catalog-filters button{flex:none;min-height:44px;white-space:nowrap}
+}
+@media (max-width:360px){
+  body:not(.formpage) .top .pill{display:none}
+}
