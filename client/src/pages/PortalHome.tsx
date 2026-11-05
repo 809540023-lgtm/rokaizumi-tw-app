@@ -5,25 +5,31 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 const ENTRIES = [
   {
-    label: "日本介護用品",
-    caption: "安心嚴選・大阪直送台灣",
-    href: "/products",
-    image: "/home/card-goods.jpg",
-    badge: "",
+    label: "山田化學百元批發",
+    caption: "山田化學商品目錄・百元精品",
+    href: "/ag",
+    external: false,
+    image: "/home/card-yamada.jpg",
+    badge: "山田化學",
+    badgeColor: "#0ABAB5",
   },
   {
-    label: "屬於女人的方向",
-    caption: "女性嚴選商品線・即將開賣",
-    href: "/women",
-    image: "/home/card-women.jpg",
-    badge: "NEW",
+    label: "日本媽媽省省購",
+    caption: "即時拼團・代購 0 元",
+    href: "https://nihon-mama-savebuy.onrender.com/",
+    external: true,
+    image: "/home/card-savebuy.jpg",
+    badge: "省省購",
+    badgeColor: "#C49A5E",
   },
   {
-    label: "專屬賣場（已開賣中）",
-    caption: "百元批發・KOKUBO 高品質商品",
-    href: "/koku",
-    image: "/home/card-koku.jpg",
-    badge: "已開賣中",
+    label: "百元批發（KOKUBO）",
+    caption: "KOKUBO 全商品目錄 1,400+ 品項",
+    href: "https://hyakuen-wholesale.onrender.com/",
+    external: true,
+    image: "/home/card-kokubo.jpg",
+    badge: "百元批發",
+    badgeColor: "#DC2626",
   },
 ] as const;
 
@@ -36,7 +42,7 @@ const FEATURES = [
 
 export function PortalHome() {
   return (
-    <div className="min-h-screen bg-[#f5fafe]">
+    <div className="min-h-screen bg-[#f5fafe] scroll-smooth">
       <SiteHeader />
 
       <main>
@@ -69,14 +75,14 @@ export function PortalHome() {
                     href="/products"
                     className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#014488] shadow-lg shadow-sky-900/30 transition hover:bg-sky-50 sm:text-base"
                   >
-                    逛逛日本介護用品 <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    逛逛日本商品 <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
-                  <Link
-                    href="/koku"
+                  <a
+                    href="#entries"
                     className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 sm:text-base"
                   >
-                    專屬賣場（已開賣中）
-                  </Link>
+                    三個服務入口
+                  </a>
                 </div>
               </div>
 
@@ -101,38 +107,47 @@ export function PortalHome() {
         </section>
 
         {/* 三個路口 */}
-        <section aria-label="服務入口" className="container mx-auto px-4 py-12 sm:py-16">
+        <section id="entries" aria-label="服務入口" className="container scroll-mt-24 mx-auto px-4 py-12 sm:py-16">
           <div className="grid gap-6 md:grid-cols-3">
-            {ENTRIES.map((entry) => (
-              <Link
-                key={entry.href + entry.label}
-                href={entry.href}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-900/10"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden bg-sky-50">
-                  <img
-                    src={entry.image}
-                    alt={entry.label}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  {entry.badge && (
-                    <span className="absolute left-3 top-3 rounded-full bg-[#014488]/90 px-3 py-1 text-xs font-bold text-white backdrop-blur">
+            {ENTRIES.map((entry) => {
+              const inner = (
+                <>
+                  <div className="relative aspect-[16/10] bg-white">
+                    <img
+                      src={entry.image}
+                      alt={entry.label}
+                      className="h-full w-full object-contain p-3"
+                      loading="lazy"
+                    />
+                    <span
+                      className="absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-bold text-white shadow"
+                      style={{ backgroundColor: entry.badgeColor }}
+                    >
                       {entry.badge}
                     </span>
-                  )}
-                </div>
-                <div className="flex flex-1 items-center justify-between gap-3 p-5">
-                  <div>
-                    <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">{entry.label}</h2>
-                    <p className="mt-1 text-xs text-slate-500 sm:text-sm">{entry.caption}</p>
                   </div>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#014488] text-white transition-transform duration-300 group-hover:translate-x-1">
-                    <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+                  <div className="flex flex-1 items-center justify-between gap-3 border-t border-sky-100 p-5">
+                    <div>
+                      <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">{entry.label}</h2>
+                      <p className="mt-1 text-xs text-slate-500 sm:text-sm">{entry.caption}</p>
+                    </div>
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-transform duration-300 group-hover:translate-x-1" style={{ backgroundColor: entry.badgeColor }}>
+                      <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                  </div>
+                </>
+              );
+              const cls = "group relative flex flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-900/10";
+              return entry.external ? (
+                <a key={entry.href} href={entry.href} target="_blank" rel="noopener noreferrer" className={cls}>
+                  {inner}
+                </a>
+              ) : (
+                <Link key={entry.href} href={entry.href} className={cls}>
+                  {inner}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="mt-10 flex justify-center">
