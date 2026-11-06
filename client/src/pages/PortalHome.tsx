@@ -1,5 +1,13 @@
 import { Link } from "wouter";
-import { ArrowRight, Cpu, ShieldCheck, PackageCheck, HeartHandshake, Sparkles, Building2 } from "lucide-react";
+import {
+  ArrowRight,
+  Cpu,
+  ShieldCheck,
+  PackageCheck,
+  HeartHandshake,
+  Sparkles,
+  Building2,
+} from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -42,6 +50,65 @@ const FEATURES = [
 
 export function PortalHome() {
   return (
+    <div className="min-h-screen bg-[#dff7ff] scroll-smooth">
+      <main>
+        <section
+          className="relative mx-auto w-full max-w-[1357px] overflow-hidden bg-white"
+          aria-label="ろかいずみ服務入口"
+        >
+          <img
+            src="/home/1793840233965.jpg"
+            alt="ろかいずみ首頁：日本精美小商品、批發、介護用品、LINE商店與女人方向服務入口"
+            className="block h-auto w-full select-none"
+            draggable={false}
+            fetchPriority="high"
+          />
+
+          {/* 只覆蓋已確認的五個入口；圖上的其他項目保持不可點擊。 */}
+          <nav className="absolute inset-0" aria-label="已確認的服務入口">
+            <Link
+              href="/products?category=hundred"
+              aria-label="日本精美小商品（零售）"
+              title="日本精美小商品（零售）"
+              className="absolute left-[2.3%] top-[28.3%] h-[12.8%] w-[24.2%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+            <Link
+              href="/ag"
+              aria-label="日本精美小商品（批發）"
+              title="日本精美小商品（批發）"
+              className="absolute left-[2.3%] top-[42.0%] h-[12.8%] w-[24.2%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+            <Link
+              href="/products?category=care"
+              aria-label="職人嚴選介護用品"
+              title="職人嚴選介護用品"
+              className="absolute left-[2.3%] top-[56.6%] h-[12.8%] w-[33.8%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+            <a
+              href="https://nihon-mama-savebuy.onrender.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LINE商店（代購）"
+              title="LINE商店（代購）"
+              className="absolute right-[2.3%] top-[28.3%] h-[12.8%] w-[24.2%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+            <Link
+              href="/women"
+              aria-label="屬於女人的方向"
+              title="屬於女人的方向"
+              className="absolute right-[2.3%] top-[72.5%] h-[12.8%] w-[31.0%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+          </nav>
+        </section>
+      </main>
+
+      {/* 原圖保留完整導航；既有可操作的網站工具列置於原圖下方。 */}
+      <SiteHeader />
+      <SiteFooter />
+    </div>
+  );
+
+  return (
     <div className="min-h-screen bg-[#f5fafe] scroll-smooth">
       <SiteHeader />
 
@@ -75,7 +142,8 @@ export function PortalHome() {
                     href="/products"
                     className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#014488] shadow-lg shadow-sky-900/30 transition hover:bg-sky-50 sm:text-base"
                   >
-                    逛逛日本商品 <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    逛逛日本商品{" "}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <a
                     href="#entries"
@@ -107,9 +175,13 @@ export function PortalHome() {
         </section>
 
         {/* 三個路口 */}
-        <section id="entries" aria-label="服務入口" className="container scroll-mt-24 mx-auto px-4 py-12 sm:py-16">
+        <section
+          id="entries"
+          aria-label="服務入口"
+          className="container scroll-mt-24 mx-auto px-4 py-12 sm:py-16"
+        >
           <div className="grid gap-6 md:grid-cols-3">
-            {ENTRIES.map((entry) => {
+            {ENTRIES.map(entry => {
               const inner = (
                 <>
                   <div className="relative aspect-[16/10] bg-white">
@@ -128,18 +200,32 @@ export function PortalHome() {
                   </div>
                   <div className="flex flex-1 items-center justify-between gap-3 border-t border-sky-100 p-5">
                     <div>
-                      <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">{entry.label}</h2>
-                      <p className="mt-1 text-xs text-slate-500 sm:text-sm">{entry.caption}</p>
+                      <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">
+                        {entry.label}
+                      </h2>
+                      <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+                        {entry.caption}
+                      </p>
                     </div>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-transform duration-300 group-hover:translate-x-1" style={{ backgroundColor: entry.badgeColor }}>
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition-transform duration-300 group-hover:translate-x-1"
+                      style={{ backgroundColor: entry.badgeColor }}
+                    >
                       <ArrowRight className="h-5 w-5" aria-hidden="true" />
                     </span>
                   </div>
                 </>
               );
-              const cls = "group relative flex flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-900/10";
+              const cls =
+                "group relative flex flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-sky-900/10";
               return entry.external ? (
-                <a key={entry.href} href={entry.href} target="_blank" rel="noopener noreferrer" className={cls}>
+                <a
+                  key={entry.href}
+                  href={entry.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cls}
+                >
                   {inner}
                 </a>
               ) : (
@@ -170,14 +256,21 @@ export function PortalHome() {
               的生活與產業方案。
             </p>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {FEATURES.map((f) => (
-                <div key={f.title} className="flex items-start gap-3 rounded-2xl bg-[#f0f7fe] p-4">
+              {FEATURES.map(f => (
+                <div
+                  key={f.title}
+                  className="flex items-start gap-3 rounded-2xl bg-[#f0f7fe] p-4"
+                >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#014488] text-white">
                     <f.icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div>
-                    <div className="text-sm font-extrabold text-slate-900 sm:text-base">{f.title}</div>
-                    <div className="mt-0.5 text-xs text-slate-500 sm:text-sm">{f.desc}</div>
+                    <div className="text-sm font-extrabold text-slate-900 sm:text-base">
+                      {f.title}
+                    </div>
+                    <div className="mt-0.5 text-xs text-slate-500 sm:text-sm">
+                      {f.desc}
+                    </div>
                   </div>
                 </div>
               ))}
