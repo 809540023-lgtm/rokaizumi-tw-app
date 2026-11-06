@@ -68,6 +68,15 @@ describe("LINE shop webhook trust boundary", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ received: true });
   });
+  it("ignores whitespace accidentally pasted into the webhook secret", async () => {
+    setup();
+    vi.stubEnv("LINE_SHOP_STRIPE_WEBHOOK_SECRET", "  whsec_test_secret\n");
+    const header = Stripe.webhooks.generateTestHeaderString({
+      payload,
+      secret: "whsec_test_secret",
+    });
+    expect((await post(payload, header)).status).toBe(200);
+  });
   it("rejects mode mismatch even with a valid signature", async () => {
     setup();
     const livePayload = payload.replace('"livemode":false', '"livemode":true');
