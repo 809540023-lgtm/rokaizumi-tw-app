@@ -64,14 +64,8 @@ export function PortalHome() {
             fetchPriority="high"
           />
 
-          {/* 只覆蓋已確認的五個入口；圖上的其他項目保持不可點擊。 */}
+          {/* 零售頁尚未完成；只開放其餘四個入口，圖上的其他項目保持不可點擊。 */}
           <nav className="absolute inset-0" aria-label="已確認的服務入口">
-            <Link
-              href="/products?category=hundred"
-              aria-label="日本精美小商品（零售）"
-              title="日本精美小商品（零售）"
-              className="absolute left-[2.3%] top-[28.3%] h-[12.8%] w-[24.2%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
-            />
             <Link
               href="/ag"
               aria-label="日本精美小商品（批發）"

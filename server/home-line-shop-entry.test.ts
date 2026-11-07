@@ -32,14 +32,14 @@ describe("homepage LINE shop entry", () => {
     }
   );
 
-  it("preserves the mother image and the four other entry destinations", () => {
+  it("does not expose the unfinished retail page", () => {
+    expect(home).not.toContain('href="/products?category=hundred"');
+    expect(home).not.toContain('aria-label="日本精美小商品（零售）"');
+  });
+
+  it("preserves the mother image, wholesale and the other ready entry destinations", () => {
     expect(home).toContain('src="/home/1793840233965.jpg"');
-    for (const href of [
-      "/products?category=hundred",
-      "/ag",
-      "/products?category=care",
-      "/women",
-    ]) {
+    for (const href of ["/ag", "/products?category=care", "/women"]) {
       expect(home).toContain(`href="${href}"`);
     }
     // The sister-site definition is separate from the LINE shop entry.
