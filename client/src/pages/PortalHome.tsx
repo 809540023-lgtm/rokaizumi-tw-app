@@ -85,12 +85,10 @@ export function PortalHome() {
               className="absolute left-[2.3%] top-[56.6%] h-[12.8%] w-[33.8%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
             />
             <a
-              href="https://nihon-mama-savebuy.onrender.com/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/line-shop/"
               aria-label="LINE商店（代購）"
               title="LINE商店（代購）"
-              className="absolute right-[2.3%] top-[28.3%] h-[12.8%] w-[24.2%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+              className="absolute right-[2.36%] top-[22.47%] h-[10%] w-[24.61%] rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
             />
             <Link
               href="/women"
