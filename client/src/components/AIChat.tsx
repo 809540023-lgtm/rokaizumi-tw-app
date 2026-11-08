@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { useLanguage } from '../contexts/LanguageContext';
+import { LINE_ADD_FRIEND_URL } from '../lib/line';
+import { aiChatCopy, getAIChatState } from '../lib/ai-chat';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -22,15 +24,24 @@ export default function AIChat() {
     onSuccess: (data: { response: string }) => {
       setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
     },
-    onError: () => {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: (language === 'zh' || language === 'cn') ? '抱歉，我現在無法回答。請稍後再試。' : 
-                 language === 'en' ? 'Sorry, I cannot answer right now. Please try again later.' :
-                 '申し訳ございません。現在お答えできません。後でもう一度お試しください。'
-      }]);
-    },
   });
+
+  const copy = aiChatCopy[language];
+  const statusQuery = trpc.ai.status.useQuery(undefined, {
+    enabled: isOpen,
+    retry: false,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchInterval: isOpen ? 60_000 : false,
+  });
+  const state = getAIChatState({
+    available: statusQuery.data?.available,
+    isPending: statusQuery.isPending,
+    isFetching: statusQuery.isFetching,
+    isError: statusQuery.isError,
+    chatError: chatMutation.isError,
+  });
+  const canSend = state === 'ready' && !chatMutation.isPending;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -41,7 +52,7 @@ export default function AIChat() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || chatMutation.isPending) return;
+    if (!input.trim() || !canSend) return;
 
     const userMessage = input.trim();
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -57,41 +68,11 @@ export default function AIChat() {
     }
   };
 
-  const getWelcomeMessage = () => {
-    switch (language) {
-      case 'zh':
-        return '您好！我是 ろかいずみ合同会社 的 AI 客服助理。我可以幫助您了解我們的產品、訂單狀態和其他問題。請問有什麼可以幫助您的嗎？';
-      case 'en':
-        return 'Hello! I am the AI customer service assistant of ろかいずみ合同会社. I can help you with our products, order status, and other questions. How can I help you?';
-      case 'ja':
-        return 'こんにちは！ろかいずみ合同会社のAIカスタマーサービスアシスタントです。製品、注文状況、その他のご質問についてサポートいたします。何かお手伝いできることはありますか？';
-      default:
-        return '您好！我是 ろかいずみ合同会社 的 AI 客服助理。';
-    }
-  };
-
-  const getPlaceholder = () => {
-    switch (language) {
-      case 'zh': return '輸入您的問題...';
-      case 'en': return 'Type your question...';
-      case 'ja': return '質問を入力してください...';
-      default: return '輸入您的問題...';
-    }
-  };
-
-  const getTitle = () => {
-    switch (language) {
-      case 'zh': return 'AI 客服助理';
-      case 'en': return 'AI Customer Service';
-      case 'ja': return 'AIカスタマーサービス';
-      default: return 'AI 客服助理';
-    }
-  };
-
   if (!isOpen) {
     return (
       <Button
-        onClick={() => setIsOpen(true)}
+        onClick={() => { if (chatMutation.isError) chatMutation.reset(); setIsOpen(true); }}
+        aria-label={copy.open}
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#0ABAB5] hover:bg-[#089B96] shadow-lg z-50 mb-[env(safe-area-inset-bottom)]"
       >
         <MessageCircle className="w-8 h-8 text-white" />
@@ -108,9 +89,9 @@ export default function AIChat() {
             <Bot className="w-6 h-6 text-[#0ABAB5]" />
           </div>
           <div>
-            <h3 className="text-white font-bold">{getTitle()}</h3>
+            <h3 className="text-white font-bold">{copy.title}</h3>
             <p className="text-white/80 text-sm">
-              {(language === 'zh' || language === 'cn') ? '在線' : language === 'en' ? 'Online' : 'オンライン'}
+              {state === 'ready' ? copy.ready : state === 'checking' ? copy.checking : copy.unavailableStatus}
             </p>
           </div>
         </div>
@@ -118,6 +99,7 @@ export default function AIChat() {
           variant="ghost"
           size="sm"
           onClick={() => setIsOpen(false)}
+          aria-label={copy.close}
           className="text-white hover:bg-white/20"
         >
           <X className="w-5 h-5" />
@@ -126,13 +108,19 @@ export default function AIChat() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messages.length === 0 && (
+        {state === 'unavailable' && (
+          <div role="status" className="bg-white rounded-lg p-3 shadow-sm text-sm text-gray-800">
+            <p>{copy.unavailable}</p>
+            <a href={LINE_ADD_FRIEND_URL} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-[#087D79] underline font-medium">{copy.contact}</a>
+          </div>
+        )}
+        {messages.length === 0 && state === 'ready' && (
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 bg-[#0ABAB5] rounded-full flex items-center justify-center flex-shrink-0">
               <Bot className="w-5 h-5 text-white" />
             </div>
             <div className="bg-white rounded-lg p-3 shadow-sm max-w-[80%]">
-              <p className="text-sm text-gray-800">{getWelcomeMessage()}</p>
+              <p className="text-sm text-gray-800">{copy.welcome}</p>
             </div>
           </div>
         )}
@@ -194,13 +182,15 @@ export default function AIChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={getPlaceholder()}
-            disabled={chatMutation.isPending}
+            placeholder={copy.placeholder}
+            aria-label={copy.placeholder}
+            disabled={!canSend}
             className="flex-1"
           />
           <Button
             onClick={handleSend}
-            disabled={!input.trim() || chatMutation.isPending}
+            disabled={!input.trim() || !canSend}
+            aria-label={copy.send}
             className="bg-[#0ABAB5] hover:bg-[#089B96]"
           >
             <Send className="w-5 h-5" />
