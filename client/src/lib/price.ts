@@ -1,3 +1,5 @@
+import { hasPurchasablePrice, pricePendingText } from '@shared/catalog';
+
 /**
  * 價格顯示
  *
@@ -50,4 +52,9 @@ export function convertPrice(priceJpy: number, language: string): number {
   if (language === 'ja') return Math.round(jpy);
   if (language === 'en') return Number((jpy * JPY_TO_USD).toFixed(2));
   return Math.round(jpy * JPY_TO_TWD);
+}
+
+/** Catalog-only display; totals and historic orders retain their actual values. */
+export function formatCatalogPrice(priceJpy: number, language: string): string {
+  return hasPurchasablePrice(priceJpy) ? formatPrice(priceJpy, language) : pricePendingText(language);
 }

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /manage
+Disallow: /mom
+Disallow: /office
+Disallow: /mask
+Disallow: /selection
+Disallow: /login
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /order-confirmation
+Disallow: /profile
+
+Sitemap: https://rokaizumi-tw.jp/sitemap.xml

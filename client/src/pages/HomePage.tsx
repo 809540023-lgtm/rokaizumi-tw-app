@@ -1,6 +1,7 @@
+import { hasPurchasablePrice, pricePendingText } from '@shared/catalog';
 import { Link } from 'wouter';
 import { trpc } from '../lib/trpc';
-import { formatPrice } from '@/lib/price';
+import { formatCatalogPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,10 @@ export default function HomePage() {
   const { add: addToCart, itemCount } = useCart();
 
   const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
+    if (!hasPurchasablePrice(product.price)) {
+      toast.error(pricePendingText(language));
+      return;
+    }
     const quantity = quantities[product.id] || 1;
     addToCart(
       { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? undefined },
@@ -333,12 +338,13 @@ export default function HomePage() {
                       </Link>
                     <div className="mb-4">
                       <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
-                        {formatPrice(product.price, language)}
+                        {formatCatalogPrice(product.price, language)}
                       </span>
                     </div>
                     <div className="flex gap-2">
                       <input
                         type="number"
+                        disabled={!hasPurchasablePrice(product.price)}
                         min="1"
                         max={MAX_CART_QUANTITY}
                         aria-label={`${product.name} 的數量`}
@@ -350,11 +356,12 @@ export default function HomePage() {
                         className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />
                       <Button
+                        disabled={!hasPurchasablePrice(product.price)}
                         onClick={() => handleAddToCart(product)}
-                        className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
+                        className="flex-1 h-auto min-h-9 whitespace-normal bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        {t('products.addToCart') || '加入購物車'}
+                        {!hasPurchasablePrice(product.price) ? pricePendingText(language) : t('products.addToCart') || '加入購物車'}
                       </Button>
                     </div>
                   </div>
@@ -408,12 +415,13 @@ export default function HomePage() {
                       </Link>
                     <div className="mb-4">
                       <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
-                        {formatPrice(product.price, language)}
+                        {formatCatalogPrice(product.price, language)}
                       </span>
                     </div>
                     <div className="flex gap-2">
                       <input
                         type="number"
+                        disabled={!hasPurchasablePrice(product.price)}
                         min="1"
                         max={MAX_CART_QUANTITY}
                         aria-label={`${product.name} 的數量`}
@@ -425,11 +433,12 @@ export default function HomePage() {
                         className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                       />
                       <Button
+                        disabled={!hasPurchasablePrice(product.price)}
                         onClick={() => handleAddToCart(product)}
-                        className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
+                        className="flex-1 h-auto min-h-9 whitespace-normal bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        {t('products.addToCart') || '加入購物車'}
+                        {!hasPurchasablePrice(product.price) ? pricePendingText(language) : t('products.addToCart') || '加入購物車'}
                       </Button>
                     </div>
                   </div>

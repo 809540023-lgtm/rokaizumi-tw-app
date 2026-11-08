@@ -22,7 +22,7 @@ export default function GuideDetail() {
         <SiteHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onSearchSubmit={() => setLocation(`/products?q=${searchQuery}`)}
+          onSearchSubmit={() => setLocation(`/products?q=${encodeURIComponent(searchQuery.trim())}`)}
         />
         <div className="flex-1 container mx-auto px-4 py-24 text-center">
           <div className="text-6xl mb-4">📄</div>
@@ -47,7 +47,7 @@ export default function GuideDetail() {
       <SiteHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onSearchSubmit={() => setLocation(`/products?q=${searchQuery}`)}
+        onSearchSubmit={() => setLocation(`/products?q=${encodeURIComponent(searchQuery.trim())}`)}
       />
 
       <article className="container mx-auto px-4 py-10 max-w-3xl">

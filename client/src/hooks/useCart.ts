@@ -7,6 +7,7 @@
  * 結帳時才需要身分——這樣任何人都能先把商品加進去。
  */
 
+import { hasPurchasablePrice } from '@shared/catalog';
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'rokaizumi.cart.v1';
@@ -38,9 +39,7 @@ function normalizeLine(value: unknown): CartLine | null {
     productId <= 0 ||
     typeof line.name !== 'string' ||
     !line.name.trim() ||
-    typeof price !== 'number' ||
-    !Number.isSafeInteger(price) ||
-    price < 0
+    !hasPurchasablePrice(price)
   ) {
     return null;
   }

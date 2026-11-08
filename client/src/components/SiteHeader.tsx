@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Search, ShoppingCart, Building2, LogIn, LogOut, User, Heart, Globe, FileSpreadsheet, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -42,6 +42,7 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }: SiteHeaderProps) {
   const [local, setLocal] = useState(searchQuery);
+  const [, setLocation] = useLocation();
   const { user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const { itemCount } = useCart();
@@ -82,11 +83,15 @@ export function SiteHeader({ searchQuery = "", onSearchChange, onSearchSubmit }:
           className="hidden max-w-2xl flex-1 items-center rounded-full bg-gray-100 px-4 py-2 lg:flex"
           onSubmit={(e) => {
             e.preventDefault();
+            if (!value.trim()) return;
             if (onSearchSubmit) onSearchSubmit();
+            else setLocation(`/products?q=${encodeURIComponent(value.trim())}`);
           }}
         >
           <Search className="w-4 h-4 text-gray-400 mr-2" />
           <input
+            type="search"
+            aria-label={t("header.searchPlaceholder")}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={t("header.searchPlaceholder")}
