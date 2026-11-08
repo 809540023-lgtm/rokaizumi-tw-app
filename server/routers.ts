@@ -4,6 +4,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import Stripe from "stripe";
 import * as db from "./db";
 import { storagePut } from "./storage";
@@ -387,12 +388,18 @@ export const appRouter = router({
 
   // AI Chat API
   ai: router({
+    status: publicProcedure.query(() => ({
+      available: Boolean(ENV.forgeApiKey.trim()),
+    })),
     chat: publicProcedure
       .input(z.object({
         message: z.string(),
         language: z.enum(['zh', 'en', 'ja']).optional(),
       }))
       .mutation(async ({ input }) => {
+        if (!ENV.forgeApiKey.trim()) {
+          throw new TRPCError({ code: 'SERVICE_UNAVAILABLE', message: 'AI chat is temporarily unavailable.' });
+        }
         const systemPrompt = input.language === 'zh'
           ? '你是ろかいずみ合同会社的 AI 客服助理。我們是一家專業的日本百元商品和老人看護器材出口公司，服務全球包括台灣。請友善、專業地回答客戶的問題。如果客戶問到產品相關問題，請介紹我們的主要產品類別：日本百元商品（廚房用品、收納用品、文具、日用百貨、清潔用品、玩具雜貨、美妆保養、食品零食）和老人看護器材（健康監測、安全監控、床邊照護、復健器材、生活輔具、行動輔助、衛浴安全、護理用品）。'
           : input.language === 'en'
