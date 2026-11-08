@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { toast } from 'sonner';
 import { trpc } from '../lib/trpc';
@@ -42,6 +42,7 @@ export default function B2B() {
     message: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
 
   const submitInquiry = trpc.b2bInquiries.create.useMutation({
     onSuccess: () => {
@@ -53,19 +54,27 @@ export default function B2B() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.company || !form.name || !form.phone) {
+    if (submissionInFlight.current) return;
+    if (!form.company.trim() || !form.name.trim() || !form.phone.trim()) {
       toast.error(t('b2b.form.required'));
       return;
     }
+    submissionInFlight.current = true;
     setSubmitting(true);
-    if (submitInquiry) {
-      submitInquiry.mutate(form);
-    } else {
-      // fallback if API not available
-      await new Promise(r => setTimeout(r, 500));
-      toast.success(t('b2b.form.fallback'));
+    try {
+      await submitInquiry.mutateAsync({
+        ...form,
+        company: form.company.trim(),
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim() || undefined,
+      });
+    } catch {
+      // onError displays the failure; retain the form for retry.
+    } finally {
+      submissionInFlight.current = false;
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   return (
@@ -73,7 +82,7 @@ export default function B2B() {
       <SiteHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onSearchSubmit={() => setLocation(`/products?q=${searchQuery}`)}
+        onSearchSubmit={() => setLocation(`/products?q=${encodeURIComponent(searchQuery.trim())}`)}
       />
 
       {/* Hero */}

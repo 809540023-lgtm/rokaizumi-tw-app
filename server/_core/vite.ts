@@ -69,6 +69,11 @@ export function staticCacheControl(filePath: string): string | null {
   return null;
 }
 
+/** Missing static files must not masquerade as a successful HTML app response. */
+export function isStaticAssetPath(pathname: string): boolean {
+  return /\.(?:js|mjs|css|png|jpe?g|webp|gif|svg|ico|woff2?|ttf|json|xml|txt|map)$/i.test(pathname);
+}
+
 export function serveStatic(app: Express) {
   // 優先級: dist/public > server/public > client/public
   let distPath = path.resolve(import.meta.dirname, "public");
@@ -119,7 +124,11 @@ export function serveStatic(app: Express) {
   });
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  app.use("*", (req, res) => {
+    if (isStaticAssetPath(req.originalUrl.split("?")[0])) {
+      res.status(404).type("text/plain").send("Not found");
+      return;
+    }
     const indexPath = path.resolve(distPath, "index.html");
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);

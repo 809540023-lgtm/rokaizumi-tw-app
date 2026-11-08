@@ -33,6 +33,7 @@ vi.mock('./db', async importOriginal => ({
   setOrderStripeSessionId: vi.fn(async () => undefined),
 }));
 
+import * as db from './db';
 import { appRouter } from './routers';
 
 describe('Stripe Payment Integration', () => {
@@ -54,6 +55,18 @@ describe('Stripe Payment Integration', () => {
       },
       res: {},
     });
+  });
+
+  it.each([0, -1, null, undefined, NaN, Infinity, 1.5])('rejects unconfirmed catalog price %s before creating a payment order', async (price) => {
+    vi.mocked(db.createOrder).mockClear();
+    vi.mocked(db.getProductById).mockResolvedValueOnce({
+      id: 1, name: 'Unpriced product', price, stock: 99, status: 'available',
+    } as any);
+    await expect(caller.payments.createCheckoutSession({
+      items: [{ productId: 1, quantity: 1 }],
+      shippingInfo: { name: 'Test', phone: '123', address: 'Test address' },
+    })).rejects.toThrow('price must be confirmed');
+    expect(db.createOrder).not.toHaveBeenCalled();
   });
 
   it('should create a checkout session with valid items', async () => {

@@ -1,5 +1,6 @@
+import { hasPurchasablePrice, pricePendingText } from '@shared/catalog';
 import { Link, useRoute, useLocation } from 'wouter';
-import { formatPrice } from '@/lib/price';
+import { formatCatalogPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,10 @@ export default function CategoryProducts() {
   const { data: products = [] } = trpc.products.list.useQuery();
   
   const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
+    if (!hasPurchasablePrice(product.price)) {
+      toast.error(pricePendingText(language));
+      return;
+    }
     addToCart({
       productId: product.id,
       name: product.name,
@@ -138,15 +143,15 @@ export default function CategoryProducts() {
                     </Link>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <span className="text-lg sm:text-2xl font-bold text-[#DC2626]">
-                      {formatPrice(product.price, language)}
+                      {formatCatalogPrice(product.price, language)}
                     </span>
                     <Button
                       onClick={() => handleAddToCart(product)}
-                      disabled={product.status !== 'available' || product.stock <= 0}
-                      className="w-full bg-[#0ABAB5] hover:bg-[#089B96] text-white sm:w-auto"
+                      disabled={!hasPurchasablePrice(product.price) || product.status !== 'available' || product.stock <= 0}
+                      className="w-full h-auto min-h-9 whitespace-normal bg-[#0ABAB5] hover:bg-[#089B96] text-white sm:w-auto"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      {product.status !== 'available' || product.stock <= 0
+                      {!hasPurchasablePrice(product.price) ? pricePendingText(language) : product.status !== 'available' || product.stock <= 0
                         ? ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
                         : (t('products.addToCart') || '加入購物車')}
                     </Button>

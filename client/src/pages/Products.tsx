@@ -1,5 +1,6 @@
-import { Link } from 'wouter';
-import { formatPrice } from '@/lib/price';
+import { hasPurchasablePrice, pricePendingText, matchesProductSearch } from '@shared/catalog';
+import { Link, useSearch } from 'wouter';
+import { formatCatalogPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { trpc } from '../lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,10 @@ export default function Products() {
 
   const handleAddToCart = (product: { id: number; name: string; price: number; imageUrl?: string | null }) => {
     const quantity = quantities[product.id] || 1;
+    if (!hasPurchasablePrice(product.price)) {
+      toast.error(pricePendingText(language));
+      return;
+    }
     addToCart(
       { productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? undefined },
       quantity
@@ -49,6 +54,8 @@ export default function Products() {
     return null;
   };
 
+  const search = useSearch();
+  const searchQuery = new URLSearchParams(search).get('q')?.trim() || '';
   const mainCategory = getMainCategoryFromUrl();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
@@ -71,7 +78,7 @@ export default function Products() {
   // 根據主分類篩選產品
   const filteredProducts = useMemo(() => {
     if (!mainCategory) {
-      return products;
+      return products.filter(product => matchesProductSearch(product, searchQuery));
     }
 
     const relevantCategories = mainCategory === 'japanese' ? japaneseCategories : elderlyCareCategories;
@@ -82,12 +89,12 @@ export default function Products() {
     const allowedIds = allowed.map(cat => cat.id);
     const allowedNames = allowed.map(cat => cat.name);
 
-    return products.filter((product: { categoryId?: number; category?: string }) =>
+    return products.filter(product => matchesProductSearch(product, searchQuery)).filter((product: { categoryId?: number; category?: string }) =>
       product.categoryId !== undefined
         ? allowedIds.includes(product.categoryId)
         : product.category !== undefined && allowedNames.includes(product.category)
     );
-  }, [products, mainCategory, selectedCategories, japaneseCategories, elderlyCareCategories]);
+  }, [products, searchQuery, mainCategory, selectedCategories, japaneseCategories, elderlyCareCategories]);
 
   // 切換分類選擇
   const toggleCategory = (categoryId: number) => {
@@ -217,7 +224,7 @@ export default function Products() {
             {mainCategory === 'japanese' ? t('home.category1') || '日本精美小商品' : mainCategory === 'elderly' ? t('home.category2') || '銀髮生活品質加乘輔具' : t('products.allProducts') || '全部商品'}
           </h1>
           <p className="text-gray-600">
-            {mainCategory ? `${filteredProducts.length} ${t('products.products') || '件商品'}` : t('products.allProductsDesc') || '瀏覽我們所有的優質商品'}
+            {mainCategory || searchQuery ? `${filteredProducts.length} ${t('products.products') || '件商品'}` : t('products.allProductsDesc') || '瀏覽我們所有的優質商品'}
           </p>
         </div>
 
@@ -280,7 +287,7 @@ export default function Products() {
                 {/* 價格 - 根據語言顯示不同幣別 */}
                 <div className="mb-4 mt-auto">
                   <span className="text-lg sm:text-2xl font-bold text-[#0ABAB5]">
-                    {formatPrice(product.price, language)}
+                    {formatCatalogPrice(product.price, language)}
                   </span>
                 </div>
 
@@ -288,6 +295,7 @@ export default function Products() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="number"
+                    disabled={!hasPurchasablePrice(product.price)}
                     min="1"
                     max={MAX_CART_QUANTITY}
                     aria-label={`${product.name} 的數量`}
@@ -299,11 +307,12 @@ export default function Products() {
                     className="w-full sm:w-16 px-2 py-1.5 border border-gray-300 rounded text-sm"
                   />
                   <Button
+                    disabled={!hasPurchasablePrice(product.price)}
                     onClick={() => handleAddToCart(product)}
-                    className="flex-1 bg-[#0ABAB5] hover:bg-[#089B96] text-white"
+                    className="flex-1 h-auto min-h-9 whitespace-normal bg-[#0ABAB5] hover:bg-[#089B96] text-white"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t('products.addToCart') || '加入購物車'}
+                    {!hasPurchasablePrice(product.price) ? pricePendingText(language) : t('products.addToCart') || '加入購物車'}
                   </Button>
                 </div>
               </div>

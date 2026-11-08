@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const store = vi.hoisted(() => ({
   nextOrderId: 1,
+  priceOverride: undefined as unknown,
+  overridePrice: false,
   orders: [] as Array<Record<string, unknown> & { id: number; userId: number; items: unknown[] }>,
 }));
 
@@ -9,7 +11,7 @@ vi.mock('./db', () => ({
   getProductById: async (id: number) => ({
     id,
     name: `Product ${id}`,
-    price: id * 1000,
+    price: store.overridePrice ? store.priceOverride : id * 1000,
     stock: 99,
     status: 'available',
   }),
@@ -35,6 +37,7 @@ describe('Orders API', () => {
   };
 
   beforeEach(() => {
+    store.overridePrice = false;
     store.nextOrderId = 1;
     store.orders = [];
   });
@@ -83,6 +86,17 @@ describe('Orders API', () => {
     });
 
     await expect(otherUser.orders.getById({ id: orderId })).resolves.toBeNull();
+  });
+
+  it.each([0, -1, null, undefined, NaN, Infinity, 1.5])('rejects unconfirmed catalog price %s before creating an order', async (price) => {
+    store.overridePrice = true;
+    store.priceOverride = price;
+    const caller = appRouter.createCaller(context);
+    await expect(caller.orders.create({
+      shippingAddress: '123 Main St', contactName: 'John Doe', contactPhone: '09123456789',
+      items: [{ productId: 1, quantity: 1 }],
+    })).rejects.toThrow('price must be confirmed');
+    expect(store.orders).toEqual([]);
   });
 
   it('requires authentication and a non-empty cart', async () => {

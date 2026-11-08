@@ -55,6 +55,10 @@ export default function Daiko() {
   const [error, setError] = useState("");
 
   async function handleFetch() {
+    if (loading) return;
+    setTitle("");
+    setImage("");
+    setPriceJPY("");
     setError("");
     setLoading(true);
     try {
@@ -65,12 +69,12 @@ export default function Daiko() {
       });
       const data = await res.json().catch(() => ({}));
       setFetched(data || {});
-      if (!data || !data.ok) {
+      if (!res.ok || !data || !data.ok) {
         setError((data && data.error) || t("daiko.errFetch"));
       } else {
         setTitle(data.title || "");
         setImage(data.image || "");
-        if (data.priceJPY) setPriceJPY(String(data.priceJPY));
+        setPriceJPY(data.priceJPY ? String(data.priceJPY) : "");
       }
     } catch (e) {
       setError(t("daiko.errNetwork"));

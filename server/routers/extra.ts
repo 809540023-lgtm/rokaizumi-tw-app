@@ -13,6 +13,7 @@
  */
 
 import { z } from 'zod';
+import { b2bInquiryInput } from '../../shared/b2b-inquiry';
 import { publicProcedure, protectedProcedure, adminProcedure, router } from '../_core/trpc';
 import { db } from '../db';
 import {
@@ -84,17 +85,7 @@ export const newsletter = router({
 export const b2bInquiries = router({
   /** 訪客送出企業合作詢價 */
   create: publicProcedure
-    .input(
-      z.object({
-        company: z.string().min(1, '公司名稱必填'),
-        name: z.string().min(1, '聯絡人必填'),
-        phone: z.string().min(1, '電話必填'),
-        email: z.string().email().optional(),
-        type: z.string(),
-        monthlyBudget: z.string(),
-        message: z.string().optional(),
-      })
-    )
+    .input(b2bInquiryInput)
     .mutation(async ({ input }) => {
       const [inserted] = await db
         .insert(b2bInquiriesTable)

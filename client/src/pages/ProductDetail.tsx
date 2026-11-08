@@ -1,6 +1,7 @@
+import { hasPurchasablePrice, pricePendingText } from '@shared/catalog';
 import { useRoute, Link } from 'wouter';
 import { trpc } from '../lib/trpc';
-import { formatPrice } from '@/lib/price';
+import { formatCatalogPrice } from '@/lib/price';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,7 +43,7 @@ export default function ProductDetail() {
   const { data: relatedProducts = [] } = trpc.products.list.useQuery();
 
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!product || !hasPurchasablePrice(product.price)) return;
     addToCart(
       {
         productId: product.id,
@@ -176,7 +177,7 @@ export default function ProductDetail() {
     product.stock === undefined ? MAX_CART_QUANTITY - quantityInCart : product.stock - quantityInCart
   );
   const selectorMax = Math.max(1, maxQuantity);
-  const isUnavailable = product.status !== 'available' || maxQuantity < 1;
+  const isUnavailable = !hasPurchasablePrice(product.price) || product.status !== 'available' || maxQuantity < 1;
 
   return (
     <div className="min-h-screen bg-[#fef9f3]">
@@ -245,7 +246,7 @@ export default function ProductDetail() {
             
             <div className="mb-6">
               <p className="text-4xl font-bold text-[#DC2626] mb-3">
-                {formatPrice(product.price, language)}
+                {formatCatalogPrice(product.price, language)}
               </p>
               {/* Stock Status */}
               <div className="flex items-center gap-2">
@@ -328,10 +329,10 @@ export default function ProductDetail() {
             <Button
               onClick={handleAddToCart}
               disabled={isUnavailable}
-              className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-white py-6 text-lg font-semibold flex items-center justify-center gap-2 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-auto whitespace-normal bg-[#DC2626] hover:bg-[#B91C1C] text-white py-6 text-lg font-semibold flex items-center justify-center gap-2 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingCart className="w-5 h-5" />
-              {isUnavailable
+              {!hasPurchasablePrice(product.price) ? pricePendingText(language) : isUnavailable
                 ? ((language === 'zh' || language === 'cn') ? '缺貨' : 'Out of Stock')
                 : ((language === 'zh' || language === 'cn') ? '加入購物車' : 'Add to Cart')
               }
@@ -443,7 +444,7 @@ export default function ProductDetail() {
                         </h3>
                         <div className="flex items-center justify-between mb-3">
                           <p className="text-xl font-bold text-[#DC2626]">
-                            {formatPrice(relatedProduct.price, language)}
+                            {formatCatalogPrice(relatedProduct.price, language)}
                           </p>
                           <span className="text-xs bg-[#0ABAB5] text-white px-2 py-1 rounded-full">
                             {(language === 'zh' || language === 'cn') ? '推薦' : 'Recommended'}

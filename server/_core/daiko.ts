@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { fetchProductHTML, ProductFetchError } from "./safe-product-fetch";
 
 /**
  * 代購（貼網址）後端：抓取單一商品網址的標題、圖片、價格。
@@ -26,50 +27,11 @@ function decodeEntities(s: string | null): string | null {
     .replace(/&nbsp;/g, " ");
 }
 
-async function readJsonBody(req: Request): Promise<any> {
-  if (req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
-    return req.body;
-  }
-  return await new Promise((resolve) => {
-    let data = "";
-    req.on("data", (c) => (data += c));
-    req.on("end", () => {
-      try {
-        resolve(data ? JSON.parse(data) : {});
-      } catch {
-        resolve({});
-      }
-    });
-    req.on("error", () => resolve({}));
-  });
-}
-
 export function registerDaikoRoutes(app: Express) {
   app.post("/api/daiko/fetch", async (req: Request, res: Response) => {
     try {
-      const body = await readJsonBody(req);
-      const url = String(body.url || "").trim();
-      if (!/^https?:\/\//i.test(url)) {
-        res.status(400).json({ ok: false, error: "請輸入有效的商品網址（http/https）" });
-        return;
-      }
-
-      let html = "";
-      try {
-        const resp = await fetch(url, {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
-            "Accept-Language": "ja,zh-TW;q=0.8,en;q=0.6",
-            Accept: "text/html,application/xhtml+xml",
-          },
-          redirect: "follow",
-        });
-        html = await resp.text();
-      } catch (e) {
-        res.json({ ok: false, error: "無法連線到此網址，請確認網址或改為手動填寫。" });
-        return;
-      }
+      const url = typeof req.body?.url === "string" ? req.body.url.trim() : "";
+      const { html, url: sourceUrl } = await fetchProductHTML(url);
 
       const title = decodeEntities(
         pick(html, [
@@ -100,16 +62,26 @@ export function registerDaikoRoutes(app: Express) {
       let priceJPY: number | null = priceRaw ? Number(priceRaw.replace(/,/g, "")) : null;
       if (priceJPY !== null && (!isFinite(priceJPY) || priceJPY <= 0)) priceJPY = null;
 
+      let imageUrl: string | null = null;
+      if (image) {
+        try {
+          const candidate = new URL(image, sourceUrl);
+          if (candidate.protocol === "https:" || candidate.protocol === "http:") imageUrl = candidate.href;
+        } catch { /* Invalid metadata: leave image empty. */ }
+      }
+
       res.json({
         ok: true,
         title: title || null,
-        image: image || null,
+        image: imageUrl,
         priceJPY,
-        sourceUrl: url,
+        sourceUrl,
       });
     } catch (error) {
-      console.error("[daiko] fetch error", error);
-      res.json({ ok: false, error: "取得商品資訊時發生錯誤，請改為手動填寫。" });
+      res.status(error instanceof ProductFetchError ? error.status : 502).json({
+        ok: false,
+        error: error instanceof ProductFetchError ? error.message : "取得商品資訊時發生錯誤，請改為手動填寫。",
+      });
     }
   });
 }

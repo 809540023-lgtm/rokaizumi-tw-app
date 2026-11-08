@@ -26,7 +26,7 @@ export default function Guides() {
       <SiteHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onSearchSubmit={() => setLocation(`/products?q=${searchQuery}`)}
+        onSearchSubmit={() => setLocation(`/products?q=${encodeURIComponent(searchQuery.trim())}`)}
       />
 
       {/* Hero */}

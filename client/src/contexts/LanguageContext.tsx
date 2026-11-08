@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Language = 'zh' | 'cn' | 'en' | 'ja';
 
@@ -14,6 +14,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const translations = {
   zh: {
+    'footer.tagline': '日本介護用品專賣・大阪直送台灣',
     // Header
     'nav.home': '首頁',
     'nav.products': '產品',
@@ -579,6 +580,7 @@ const translations = {
     'login.errNetwork': '網路錯誤，請稍後再試',
 },
   en: {
+    'footer.tagline': 'Japanese care supplies · Shipped from Osaka to Taiwan',
     // Header
     'nav.home': 'Home',
     'nav.products': 'Products',
@@ -1140,6 +1142,7 @@ const translations = {
     'login.errNetwork': 'Network error. Please try again later.',
 },
   ja: {
+    'footer.tagline': '日本介護用品専門店・大阪から台湾へ直送',
     // Header
     'nav.home': 'ホーム',
     'nav.products': '商品',
@@ -1705,6 +1708,7 @@ const translations = {
     'login.errNetwork': '通信エラーが発生しました。しばらくしてからお試しください。',
 },
   cn: {
+    'footer.tagline': '日本介护用品专卖・大阪直送台湾',
     // Header
     'nav.home': '首页',
     'nav.products': '产品',
@@ -2274,13 +2278,25 @@ const translations = {
 /** 讀取上次選擇的語言；沒有的話用繁中（本站主要客群在台灣） */
 function initialLanguage(): Language {
   if (typeof window === 'undefined') return 'zh';
-  const saved = window.localStorage.getItem(STORAGE_KEY);
-  if (saved && saved in translations) return saved as Language;
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved && saved in translations) return saved as Language;
+  } catch {
+    // Storage can be unavailable in private or restricted browsing.
+  }
   return 'zh';
+}
+
+export function documentLanguage(language: Language): string {
+  return { zh: 'zh-TW', cn: 'zh-CN', ja: 'ja', en: 'en' }[language];
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(initialLanguage);
+
+  useEffect(() => {
+    document.documentElement.lang = documentLanguage(language);
+  }, [language]);
 
   // 語言選擇要跨頁面保留，否則每次換頁都會跳回預設值
   const setLanguage = (lang: Language) => {

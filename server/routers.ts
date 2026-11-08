@@ -1,3 +1,4 @@
+import { hasPurchasablePrice } from '../shared/catalog';
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -51,6 +52,9 @@ async function resolveOrderItems(items: CheckoutItemInput[]) {
     const product = await db.getProductById(productId);
     if (!product || product.status !== 'available') {
       throw new Error(`Product ${productId} is unavailable`);
+    }
+    if (!hasPurchasablePrice(product.price)) {
+      throw new Error(`${product.name}: price must be confirmed before ordering. Please contact us.`);
     }
     if (product.stock < quantity) {
       throw new Error(`${product.name} does not have enough stock`);

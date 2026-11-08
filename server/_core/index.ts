@@ -14,6 +14,7 @@ import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
 import candleProductsRouter from "../candle-products";
 import candleOrdersRouter from "../candle-orders";
+import { registerDaikoRoutes } from "./daiko";
 import { registerAiRoutes } from "./ai";
 import { registerImageProxy } from "../image-proxy";
 import { maskAgentRouter } from "../mask/agentRoutes";
@@ -73,6 +74,7 @@ async function startServer() {
   // 注意：這個函式先前從未被呼叫，導致 Selection.tsx 打的
   // /api/ai/product-draft 會落到 SPA fallback 回傳 HTML，功能其實是壞的。
   registerAiRoutes(app);
+  registerDaikoRoutes(app);
   // tRPC API
   app.use(
     "/api/trpc",
