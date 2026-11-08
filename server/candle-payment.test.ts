@@ -8,7 +8,7 @@ const session = (market: "AU" | "TW") => ({id: "cs_paid", payment_status: "paid"
 beforeEach(() => {
   process.env.DATABASE_URL = "mysql://user:pass@127.0.0.1:3306/test";
   delete process.env.SMTP_HOST; delete process.env.RESEND_API_KEY;
-  execute.mockReset().mockResolvedValue([[{id: "RI-TEST"}], []]); query.mockReset().mockResolvedValue([[], []]);
+  execute.mockReset().mockImplementation(async (sql: string) => sql.includes("FROM candle_online_payments") ? [[], []] : [[{id: "RI-TEST"}], []]); query.mockReset().mockResolvedValue([[], []]);
 });
 describe("verified candle payments", () => {
   it.each(["AU", "TW"] as const)("marks only the matching %s order and queues both receipts", async market => {
@@ -21,10 +21,10 @@ describe("verified candle payments", () => {
     for (const changes of [{amount_total: 1}, {currency: "jpy"}, {payment_status: "unpaid"}, {metadata: {candleOrderId: "RI-TEST", candleMarket: "UK"}}]) {
       await expect(markCandleOrderPaidByStripeSessionId({...session("TW"), ...changes} as Stripe.Checkout.Session)).rejects.toThrow();
     }
-    expect(execute).not.toHaveBeenCalled();
+    expect(execute.mock.calls.filter(([sql]) => /^(UPDATE|INSERT)/.test(sql))).toHaveLength(0);
   });
   it("does not acknowledge an unknown session or a failed database update", async () => {
-    execute.mockResolvedValueOnce([[], []]);
+    execute.mockResolvedValueOnce([[], []]).mockResolvedValueOnce([[], []]);
     await expect(markCandleOrderPaidByStripeSessionId(session("AU"))).rejects.toThrow("Unknown candle payment session");
     execute.mockRejectedValueOnce(new Error("Database unavailable"));
     await expect(markCandleOrderPaidByStripeSessionId(session("AU"))).rejects.toThrow("Database unavailable");

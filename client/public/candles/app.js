@@ -25,7 +25,7 @@ const dialog = document.getElementById('photo-dialog');
 const orderForm = document.getElementById('order-form');
 const paymentOptions = document.createElement('fieldset');
 paymentOptions.className = 'payment-options';
-paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" checked> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="bank_transfer"> Australian bank transfer</label>';
+paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" disabled> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="paypal" disabled> PayPal</label><label><input type="radio" name="paymentMethod" value="bank_transfer" checked> Australian bank transfer</label><small id="payment-method-status" role="status">Checking secure payment options…</small>';
 const readyScentOptions = scentOptions.filter(option => option.label.trim());
 if (readyScentOptions.length === 5) {
   const scentLabel = document.createElement('label');
@@ -48,6 +48,7 @@ if (readyScentOptions.length === 5) {
   orderForm.insertBefore(scentHelp, noteLabel);
 }
 orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
+let paymentDescription = "Australian bank transfer";
 let priceLabel = 'A$99';
 const priceNodes = [];
 function collectPriceNodes(node) {
@@ -59,9 +60,9 @@ function collectPriceNodes(node) {
   for (const child of node.childNodes) collectPriceNodes(child);
 }
 function applyPrice() {
-  document.querySelector('#order .order-grid > div:first-child p').textContent = `Choose five designs for ${priceLabel}, with delivery to Australia included. Pay by card or Australian bank transfer; we begin making your set after payment. Your tracking number is provided within 3 business days of payment. Delivery time is additional.`;
-  document.querySelector('#order-help > p').textContent = `Delivery to Australia · ${priceLabel} total. Choose card payment or bank transfer after entering your details.`;
-  document.querySelector('#order .selected > small').textContent = `No sign-up. ${priceLabel} total, including delivery. Choose card payment or bank transfer.`;
+  document.querySelector('#order .order-grid > div:first-child p').textContent = `Choose five designs for ${priceLabel}, with delivery to Australia included. Pay by ${paymentDescription}; we begin making your set after payment. Your tracking number is provided within 3 business days of payment. Delivery time is additional.`;
+  document.querySelector('#order-help > p').textContent = `Delivery to Australia · ${priceLabel} total. Choose your payment method after entering your details.`;
+  document.querySelector('#order .selected > small').textContent = `No sign-up. ${priceLabel} total, including delivery. Pay by ${paymentDescription}.`;
   setSubmitLabel();
   priceNodes.length = 0;
   collectPriceNodes(document.body);
@@ -77,10 +78,29 @@ function applyPrice() {
   });
 }
 function setSubmitLabel() {
-  document.getElementById('submit-order').textContent = paymentOptions.querySelector('input:checked').value === 'card' ? `Continue to secure payment · ${priceLabel}` : `Place order · ${priceLabel}`;
+  document.getElementById('submit-order').textContent = paymentOptions.querySelector('input:checked').value !== 'bank_transfer' ? `Continue to secure payment · ${priceLabel}` : `Place order · ${priceLabel}`;
 }
 applyPrice();
 paymentOptions.addEventListener('change', setSubmitLabel);
+fetch('/api/candles/orders/payment-methods', { headers: { accept: 'application/json' } })
+  .then(response => { if (!response.ok) throw new Error('unavailable'); return response.json(); })
+  .then(methods => {
+    const available = [];
+    for (const [method, label] of [['card', 'card via Stripe'], ['paypal', 'PayPal']]) {
+      const input = paymentOptions.querySelector(`input[value="${method}"]`);
+      input.disabled = methods[method] !== true;
+      input.parentElement.title = input.disabled ? 'Temporarily unavailable' : '';
+      if (!input.disabled) available.push(label);
+    }
+    available.push('Australian bank transfer');
+    paymentDescription = available.join(', ');
+    if (methods.card) paymentOptions.querySelector('input[value="card"]').checked = true;
+    else if (methods.paypal) paymentOptions.querySelector('input[value="paypal"]').checked = true;
+    document.getElementById('payment-method-status').textContent = methods.card && methods.paypal ? 'Secure checkout opens after you place your order. Card details stay with the payment provider.' : 'Unavailable online payment options are disabled. You can still pay by Australian bank transfer.';
+    applyPrice();
+  })
+  .catch(() => { document.getElementById('payment-method-status').textContent = 'Online payment availability could not be checked. Bank transfer is available; please try again later for card or PayPal.'; });
+
 let activePhoto = null;
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const staticImages = n => {
@@ -189,7 +209,7 @@ document.getElementById('order-form').addEventListener('submit', async event => 
   const scentSelect = form.querySelector('#scent-choice');
   if (scentSelect?.value) {
     const scentName = scentSelect.selectedOptions[0].textContent.trim();
-    fields.note = [fields.note?.trim(), `Fragrance choice: ${scentName}`].filter(Boolean).join('\\n\\n');
+    fields.note = [fields.note?.trim(), `Fragrance choice: ${scentName}`].filter(Boolean).join('\n\n');
     delete fields.scent;
   }
   const payload = { ...fields, items: [...selected].sort((a, b) => a - b) };
@@ -204,11 +224,22 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || 'Please try again.');
-    if (result.checkoutUrl) {
-      window.location.assign(result.checkoutUrl);
+    orderPlaced = true;
+    if (payload.paymentMethod !== 'bank_transfer') {
+      if (result.receiptToken) {
+        const query = new URLSearchParams({ order: result.orderNumber, receipt: result.receiptToken });
+        history.replaceState(null, '', `${location.pathname}?${query}`);
+      }
+      form.hidden = true;
+      document.getElementById('inquire').disabled = true;
+      for (const card of grid.children) card.querySelector('.pick').disabled = true;
+      if (result.checkoutUrl) {
+        window.location.assign(result.checkoutUrl);
+        return;
+      }
+      await showPaymentResult();
       return;
     }
-    orderPlaced = true;
     document.getElementById('order-reference').textContent = result.orderNumber;
     document.getElementById('payment-reference').textContent = result.orderNumber;
     const bank = result.payment.bank;
@@ -230,7 +261,7 @@ document.getElementById('order-form').addEventListener('submit', async event => 
     status.textContent = '';
   } catch (error) {
     submitting = false;
-    status.textContent = `Your order was not submitted. ${error.message} Please keep this page open and try again.`;
+    status.textContent = `We could not confirm your order status. ${error.message} Keep this page open and check your confirmation email before trying again. If an order number was emailed to you, do not place another order; reply to that email for help.`;
     button.disabled = false;
   }
 });
@@ -249,16 +280,64 @@ for (const button of document.querySelectorAll('[data-copy]')) {
   });
 }
 
-// Stripe returns here after a card payment: /candles/?payment=success&session_id=…
-if (new URLSearchParams(location.search).get('payment') === 'success') {
+// A return URL never proves payment. Only the server's verified order status does.
+async function showPaymentResult() {
+  const params = new URLSearchParams(location.search);
+  const order = params.get('order');
+  const receipt = params.get('receipt');
+  const payment = params.get('payment');
+  if (!order && !payment) return;
+  orderPlaced = true;
   const notice = document.createElement('div');
   notice.className = 'paid-notice';
   notice.setAttribute('role', 'status');
-  const paidLabel = `${priceLabel}.00`;
-  notice.innerHTML = `<div class="wrap"><h2>Payment received · thank you</h2><p>Your card payment of ${paidLabel} has gone through and your receipt is on its way by email. We start making your five candles right away and will send your courier tracking number within 3 business days. There is nothing more you need to do.</p></div>`;
-  document.getElementById('top').prepend(notice);
+  const wrap = document.createElement('div'); wrap.className = 'wrap';
+  const heading = document.createElement('h2'); heading.textContent = 'Checking your payment';
+  const text = document.createElement('p'); text.textContent = 'Please keep this page open while we verify the payment. Do not pay again.';
+  wrap.append(heading, text); notice.append(wrap); document.getElementById('top').prepend(notice);
   window.scrollTo({ top: 0 });
+  if (!order || !receipt) {
+    heading.textContent = 'Please check your payment confirmation';
+    text.textContent = 'A return link alone cannot confirm payment. Check your payment confirmation email, or contact info@rokaizumi-tw.jp with your order number. Do not pay again if your payment provider shows a completed charge.';
+    return;
+  }
+  try {
+    if (payment === 'paypal') {
+      const response = await fetch('/api/candles/orders/paypal/capture', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order, receipt }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Payment is still being verified.');
+    }
+    const response = await fetch(`/api/candles/orders/payment-status?${new URLSearchParams({ order, receipt })}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Payment is still being verified.');
+    if (result.status === 'paid') {
+      heading.textContent = 'Payment confirmed · thank you';
+      text.textContent = `Order ${result.orderNumber}: your A$${Number(result.amount).toFixed(2)} payment is confirmed. Your receipt will be emailed to you. We will complete your set and provide a courier tracking number within 3 business days. Delivery time is additional.`;
+    } else {
+      heading.textContent = 'Order saved · awaiting payment confirmation';
+      text.textContent = `Your order number is ${result.orderNumber}. ${payment === 'cancelled' ? 'Checkout was cancelled. You can resume the same order below.' : 'Payment is not yet confirmed. If you have already paid, do not pay again; refresh this page or check your email shortly.'} Please do not place another order for the same set.`;
+      if (payment !== 'success' && payment !== 'paypal') {
+        const resume = document.createElement('button'); resume.className = 'primary'; resume.textContent = 'Resume secure payment';
+        resume.addEventListener('click', async () => {
+          resume.disabled = true;
+          try {
+            const retry = await fetch('/api/candles/orders/checkout/resume', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order, receipt }) });
+            const next = await retry.json();
+            if (!retry.ok || !next.checkoutUrl) throw new Error(next.error || 'Payment is temporarily unavailable.');
+            window.location.assign(next.checkoutUrl);
+          } catch (error) { text.textContent = `Order ${order}: ${error.message}`; resume.disabled = false; }
+        });
+        wrap.append(resume);
+      }
+      const refresh = document.createElement('button'); refresh.className = 'copy-detail'; refresh.textContent = 'Check payment status again';
+      refresh.addEventListener('click', () => location.reload()); wrap.append(refresh);
+    }
+  } catch (error) {
+    heading.textContent = 'Payment verification pending';
+    text.textContent = `Order ${order}: ${error.message} Do not pay again if your provider shows a completed charge. Contact info@rokaizumi-tw.jp with your order number if you need help.`;
+  }
 }
+void showPaymentResult();
 function focusRequestedProduct() {
   const id = new URLSearchParams(location.search).get('product');
   if (!id) return;
