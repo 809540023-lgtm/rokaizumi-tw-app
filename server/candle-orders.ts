@@ -105,7 +105,7 @@ const stripeConfigured = () => {
   return Boolean(key && (process.env.STRIPE_WEBHOOK_SECRET || process.env.LINE_SHOP_STRIPE_WEBHOOK_SECRET) && (process.env.NODE_ENV !== "production" || /^(sk|rk)_live_/.test(key)));
 };
 const paypalAvailable = () => paypalConfigured() && (process.env.NODE_ENV !== "production" || process.env.PAYPAL_ENVIRONMENT === "live");
-const onlinePaymentAvailable = (method: CandlePaymentMethod) => method === "card" ? stripeConfigured() : method === "paypal" ? paypalAvailable() : true;
+const onlinePaymentAvailable = (method: CandlePaymentMethod) => method === "card" ? stripeConfigured() : method === "paypal" ? paypalAvailable() : false;
 
 const audPayment = {
   method: "bank_transfer", currency: "AUD", amount: DEFAULT_PRICES.aud, shipping: 0,
@@ -182,7 +182,7 @@ async function prepareOnlineCheckout(db: mysql.Pool, order: CandleOrder, receipt
 
 router.get("/payment-methods", (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
-  res.json({ card: stripeConfigured(), paypal: paypalAvailable(), bank_transfer: true });
+  res.json({ card: stripeConfigured(), paypal: paypalAvailable(), bank_transfer: false });
 });
 
 const sameOrigin = (req: import("express").Request) => {

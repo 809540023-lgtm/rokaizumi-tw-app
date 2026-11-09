@@ -25,7 +25,7 @@ const dialog = document.getElementById('photo-dialog');
 const orderForm = document.getElementById('order-form');
 const paymentOptions = document.createElement('fieldset');
 paymentOptions.className = 'payment-options';
-paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" disabled> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="paypal" disabled> PayPal</label><label><input type="radio" name="paymentMethod" value="bank_transfer" checked> Australian bank transfer</label><small id="payment-method-status" role="status">Checking secure payment options…</small>';
+paymentOptions.innerHTML = '<legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="card" checked disabled> Credit / debit card via Stripe</label><label><input type="radio" name="paymentMethod" value="paypal" disabled> PayPal</label><small id="payment-method-status" role="status">Checking secure payment options…</small>';
 const readyScentOptions = scentOptions.filter(option => option.label.trim());
 if (readyScentOptions.length === 5) {
   const scentLabel = document.createElement('label');
@@ -48,7 +48,7 @@ if (readyScentOptions.length === 5) {
   orderForm.insertBefore(scentHelp, noteLabel);
 }
 orderForm.insertBefore(paymentOptions, orderForm.querySelector('.import-confirm'));
-let paymentDescription = "Australian bank transfer";
+let paymentDescription = "card";
 let priceLabel = 'A$99';
 const priceNodes = [];
 function collectPriceNodes(node) {
@@ -86,20 +86,19 @@ fetch('/api/candles/orders/payment-methods', { headers: { accept: 'application/j
   .then(response => { if (!response.ok) throw new Error('unavailable'); return response.json(); })
   .then(methods => {
     const available = [];
-    for (const [method, label] of [['card', 'card via Stripe'], ['paypal', 'PayPal']]) {
+    for (const [method, label] of [['card', 'card'], ['paypal', 'PayPal']]) {
       const input = paymentOptions.querySelector(`input[value="${method}"]`);
       input.disabled = methods[method] !== true;
       input.parentElement.title = input.disabled ? 'Temporarily unavailable' : '';
       if (!input.disabled) available.push(label);
     }
-    available.push('Australian bank transfer');
-    paymentDescription = available.join(', ');
+    paymentDescription = available.join(' or ') || 'card';
     if (methods.card) paymentOptions.querySelector('input[value="card"]').checked = true;
     else if (methods.paypal) paymentOptions.querySelector('input[value="paypal"]').checked = true;
-    document.getElementById('payment-method-status').textContent = methods.card && methods.paypal ? 'Secure checkout opens after you place your order. Card details stay with the payment provider.' : 'Unavailable online payment options are disabled. You can still pay by Australian bank transfer.';
+    document.getElementById('payment-method-status').textContent = 'Secure checkout opens after you place your order. Card details stay with the payment provider.';
     applyPrice();
   })
-  .catch(() => { document.getElementById('payment-method-status').textContent = 'Online payment availability could not be checked. Bank transfer is available; please try again later for card or PayPal.'; });
+  .catch(() => { document.getElementById('payment-method-status').textContent = 'Online payment availability could not be checked. Please try again in a moment.'; });
 
 let activePhoto = null;
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
