@@ -1,0 +1,147 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>勤怠打刻 | ROKA IZUMI</title><meta name="description" content="ROKA IZUMI 従業員用 勤怠打刻ページ"><style>
+body{font:17px/1.6 system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;max-width:480px;margin:0 auto;padding:20px 16px 48px;color:#33242b;background:#faf7f4}
+h1{font-size:1.4rem;margin:8px 0 0}
+.brand{font-size:.8rem;letter-spacing:.18em;color:#713e55}
+#clock{font-size:2.2rem;font-weight:700;margin:4px 0 0;font-variant-numeric:tabular-nums}
+#date{color:#6b5a61;margin:0 0 16px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+select,input{width:100%;box-sizing:border-box;font:inherit;padding:14px;border:1px solid #cdbfba;border-radius:10px;background:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+button.punch{font:inherit;font-weight:700;padding:22px 8px;border:0;border-radius:14px;color:#fff;cursor:pointer}
+button.punch:disabled{opacity:.35;cursor:default}
+#btn-in{background:#2e7d4f}#btn-out{background:#333f50}#btn-break-start{background:#b07d2b}#btn-break-end{background:#7a5ea8}
+#check{width:100%;margin-top:14px;font:inherit;font-weight:600;padding:14px;border-radius:10px;border:1px solid #713e55;background:#fff;color:#713e55;cursor:pointer}
+#message{margin-top:18px;padding:12px 16px;border-radius:10px;display:none}
+#message.ok{display:block;background:#e5f3ea;border:1px solid #2e7d4f}
+#message.err{display:block;background:#fbeaea;border:1px solid #b03a3a}
+#today{background:#fff;border:1px solid #ded2d0;border-radius:10px;padding:12px 16px;margin-top:16px}
+#today h2{font-size:1rem;margin:0 0 8px}
+#today ul{margin:0;padding-left:20px}
+.note{color:#6b5a61;font-size:.85rem;margin-top:20px}
+</style></head><body>
+<p class="brand">ROKA IZUMI</p>
+<h1>勤怠打刻</h1>
+<p id="clock">--:--:--</p>
+<p id="date">読み込み中…</p>
+
+<label for="employee">名前</label>
+<select id="employee"><option value="">選択してください</option></select>
+
+<label for="pin">PINコード（4〜8桁）</label>
+<input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="PINを入力">
+
+<button id="check" type="button">状態を確認する</button>
+
+<div class="grid">
+  <button class="punch" id="btn-in" data-type="in" disabled>出勤</button>
+  <button class="punch" id="btn-out" data-type="out" disabled>退勤</button>
+  <button class="punch" id="btn-break-start" data-type="break_start" disabled>休憩開始</button>
+  <button class="punch" id="btn-break-end" data-type="break_end" disabled>休憩終了</button>
+</div>
+
+<p id="message" role="status" aria-live="polite"></p>
+
+<div id="today" hidden><h2>本日の打刻</h2><ul id="today-list"></ul></div>
+
+<p class="note">打刻時刻はサーバーの時刻で記録されます。スマートフォンの時刻設定を変更しても影響しません。</p>
+
+<script>
+const $ = id => document.getElementById(id);
+const labels = { in: '出勤', out: '退勤', break_start: '休憩開始', break_end: '休憩終了' };
+let allowed = [];
+
+function tick() {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  const dfmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+  $('clock').textContent = fmt.format(now);
+  $('date').textContent = dfmt.format(now);
+}
+tick(); setInterval(tick, 1000);
+
+function showMessage(text, ok) {
+  const el = $('message');
+  el.textContent = text;
+  el.className = ok ? 'ok' : 'err';
+}
+function setAllowed(list) {
+  allowed = list || [];
+  for (const btn of document.querySelectorAll('button.punch')) {
+    btn.disabled = !allowed.includes(btn.dataset.type);
+  }
+}
+function credentials() {
+  return { employeeId: $('employee').value, pin: $('pin').value };
+}
+async function post(path, body) {
+  const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(body) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || 'エラーが発生しました。');
+  return data;
+}
+function renderToday(items) {
+  const box = $('today');
+  const list = $('today-list');
+  list.textContent = '';
+  if (!items || items.length === 0) { box.hidden = true; return; }
+  for (const item of items) {
+    const li = document.createElement('li');
+    li.textContent = `${item.time}　${labels[item.type] || item.type}`;
+    list.append(li);
+  }
+  box.hidden = false;
+}
+async function refreshStatus() {
+  const { employeeId, pin } = credentials();
+  if (!employeeId || pin.length < 4) { setAllowed([]); return; }
+  try {
+    const data = await post('/api/attendance/status', { employeeId, pin });
+    setAllowed(data.allowed);
+    renderToday(data.today);
+  } catch (error) {
+    setAllowed([]);
+    showMessage(error.message, false);
+  }
+}
+
+fetch('/api/attendance/employees', { credentials: 'same-origin' }).then(async response => {
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || '読み込めませんでした。');
+  const select = $('employee');
+  for (const employee of data.employees) {
+    const option = document.createElement('option');
+    option.value = employee.id;
+    option.textContent = employee.name;
+    select.append(option);
+  }
+  const saved = localStorage.getItem('attendance-employee');
+  if (saved && data.employees.some(e => e.id === saved)) select.value = saved;
+  if (data.employees.length === 0) showMessage('従業員がまだ登録されていません。管理者にお問い合わせください。', false);
+}).catch(error => showMessage(error.message, false));
+
+$('employee').addEventListener('change', () => {
+  localStorage.setItem('attendance-employee', $('employee').value);
+  $('pin').value = '';
+  setAllowed([]);
+  $('today').hidden = true;
+});
+$('pin').addEventListener('input', () => setAllowed([]));
+$('check').addEventListener('click', refreshStatus);
+
+for (const btn of document.querySelectorAll('button.punch')) {
+  btn.addEventListener('click', async () => {
+    const { employeeId, pin } = credentials();
+    const type = btn.dataset.type;
+    setAllowed([]);
+    try {
+      const data = await post('/api/attendance/clock', { employeeId, pin, type });
+      showMessage(`${labels[type]} を記録しました：${data.date} ${data.time}`, true);
+      await refreshStatus();
+    } catch (error) {
+      showMessage(error.message, false);
+      await refreshStatus();
+    }
+  });
+}
+</script>
+</body></html>

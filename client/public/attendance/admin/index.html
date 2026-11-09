@@ -1,0 +1,159 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>員工打卡管理 | ROKA IZUMI</title><style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px 60px;color:#33242b;background:#faf7f4}
+a{color:#713e55}h1{font-size:1.7rem}h2{font-size:1.2rem;margin-top:36px}
+article,section.card{background:#fff;border:1px solid #ded2d0;border-radius:8px;padding:16px 20px;margin:12px 0}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,select{font:inherit;padding:10px;border:1px solid #cdbfba;border-radius:6px}
+button{background:#713e55;color:#fff;border:0;border-radius:6px;padding:10px 16px;font:inherit;cursor:pointer;margin:6px 6px 6px 0}
+button.secondary{background:#fff;color:#713e55;border:1px solid #713e55}
+button:disabled{opacity:.6;cursor:default}
+table{width:100%;border-collapse:collapse;margin:10px 0}
+th,td{border-bottom:1px solid #e8ddda;padding:8px;text-align:left;white-space:nowrap}
+.wrap{overflow-x:auto}
+#status{color:#6b5a61}
+.err{color:#b03a3a}
+ul.plain{list-style:none;padding:0;margin:0}
+ul.plain li{padding:8px 0;border-bottom:1px solid #e8ddda;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.type-in{font-weight:700}
+</style></head><body>
+<a href="/attendance/">← 員工打卡頁</a>
+<h1>員工打卡管理</h1>
+<p id="status">載入中…</p>
+
+<section class="card">
+<h2>員工名單</h2>
+<ul class="plain" id="employees"></ul>
+<form id="add-form">
+<label for="new-name">新增員工姓名</label>
+<input id="new-name" required maxlength="50" placeholder="例：山田花子">
+<label for="new-pin">PIN 碼（4〜8 位數字，員工打卡時輸入）</label>
+<input id="new-pin" required inputmode="numeric" pattern="[0-9]{4,8}" maxlength="8" placeholder="例：1234">
+<div><button type="submit">新增員工</button></div>
+<p id="add-status" role="status"></p>
+</form>
+</section>
+
+<section class="card">
+<h2>打卡紀錄</h2>
+<label for="month">月份</label>
+<input id="month" type="month">
+<button id="load" type="button">查看</button>
+<button id="csv-punches" class="secondary" type="button">下載打卡明細 CSV</button>
+<button id="csv-summary" class="secondary" type="button">下載每日彙總 CSV</button>
+<div class="wrap"><table id="summary-table" hidden><thead><tr><th>日期</th><th>員工</th><th>出勤</th><th>退勤</th><th>休息（分）</th><th>工作時間</th><th>狀態</th></tr></thead><tbody></tbody></table></div>
+<div class="wrap"><table id="records-table" hidden><thead><tr><th>日期</th><th>時間</th><th>員工</th><th>種類</th></tr></thead><tbody></tbody></table></div>
+<p id="records-status" role="status"></p>
+</section>
+
+<script>
+const $ = id => document.getElementById(id);
+const labels = { in: '出勤', out: '退勤', break_start: '休息開始', break_end: '休息結束' };
+const statusEl = $('status');
+
+async function api(path, options) {
+  const response = await fetch(path, { credentials: 'same-origin', ...options });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || '讀取失敗。');
+  return data;
+}
+function needLogin(error) {
+  statusEl.innerHTML = '';
+  const p = document.createElement('p');
+  p.className = 'err';
+  p.textContent = '需要管理員登入才能使用這個頁面。';
+  const a = document.createElement('a');
+  a.href = '/login';
+  a.textContent = '請先到主站登入管理員帳號';
+  a.target = '_blank';
+  statusEl.append(p, a);
+  return error;
+}
+
+async function loadEmployees() {
+  const data = await api('/api/attendance/admin/employees');
+  const list = $('employees');
+  list.textContent = '';
+  if (data.employees.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = '尚無員工，請用下方表單新增。';
+    list.append(li);
+  }
+  for (const employee of data.employees) {
+    const li = document.createElement('li');
+    const span = document.createElement('span');
+    span.textContent = `${employee.name}${employee.active ? '' : '（已停用）'}`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'secondary';
+    btn.textContent = employee.active ? '停用' : '重新啟用';
+    btn.addEventListener('click', async () => {
+      try {
+        await api(`/api/attendance/employees/${employee.id}/active`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: !employee.active }) });
+        loadEmployees();
+      } catch (error) { $('add-status').textContent = error.message; }
+    });
+    li.append(span, btn);
+    list.append(li);
+  }
+}
+
+function currentMonth() {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit' });
+  return fmt.format(new Date());
+}
+
+async function loadRecords() {
+  const month = $('month').value || currentMonth();
+  const data = await api(`/api/attendance/records?month=${month}`);
+  $('records-status').textContent = `${month}：每日彙總 ${data.summary.length} 筆、打卡明細 ${data.records.length} 筆。`;
+  const summaryBody = document.querySelector('#summary-table tbody');
+  summaryBody.textContent = '';
+  for (const row of data.summary) {
+    const tr = document.createElement('tr');
+    const work = row.workMinutes === null ? '—' : `${Math.floor(row.workMinutes / 60)}小時${String(row.workMinutes % 60).padStart(2, '0')}分`;
+    for (const value of [row.date, row.employeeName, row.firstIn ?? '—', row.lastOut ?? '—', row.breakMinutes, work, row.complete ? '完整' : '未退勤／未齊']) {
+      const td = document.createElement('td');
+      td.textContent = value;
+      tr.append(td);
+    }
+    summaryBody.append(tr);
+  }
+  $('summary-table').hidden = data.summary.length === 0;
+  const recordsBody = document.querySelector('#records-table tbody');
+  recordsBody.textContent = '';
+  for (const row of data.records) {
+    const tr = document.createElement('tr');
+    for (const value of [row.date, row.time, row.employeeName, labels[row.type] || row.type]) {
+      const td = document.createElement('td');
+      td.textContent = value;
+      if (value === labels.in) td.className = 'type-in';
+      tr.append(td);
+    }
+    recordsBody.append(tr);
+  }
+  $('records-table').hidden = data.records.length === 0;
+}
+
+$('month').value = currentMonth();
+$('load').addEventListener('click', () => loadRecords().catch(e => { $('records-status').textContent = e.message; }));
+$('csv-punches').addEventListener('click', () => { window.location.href = `/api/attendance/records.csv?month=${$('month').value || currentMonth()}&kind=punches`; });
+$('csv-summary').addEventListener('click', () => { window.location.href = `/api/attendance/records.csv?month=${$('month').value || currentMonth()}&kind=summary`; });
+
+$('add-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const name = $('new-name').value.trim();
+  const pin = $('new-pin').value.trim();
+  try {
+    await api('/api/attendance/employees', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, pin }) });
+    $('add-status').textContent = `已新增：${name}（PIN 已設定，請私下告訴員工本人）`;
+    $('new-name').value = '';
+    $('new-pin').value = '';
+    loadEmployees();
+  } catch (error) {
+    $('add-status').textContent = error.message;
+  }
+});
+
+Promise.all([loadEmployees(), loadRecords()]).then(() => { statusEl.textContent = '已連線。打卡時間以日本時間（JST）記錄。'; }).catch(needLogin);
+</script>
+</body></html>

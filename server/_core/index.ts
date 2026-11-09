@@ -14,6 +14,7 @@ import openclawRouter from "../routers/openclaw";
 import { handleStripeWebhook } from "../stripe-webhook";
 import candleProductsRouter from "../candle-products";
 import candleOrdersRouter from "../candle-orders";
+import attendanceRouter from "../attendance";
 import { registerDaikoRoutes } from "./daiko";
 import { registerAiRoutes } from "./ai";
 import { registerImageProxy } from "../image-proxy";
@@ -59,6 +60,8 @@ async function startServer() {
   app.use("/api/candles/orders", candleOrdersRouter);
   // 蠟燭商品目錄與後台上架（商品、照片、售價）
   app.use("/api/candles", candleProductsRouter);
+  // 員工打卡（簡單版試用）：員工端打卡、管理員紀錄與 CSV
+  app.use("/api/attendance", attendanceRouter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // 本站帳密登入。先前未註冊，導致 /api/auth/register 與 /api/auth/login
