@@ -38,10 +38,44 @@ router.get("/", async (req, res) => {
     const db = database();
     if (!db) return res.status(503).json({ error: "Orders are temporarily unavailable." });
     await ensureNotificationTable(db);
-    const [rows] = await db.query("SELECT o.id, o.created_at, o.customer_name, o.customer_email, o.customer_phone, o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.status, n.sent_at AS notified_at FROM candle_orders o LEFT JOIN candle_order_notifications n ON n.order_id = o.id ORDER BY o.created_at DESC LIMIT 200");
+    const [rows] = await db.query("SELECT o.id, o.created_at, o.customer_name, o.customer_email, o.customer_phone, o.street_address, o.suburb, o.state, o.postcode, o.items, o.note, o.status, o.payment_method, n.sent_at AS notified_at FROM candle_orders o LEFT JOIN candle_order_notifications n ON n.order_id = o.id ORDER BY o.created_at DESC LIMIT 200");
     return res.json({ orders: rows });
   } catch {
     return res.status(401).json({ error: "Please sign in as an administrator." });
+  }
+});
+
+// Admin only: manually confirm a bank transfer order as paid and queue the
+// payment-confirmed emails (customer + merchant). Online payments (card /
+// PayPal) confirm themselves through their verified flows and are rejected.
+router.post("/:id/confirm-payment", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  if (!sameOrigin(req)) return res.status(403).json({ error: "Invalid request." });
+  try {
+    const user = await sdk.authenticateRequest(req);
+    if (user.role !== "admin") return res.status(403).json({ error: "Access denied." });
+  } catch {
+    return res.status(401).json({ error: "Please sign in as an administrator." });
+  }
+  const id = req.params.id;
+  if (typeof id !== "string" || id.length === 0 || id.length > 32) return res.status(400).json({ error: "Invalid order number." });
+  const db = database();
+  if (!db) return res.status(503).json({ error: "Orders are temporarily unavailable." });
+  try {
+    await ensurePaidEmailTable(db);
+    const [rows] = await db.execute<mysql.RowDataPacket[]>("SELECT id, status, payment_method FROM candle_orders WHERE id = ?", [id]);
+    if (rows.length !== 1) return res.status(404).json({ error: "Order not found." });
+    const order = rows[0];
+    if (order.status === "paid") return res.status(409).json({ error: "This order is already marked as paid." });
+    if (order.payment_method !== "bank_transfer") return res.status(400).json({ error: "Only bank transfer orders need manual confirmation; online payments confirm automatically." });
+    if (order.status !== "awaiting_payment") return res.status(409).json({ error: "This order cannot be marked as paid." });
+    await db.execute("UPDATE candle_orders SET status = 'paid' WHERE id = ? AND status = 'awaiting_payment'", [id]);
+    await db.execute("INSERT IGNORE INTO candle_paid_emails (order_id, market, kind, sent_at) VALUES (?, 'AU', 'customer', NULL), (?, 'AU', 'merchant', NULL)", [id, id]);
+    await retryPaidCandleEmails();
+    return res.json({ orderNumber: id, status: "paid" });
+  } catch (error) {
+    console.error("Could not confirm candle order payment", error);
+    return res.status(503).json({ error: "Could not confirm this payment. Please try again." });
   }
 });
 
@@ -536,7 +570,7 @@ export async function retryPaidCandleEmails() {
         const merchant = mail.kind === "merchant";
         const payment = await onlinePayment(db, row.id);
         const paidAmount = payment ? payment.amount_minor / 100 : (market === "TW" ? prices.twd : prices.aud);
-        const paidProvider = row.payment_method === "paypal" ? "PayPal" : "Stripe";
+        const paidProvider = row.payment_method === "paypal" ? "PayPal" : row.payment_method === "bank_transfer" ? "Bank transfer" : "Stripe";
         const text = market === "TW" ? [
           `訂單 ${row.id}：付款成功`, `已確認 ${paidProvider} 付款 NT$${paidAmount.toLocaleString("en-US")}，含寄送台灣運費。`, designs,
           "確認款項後開始製作，3個工作日內完成並提供快遞單號，運送時間另計。",
