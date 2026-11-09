@@ -23,6 +23,9 @@ export type AttendanceRecord = {
   employeeName: string;
   type: AttendanceType;
   atMs: number;
+  /** true = 管理員事後補登（非即時打卡）。補登必須以實際出勤事實為依據。 */
+  manual?: boolean;
+  note?: string;
 };
 
 type Employee = {
@@ -70,6 +73,24 @@ export function jstMonthRangeMs(month: string): { startMs: number; endMs: number
   const endMs = Date.UTC(y, m, 1) - JST_OFFSET_MS;
   return { startMs, endMs };
 }
+
+/** JST 牆鐘時間（date "YYYY-MM-DD" + time "HH:MM"）轉 UTC epoch ms。 */
+export function jstWallToMs(date: string, time: string): number {
+  const [y, m, d] = date.split("-").map(Number);
+  const [hh, mm] = time.split(":").map(Number);
+  return Date.UTC(y, m - 1, d, hh, mm) - JST_OFFSET_MS;
+}
+
+/** date "YYYY-MM-DD" 的星期（0=週日 … 6=週六，JST 與 UTC 同日曆日）。 */
+export function jstWeekday(date: string): number {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+}
+
+export const validDateString = (value: unknown): value is string =>
+  typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
+export const validTimeString = (value: unknown): value is string =>
+  typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 
 // ---------- 打卡狀態機 ----------
 export function allowedNext(last: AttendanceType | null): AttendanceType[] {
@@ -168,7 +189,10 @@ function database(): mysql.Pool | null {
 
 async function ensureTables(db: mysql.Pool) {
   await db.query("CREATE TABLE IF NOT EXISTS attendance_employees (id VARCHAR(36) PRIMARY KEY, name VARCHAR(100) NOT NULL, pin_hash VARCHAR(200) NOT NULL, active TINYINT(1) NOT NULL DEFAULT 1, created_at_ms BIGINT NOT NULL)");
-  await db.query("CREATE TABLE IF NOT EXISTS attendance_records (id VARCHAR(36) PRIMARY KEY, employee_id VARCHAR(36) NOT NULL, type VARCHAR(20) NOT NULL, at_ms BIGINT NOT NULL, INDEX idx_attendance_employee (employee_id), INDEX idx_attendance_at (at_ms))");
+  await db.query("CREATE TABLE IF NOT EXISTS attendance_records (id VARCHAR(36) PRIMARY KEY, employee_id VARCHAR(36) NOT NULL, type VARCHAR(20) NOT NULL, at_ms BIGINT NOT NULL, manual TINYINT(1) NOT NULL DEFAULT 0, note VARCHAR(255) NULL, INDEX idx_attendance_employee (employee_id), INDEX idx_attendance_at (at_ms))");
+  // 既有資料表（補登功能上線前建立的）補上 manual / note 欄位；重複欄位錯誤忽略。
+  try { await db.query("ALTER TABLE attendance_records ADD COLUMN manual TINYINT(1) NOT NULL DEFAULT 0"); } catch { /* 已存在 */ }
+  try { await db.query("ALTER TABLE attendance_records ADD COLUMN note VARCHAR(255) NULL"); } catch { /* 已存在 */ }
 }
 
 // 本地測試用 JSON 檔後備（正式環境有 DATABASE_URL，不會使用）
@@ -236,13 +260,13 @@ async function setEmployeeActive(id: string, active: boolean): Promise<boolean> 
   return true;
 }
 
-async function addRecord(employeeId: string, type: AttendanceType, atMs: number): Promise<AttendanceRecord> {
+async function addRecord(employeeId: string, type: AttendanceType, atMs: number, opts?: { manual?: boolean; note?: string }): Promise<AttendanceRecord> {
   const employee = await findEmployee(employeeId);
-  const record: AttendanceRecord = { id: randomUUID(), employeeId, employeeName: employee?.name ?? "", type, atMs };
+  const record: AttendanceRecord = { id: randomUUID(), employeeId, employeeName: employee?.name ?? "", type, atMs, manual: opts?.manual ?? false, note: opts?.note };
   const db = database();
   if (db) {
     await ensureTables(db);
-    await db.execute("INSERT INTO attendance_records (id, employee_id, type, at_ms) VALUES (?, ?, ?, ?)", [record.id, employeeId, type, atMs]);
+    await db.execute("INSERT INTO attendance_records (id, employee_id, type, at_ms, manual, note) VALUES (?, ?, ?, ?, ?, ?)", [record.id, employeeId, type, atMs, record.manual ? 1 : 0, record.note ?? null]);
     return record;
   }
   const data = readFileData();
@@ -258,9 +282,9 @@ async function listRecords(range?: { startMs: number; endMs: number }): Promise<
   if (db) {
     await ensureTables(db);
     const [rows] = range
-      ? await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms FROM attendance_records WHERE at_ms >= ? AND at_ms < ? ORDER BY at_ms DESC LIMIT 5000", [range.startMs, range.endMs])
-      : await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms FROM attendance_records ORDER BY at_ms DESC LIMIT 5000");
-    return rows.map(r => ({ id: String(r.id), employeeId: String(r.employee_id), employeeName: names.get(String(r.employee_id)) ?? "", type: r.type as AttendanceType, atMs: Number(r.at_ms) }));
+      ? await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms, manual, note FROM attendance_records WHERE at_ms >= ? AND at_ms < ? ORDER BY at_ms DESC LIMIT 5000", [range.startMs, range.endMs])
+      : await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms, manual, note FROM attendance_records ORDER BY at_ms DESC LIMIT 5000");
+    return rows.map(r => ({ id: String(r.id), employeeId: String(r.employee_id), employeeName: names.get(String(r.employee_id)) ?? "", type: r.type as AttendanceType, atMs: Number(r.at_ms), manual: Boolean(r.manual), note: r.note ? String(r.note) : undefined }));
   }
   return readFileData()
     .records.filter(r => !range || (r.atMs >= range.startMs && r.atMs < range.endMs))
@@ -275,10 +299,10 @@ async function lastRecord(employeeId: string): Promise<AttendanceRecord | null> 
   const name = employees.find(e => e.id === employeeId)?.name ?? "";
   if (db) {
     await ensureTables(db);
-    const [rows] = await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms FROM attendance_records WHERE employee_id = ? ORDER BY at_ms DESC LIMIT 1", [employeeId]);
+    const [rows] = await db.query<mysql.RowDataPacket[]>("SELECT id, employee_id, type, at_ms, manual, note FROM attendance_records WHERE employee_id = ? ORDER BY at_ms DESC LIMIT 1", [employeeId]);
     if (rows.length === 0) return null;
     const r = rows[0];
-    return { id: String(r.id), employeeId: String(r.employee_id), employeeName: name, type: r.type as AttendanceType, atMs: Number(r.at_ms) };
+    return { id: String(r.id), employeeId: String(r.employee_id), employeeName: name, type: r.type as AttendanceType, atMs: Number(r.at_ms), manual: Boolean(r.manual), note: r.note ? String(r.note) : undefined };
   }
   const mine = readFileData().records.filter(r => r.employeeId === employeeId).sort((a, b) => b.atMs - a.atMs);
   return mine.length ? { ...mine[0], employeeName: name } : null;
@@ -371,7 +395,7 @@ router.post("/status", async (req, res) => {
     const todays = all
       .filter(r => r.employeeId === employee.id && jstDateString(r.atMs) === today)
       .sort((a, b) => a.atMs - b.atMs)
-      .map(r => ({ type: r.type, time: jstTimeString(r.atMs) }));
+      .map(r => ({ type: r.type, time: jstTimeString(r.atMs), manual: Boolean(r.manual) }));
     return res.json({ employee: { id: employee.id, name: employee.name }, lastType: last?.type ?? null, allowed: allowedNext(last?.type ?? null), today: todays });
   } catch (error) {
     console.error("Could not read attendance status", error);
@@ -442,6 +466,122 @@ router.post("/employees/:id/active", async (req, res) => {
   return res.json({ ok: true, active });
 });
 
+// ---------- 管理員補登（事後補紀錄，全部標記 manual） ----------
+// 補登是「把實際發生過的出勤事後補進系統」，不是即時打卡：紀錄會永久標記為
+// 補登並附補登備註，列印／CSV 都看得出區別。只能補已經過去的時間。
+type ManualDay = { date: string; in: string; out: string; breakStart?: string; breakEnd?: string; note?: string };
+
+function parseManualDay(body: Record<string, unknown>): { day: ManualDay } | { error: string } {
+  const date = body?.date;
+  if (!validDateString(date)) return { error: "日期格式不正確（YYYY-MM-DD）。" };
+  if (date > jstDateString(Date.now())) return { error: "不能補登未來的日期。" };
+  const inTime = body?.in;
+  const outTime = body?.out;
+  if (!validTimeString(inTime) || !validTimeString(outTime)) return { error: "請輸入正確的出勤與退勤時間。" };
+  if (jstWallToMs(date, outTime) <= jstWallToMs(date, inTime)) return { error: "退勤時間必須晚於出勤時間（簡單版不支援跨夜班）。" };
+  if (jstWallToMs(date, outTime) > Date.now()) return { error: "只能補登已經過去的時間。" };
+  const breakStart = body?.breakStart;
+  const breakEnd = body?.breakEnd;
+  const hasBreakStart = typeof breakStart === "string" && breakStart.length > 0;
+  const hasBreakEnd = typeof breakEnd === "string" && breakEnd.length > 0;
+  if (hasBreakStart !== hasBreakEnd) return { error: "休息開始與休息結束要一起填，或都留空。" };
+  if (hasBreakStart) {
+    if (!validTimeString(breakStart) || !validTimeString(breakEnd)) return { error: "休息時間格式不正確。" };
+    if (jstWallToMs(date, breakStart) < jstWallToMs(date, inTime) || jstWallToMs(date, breakEnd) > jstWallToMs(date, outTime) || jstWallToMs(date, breakEnd) <= jstWallToMs(date, breakStart)) {
+      return { error: "休息時間必須在出勤到退勤之間，且結束晚於開始。" };
+    }
+  }
+  const note = field(body?.note, 200) ?? undefined;
+  return { day: { date, in: inTime, out: outTime, breakStart: hasBreakStart ? (breakStart as string) : undefined, breakEnd: hasBreakEnd ? (breakEnd as string) : undefined, note } };
+}
+
+async function dayHasRecords(employeeId: string, date: string): Promise<boolean> {
+  const startMs = jstWallToMs(date, "00:00");
+  const records = await listRecords({ startMs, endMs: startMs + 24 * 60 * 60 * 1000 });
+  return records.some(r => r.employeeId === employeeId);
+}
+
+async function createManualDay(employeeId: string, day: ManualDay): Promise<number> {
+  const note = day.note ?? "管理員補登";
+  let count = 0;
+  await addRecord(employeeId, "in", jstWallToMs(day.date, day.in), { manual: true, note });
+  count += 1;
+  if (day.breakStart && day.breakEnd) {
+    await addRecord(employeeId, "break_start", jstWallToMs(day.date, day.breakStart), { manual: true, note });
+    await addRecord(employeeId, "break_end", jstWallToMs(day.date, day.breakEnd), { manual: true, note });
+    count += 2;
+  }
+  await addRecord(employeeId, "out", jstWallToMs(day.date, day.out), { manual: true, note });
+  count += 1;
+  return count;
+}
+
+router.post("/manual", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  if (!sameOrigin(req)) return res.status(403).json({ error: "Invalid request." });
+  if (!(await requireAdmin(req))) return res.status(401).json({ error: "Please sign in as an administrator." });
+  const employeeId = field(req.body?.employeeId, 64);
+  if (!employeeId) return res.status(400).json({ error: "請選擇員工。" });
+  const employee = await findEmployee(employeeId);
+  if (!employee) return res.status(404).json({ error: "找不到這位員工。" });
+  const parsed = parseManualDay(req.body ?? {});
+  if ("error" in parsed) return res.status(400).json({ error: parsed.error });
+  try {
+    if (await dayHasRecords(employeeId, parsed.day.date)) {
+      return res.status(409).json({ error: `${parsed.day.date} 這天已經有打卡紀錄，不能再補登（避免重複）。` });
+    }
+    const created = await createManualDay(employeeId, parsed.day);
+    return res.json({ ok: true, date: parsed.day.date, created });
+  } catch (error) {
+    console.error("Could not create manual attendance day", error);
+    return res.status(503).json({ error: "補登失敗，請再試一次。" });
+  }
+});
+
+router.post("/manual-batch", async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  if (!sameOrigin(req)) return res.status(403).json({ error: "Invalid request." });
+  if (!(await requireAdmin(req))) return res.status(401).json({ error: "Please sign in as an administrator." });
+  const employeeId = field(req.body?.employeeId, 64);
+  if (!employeeId) return res.status(400).json({ error: "請選擇員工。" });
+  const employee = await findEmployee(employeeId);
+  if (!employee) return res.status(404).json({ error: "找不到這位員工。" });
+  const fromDate = req.body?.fromDate;
+  const toDate = req.body?.toDate;
+  if (!validDateString(fromDate) || !validDateString(toDate)) return res.status(400).json({ error: "起訖日期格式不正確。" });
+  if (fromDate > toDate) return res.status(400).json({ error: "結束日期不能早於開始日期。" });
+  if (toDate > jstDateString(Date.now())) return res.status(400).json({ error: "結束日期不能是未來。" });
+  const weekdaysRaw = req.body?.weekdays;
+  if (!Array.isArray(weekdaysRaw) || weekdaysRaw.length === 0 || !weekdaysRaw.every(w => Number.isInteger(w) && w >= 0 && w <= 6)) {
+    return res.status(400).json({ error: "請至少選一個上班星期。" });
+  }
+  const weekdays = new Set(weekdaysRaw as number[]);
+  const spanDays = Math.round((jstWallToMs(toDate, "00:00") - jstWallToMs(fromDate, "00:00")) / (24 * 60 * 60 * 1000)) + 1;
+  if (spanDays > 731) return res.status(400).json({ error: "一次最多補登兩年，請分段補登。" });
+  // 用單日解析驗證時間欄位（日期先用 fromDate 代表，未來檢查改用 toDate 的退勤時間）
+  const parsed = parseManualDay({ date: fromDate, in: req.body?.in, out: req.body?.out, breakStart: req.body?.breakStart, breakEnd: req.body?.breakEnd, note: req.body?.note });
+  if ("error" in parsed) return res.status(400).json({ error: parsed.error });
+  if (jstWallToMs(toDate, parsed.day.out) > Date.now()) return res.status(400).json({ error: "結束日期當天的退勤時間還沒到，只能補登已經過去的時間。" });
+  try {
+    const createdDates: string[] = [];
+    const skippedDates: string[] = [];
+    for (let i = 0; i < spanDays; i += 1) {
+      const date = jstDateString(jstWallToMs(fromDate, "12:00") + i * 24 * 60 * 60 * 1000);
+      if (!weekdays.has(jstWeekday(date))) continue;
+      if (await dayHasRecords(employeeId, date)) {
+        skippedDates.push(date);
+        continue;
+      }
+      await createManualDay(employeeId, { ...parsed.day, date });
+      createdDates.push(date);
+    }
+    return res.json({ ok: true, createdDays: createdDates.length, createdDates, skippedDays: skippedDates });
+  } catch (error) {
+    console.error("Could not create manual attendance batch", error);
+    return res.status(503).json({ error: "批量補登失敗，請再試一次。" });
+  }
+});
+
 function currentJstMonth(): string {
   return jstDateString(Date.now()).slice(0, 7);
 }
@@ -454,7 +594,7 @@ router.get("/records", async (req, res) => {
     const records = await listRecords(jstMonthRangeMs(month));
     return res.json({
       month,
-      records: records.map(r => ({ id: r.id, employeeName: r.employeeName, type: r.type, date: jstDateString(r.atMs), time: jstTimeString(r.atMs) })),
+      records: records.map(r => ({ id: r.id, employeeName: r.employeeName, type: r.type, date: jstDateString(r.atMs), time: jstTimeString(r.atMs), manual: Boolean(r.manual), note: r.note ?? "" })),
       summary: summarize(records),
     });
   } catch (error) {
@@ -482,9 +622,9 @@ router.get("/records.csv", async (req, res) => {
         lines.push([s.date, s.employeeName, s.firstIn ?? "", s.lastOut ?? "", s.breakMinutes, s.workMinutes ?? "", s.complete ? "yes" : "no"].map(csvCell).join(","));
       }
     } else {
-      lines = ["date,time_jst,employee,type"];
+      lines = ["date,time_jst,employee,type,source,note"];
       for (const r of [...records].sort((a, b) => a.atMs - b.atMs)) {
-        lines.push([jstDateString(r.atMs), jstTimeString(r.atMs), r.employeeName, r.type].map(csvCell).join(","));
+        lines.push([jstDateString(r.atMs), jstTimeString(r.atMs), r.employeeName, r.type, r.manual ? "manual" : "punch", r.note ?? ""].map(csvCell).join(","));
       }
     }
     res.setHeader("Content-Type", "text/csv; charset=utf-8");

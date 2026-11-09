@@ -15,12 +15,20 @@ th,td{border-bottom:1px solid #e8ddda;padding:8px;text-align:left;white-space:no
 ul.plain{list-style:none;padding:0;margin:0}
 ul.plain li{padding:8px 0;border-bottom:1px solid #e8ddda;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .type-in{font-weight:700}
+.badge-manual{background:#fff6e5;border:1px solid #e6a100;border-radius:4px;padding:1px 6px;font-size:.85em}
+.weekdays label{display:inline-block;font-weight:400;margin:4px 10px 4px 0}
+.hint{color:#6b5a61;font-size:.9rem}
+@media print{
+  .no-print{display:none !important}
+  body{margin:0;background:#fff}
+  section.card{border:0;padding:0}
+}
 </style></head><body>
 <a href="/attendance/">← 員工打卡頁</a>
 <h1>員工打卡管理</h1>
 <p id="status">載入中…</p>
 
-<section class="card">
+<section class="card no-print">
 <h2>員工名單</h2>
 <ul class="plain" id="employees"></ul>
 <form id="add-form">
@@ -35,14 +43,72 @@ ul.plain li{padding:8px 0;border-bottom:1px solid #e8ddda;display:flex;justify-c
 
 <section class="card">
 <h2>打卡紀錄</h2>
+<div class="no-print">
 <label for="month">月份</label>
 <input id="month" type="month">
 <button id="load" type="button">查看</button>
 <button id="csv-punches" class="secondary" type="button">下載打卡明細 CSV</button>
 <button id="csv-summary" class="secondary" type="button">下載每日彙總 CSV</button>
+<button id="print" class="secondary" type="button">列印本月紀錄</button>
+</div>
 <div class="wrap"><table id="summary-table" hidden><thead><tr><th>日期</th><th>員工</th><th>出勤</th><th>退勤</th><th>休息（分）</th><th>工作時間</th><th>狀態</th></tr></thead><tbody></tbody></table></div>
-<div class="wrap"><table id="records-table" hidden><thead><tr><th>日期</th><th>時間</th><th>員工</th><th>種類</th></tr></thead><tbody></tbody></table></div>
+<div class="wrap"><table id="records-table" hidden><thead><tr><th>日期</th><th>時間</th><th>員工</th><th>種類</th><th>來源</th></tr></thead><tbody></tbody></table></div>
 <p id="records-status" role="status"></p>
+</section>
+
+<section class="card no-print">
+<h2>補登出勤（事後補紀錄）</h2>
+<p class="hint">把實際發生過的出勤事後補進系統。補登的紀錄會永久標記為「補登」，跟即時打卡分得清楚；只能補已經過去的時間，已經有紀錄的日子會自動跳過。請以班表、薪資紀錄等實際依據來補登。</p>
+<label for="manual-employee">員工</label>
+<select id="manual-employee"></select>
+
+<h3>批量補登（一段期間、固定班表）</h3>
+<form id="batch-form">
+<label for="batch-from">開始日期（例：入職日）</label>
+<input id="batch-from" type="date" required>
+<label for="batch-to">結束日期</label>
+<input id="batch-to" type="date" required>
+<label>上班星期</label>
+<div class="weekdays" id="batch-weekdays">
+<label><input type="checkbox" value="1" checked> 週一</label>
+<label><input type="checkbox" value="2" checked> 週二</label>
+<label><input type="checkbox" value="3" checked> 週三</label>
+<label><input type="checkbox" value="4" checked> 週四</label>
+<label><input type="checkbox" value="5" checked> 週五</label>
+<label><input type="checkbox" value="6"> 週六</label>
+<label><input type="checkbox" value="0"> 週日</label>
+</div>
+<label for="batch-in">出勤時間</label>
+<input id="batch-in" type="time" value="10:00" required>
+<label for="batch-out">退勤時間</label>
+<input id="batch-out" type="time" value="14:00" required>
+<label for="batch-break-start">休息開始（沒有休息可留空）</label>
+<input id="batch-break-start" type="time">
+<label for="batch-break-end">休息結束</label>
+<input id="batch-break-end" type="time">
+<label for="batch-note">備註（例：依班表補登）</label>
+<input id="batch-note" maxlength="200" placeholder="依班表補登">
+<div><button type="submit">批量補登</button></div>
+<p id="batch-status" role="status"></p>
+</form>
+
+<h3>單日補登（某一天跟平常不一樣時用）</h3>
+<form id="manual-form">
+<label for="manual-date">日期</label>
+<input id="manual-date" type="date" required>
+<label for="manual-in">出勤時間</label>
+<input id="manual-in" type="time" value="10:00" required>
+<label for="manual-out">退勤時間</label>
+<input id="manual-out" type="time" value="14:00" required>
+<label for="manual-break-start">休息開始（可留空）</label>
+<input id="manual-break-start" type="time">
+<label for="manual-break-end">休息結束</label>
+<input id="manual-break-end" type="time">
+<label for="manual-note">備註</label>
+<input id="manual-note" maxlength="200" placeholder="管理員補登">
+<div><button type="submit">補登這一天</button></div>
+<p id="manual-status" role="status"></p>
+</form>
 </section>
 
 <script>
@@ -71,6 +137,14 @@ function needLogin(error) {
 
 async function loadEmployees() {
   const data = await api('/api/attendance/admin/employees');
+  const manualSelect = $('manual-employee');
+  manualSelect.textContent = '';
+  for (const employee of data.employees) {
+    const option = document.createElement('option');
+    option.value = employee.id;
+    option.textContent = employee.name;
+    manualSelect.append(option);
+  }
   const list = $('employees');
   list.textContent = '';
   if (data.employees.length === 0) {
@@ -129,13 +203,71 @@ async function loadRecords() {
       if (value === labels.in) td.className = 'type-in';
       tr.append(td);
     }
+    const sourceTd = document.createElement('td');
+    if (row.manual) {
+      const badge = document.createElement('span');
+      badge.className = 'badge-manual';
+      badge.textContent = row.note ? `補登（${row.note}）` : '補登';
+      sourceTd.append(badge);
+    } else {
+      sourceTd.textContent = '即時打卡';
+    }
+    tr.append(sourceTd);
     recordsBody.append(tr);
   }
   $('records-table').hidden = data.records.length === 0;
 }
 
 $('month').value = currentMonth();
+$('print').addEventListener('click', () => window.print());
 $('load').addEventListener('click', () => loadRecords().catch(e => { $('records-status').textContent = e.message; }));
+
+function manualEmployeeId() { return $('manual-employee').value; }
+
+$('batch-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const weekdays = [...document.querySelectorAll('#batch-weekdays input:checked')].map(input => Number(input.value));
+  const body = {
+    employeeId: manualEmployeeId(),
+    fromDate: $('batch-from').value,
+    toDate: $('batch-to').value,
+    weekdays,
+    in: $('batch-in').value,
+    out: $('batch-out').value,
+    breakStart: $('batch-break-start').value || undefined,
+    breakEnd: $('batch-break-end').value || undefined,
+    note: $('batch-note').value.trim() || undefined,
+  };
+  try {
+    const data = await api('/api/attendance/manual-batch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    let text = `已補登 ${data.createdDays} 天。`;
+    if (data.skippedDays && data.skippedDays.length) text += ` ${data.skippedDays.length} 天已有紀錄而跳過：${data.skippedDays.join('、')}`;
+    $('batch-status').textContent = text;
+    loadRecords().catch(() => {});
+  } catch (error) {
+    $('batch-status').textContent = error.message;
+  }
+});
+
+$('manual-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const body = {
+    employeeId: manualEmployeeId(),
+    date: $('manual-date').value,
+    in: $('manual-in').value,
+    out: $('manual-out').value,
+    breakStart: $('manual-break-start').value || undefined,
+    breakEnd: $('manual-break-end').value || undefined,
+    note: $('manual-note').value.trim() || undefined,
+  };
+  try {
+    const data = await api('/api/attendance/manual', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    $('manual-status').textContent = `已補登 ${data.date}（${data.created} 筆紀錄）。`;
+    loadRecords().catch(() => {});
+  } catch (error) {
+    $('manual-status').textContent = error.message;
+  }
+});
 $('csv-punches').addEventListener('click', () => { window.location.href = `/api/attendance/records.csv?month=${$('month').value || currentMonth()}&kind=punches`; });
 $('csv-summary').addEventListener('click', () => { window.location.href = `/api/attendance/records.csv?month=${$('month').value || currentMonth()}&kind=summary`; });
 

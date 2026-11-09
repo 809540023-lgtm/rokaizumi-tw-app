@@ -145,3 +145,60 @@ describe("attendance API (file fallback storage)", () => {
     expect(response.status).toBe(401);
   });
 });
+
+describe("attendance manual backfill (admin only, flagged as manual)", () => {
+  let employeeId = "";
+
+  beforeAll(async () => {
+    const created = await postJson("/api/attendance/employees", { name: "佐藤一郎", pin: "5678" }, adminHeaders);
+    employeeId = created.data.employee.id;
+  });
+
+  it("converts JST wall time correctly", () => {
+    expect(attendance.jstWallToMs("2026-11-09", "09:30")).toBe(Date.UTC(2026, 10, 9, 0, 30));
+    expect(attendance.jstWeekday("2026-10-05")).toBe(1); // Monday
+  });
+
+  it("rejects manual entry without admin and for future dates", async () => {
+    const noAdmin = await postJson("/api/attendance/manual", { employeeId, date: "2026-10-12", in: "10:00", out: "14:00" });
+    expect(noAdmin.status).toBe(401);
+
+    const future = await postJson("/api/attendance/manual", { employeeId, date: "2999-01-04", in: "10:00", out: "14:00" }, adminHeaders);
+    expect(future.status).toBe(400);
+  });
+
+  it("backfills one day with a break, flagged manual, and refuses a duplicate day", async () => {
+    const created = await postJson(
+      "/api/attendance/manual",
+      { employeeId, date: "2026-10-12", in: "10:00", out: "14:00", breakStart: "12:00", breakEnd: "12:45", note: "依班表補登" },
+      adminHeaders
+    );
+    expect(created.status).toBe(200);
+    expect(created.data.created).toBe(4);
+
+    const duplicate = await postJson("/api/attendance/manual", { employeeId, date: "2026-10-12", in: "10:00", out: "14:00" }, adminHeaders);
+    expect(duplicate.status).toBe(409);
+
+    const response = await fetch(`${base}/api/attendance/records?month=2026-10`, { headers: adminHeaders });
+    const data = (await response.json()) as { records: { manual: boolean; note: string }[]; summary: { employeeName: string; workMinutes: number | null; breakMinutes: number }[] };
+    const mine = data.records.filter(r => r.manual);
+    expect(mine.length).toBe(4);
+    expect(mine[0].note).toBe("依班表補登");
+    const summary = data.summary.find(s => s.employeeName === "佐藤一郎");
+    expect(summary?.workMinutes).toBe(195);
+    expect(summary?.breakMinutes).toBe(45);
+  });
+
+  it("batch backfills weekdays only and skips days that already have records", async () => {
+    const body = { employeeId, fromDate: "2026-10-05", toDate: "2026-10-11", weekdays: [1, 2, 3, 4, 5], in: "10:00", out: "14:00" };
+    const first = await postJson("/api/attendance/manual-batch", body, adminHeaders);
+    expect(first.status).toBe(200);
+    expect(first.data.createdDays).toBe(5);
+    expect(first.data.createdDates).toEqual(["2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09"]);
+
+    const second = await postJson("/api/attendance/manual-batch", body, adminHeaders);
+    expect(second.status).toBe(200);
+    expect(second.data.createdDays).toBe(0);
+    expect(second.data.skippedDays).toHaveLength(5);
+  });
+});
