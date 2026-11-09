@@ -86,7 +86,7 @@ function renderToday(items) {
   if (!items || items.length === 0) { box.hidden = true; return; }
   for (const item of items) {
     const li = document.createElement('li');
-    li.textContent = `${item.time}　${labels[item.type] || item.type}`;
+    li.textContent = `${item.time}　${labels[item.type] || item.type}${item.manual ? '（補登）' : ''}`;
     list.append(li);
   }
   box.hidden = false;
