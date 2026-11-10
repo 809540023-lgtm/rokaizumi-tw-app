@@ -64,7 +64,7 @@ export function PortalHome() {
             fetchPriority="high"
           />
 
-          {/* 零售頁尚未完成；只開放其餘四個入口，圖上的其他項目保持不可點擊。 */}
+          {/* 零售與大阪不動產投資內頁尚未完成；僅開放已確認的四個入口。 */}
           <nav className="absolute inset-0" aria-label="已確認的服務入口">
             <Link
               href="/ag"
@@ -76,7 +76,7 @@ export function PortalHome() {
               href="/products?category=care"
               aria-label="職人嚴選介護用品"
               title="職人嚴選介護用品"
-              className="absolute left-[2.3%] top-[56.6%] h-[12.8%] w-[33.8%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+              className="absolute left-[2.3%] top-[49.74%] h-[10%] w-[33.1%] rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
             />
             <a
               href="/line-shop/"
