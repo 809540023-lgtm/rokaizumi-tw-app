@@ -15,7 +15,7 @@ const devices = [
 const principles = [
   { icon: Users, title: "組織學", question: "誰指揮、誰執行、誰驗收？", text: "先定義每個角色的權限、交付責任與人工覆核點。" },
   { icon: Scale, title: "經濟學", question: "每次交付花多少、創造多少價值？", text: "比較工時、算力與維運成本，從產品延伸到服務，再依場域需求組成解決方案。" },
-  { icon: ListChecks, title: "方法學", question: "怎麼把意圖變成可驗收的成果？", text: "用 Abp C 協作網路派工、執行並回傳證據，再依預先約定的標準驗收。" },
+  { icon: ListChecks, title: "方法學", question: "怎麼把意圖變成可驗收的成果？", text: "用 ABC_YPCloud 協作網路派工、執行並回傳證據，再依預先約定的標準驗收。" },
 ];
 
 const roles = [
@@ -52,8 +52,8 @@ export function AbpCTrends() {
     <section id="abp-c" aria-labelledby="abp-c-title" className="scroll-mt-6 space-y-8">
       <header className="overflow-hidden rounded-2xl bg-[#061a33] px-6 py-9 text-white sm:px-9">
         <p className="text-sm font-semibold tracking-widest text-cyan-200">日本 AI 大腦｜研發方向與目前進度</p>
-        <h2 id="abp-c-title" className="mt-3 text-3xl font-bold sm:text-5xl">Abp C</h2>
-        <p className="mt-4 max-w-3xl leading-8 text-sky-100">Abp C 是林博 AI 在日本發展的 AI 大腦。研發方向是把組織知識、任務分工與本機及雲端算力接起來，讓企業、教室和內容團隊能在自己的工作場域指派任務、追蹤執行並驗收成果。</p>
+        <h2 id="abp-c-title" className="mt-3 text-3xl font-bold sm:text-5xl">ABC_YPCloud</h2>
+        <p className="mt-4 max-w-3xl leading-8 text-sky-100">ABC_YPCloud 是林博 AI 在日本發展的 AI 大腦。研發方向是把組織知識、任務分工與本機及雲端算力接起來，讓企業、教室和內容團隊能在自己的工作場域指派任務、追蹤執行並驗收成果。</p>
       </header>
 
       <section aria-labelledby="abp-c-progress" className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
