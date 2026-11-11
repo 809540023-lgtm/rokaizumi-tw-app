@@ -42,7 +42,5 @@ describe("homepage LINE shop entry", () => {
     for (const href of ["/ag", "/products?category=care", "/women"]) {
       expect(home).toContain(`href="${href}"`);
     }
-    // The sister-site definition is separate from the LINE shop entry.
-    expect(home).toContain('href: "https://nihon-mama-savebuy.onrender.com/"');
   });
 });

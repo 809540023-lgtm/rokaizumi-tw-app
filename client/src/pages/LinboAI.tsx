@@ -1,3 +1,6 @@
+import { PortalNavigation } from "@/components/PortalNavigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LinboInternational } from "./LinboInternational";
 import { ArrowLeft, ArrowRight, Cpu, Layers3, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import { AbpCTrends } from "@/components/AbpCTrends";
@@ -30,8 +33,11 @@ const japan = [
 ];
 
 export default function LinboAI() {
+  const { language } = useLanguage();
+  if (language !== "zh") return <LinboInternational language={language} />;
   return (
     <div className="min-h-screen bg-[#f2f6fa] text-slate-950">
+      <PortalNavigation />
       <header className="bg-[#061a33] text-white">
         <div className="mx-auto max-w-6xl px-5 py-5 sm:px-8">
           <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-sky-200 hover:text-white">

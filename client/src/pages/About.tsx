@@ -1,9 +1,7 @@
 import { Link } from 'wouter';
-import { SiteHeader } from '@/components/SiteHeader';
+import { PortalNavigation } from '@/components/PortalNavigation';
 import { SiteFooter } from '@/components/SiteFooter';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
-import { useState } from 'react';
-import { useLocation } from 'wouter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const DIFF_ROW_KEYS = ['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7'] as const;
@@ -12,15 +10,9 @@ const STAT_KEYS = ['1', '2', '3', '4'] as const;
 
 export default function About() {
   const { t } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [, setLocation] = useLocation();
-  const handleSearch = () => {
-    if (searchQuery.trim()) setLocation(`/products?q=${encodeURIComponent(searchQuery)}`);
-  };
-
   return (
     <div className="min-h-screen bg-[#FEF9F3]">
-      <SiteHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} onSearchSubmit={handleSearch} />
+      <PortalNavigation />
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#E0F7F6] via-[#FFF5F0] to-[#FFE0E8] py-20 text-center">
