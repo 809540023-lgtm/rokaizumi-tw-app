@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>林 吟芝 博士｜AI・ブロックチェーンで、日本の産業基盤を再構築する</title>
+  <meta name="description" content="林吟芝（リン・インジー）博士による日本政府・関係機関への政策提言。30年の産業実装と経済学博士の研究を基に、AI産業基盤、企業AIガバナンス、RWA（実物資産トークン化）、大阪発のブロックチェーン産業振興を構想します。" />
+  <meta name="theme-color" content="#0b1829" />
+  <link rel="canonical" href="https://rokaizumi-tw.jp/emily/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:site_name" content="ろかいずみ合同会社" />
+  <meta property="og:title" content="林 吟芝 博士｜AI・ブロックチェーンで、日本の産業基盤を再構築する" />
+  <meta property="og:description" content="30年の産業実装と経済学博士の制度研究。AI産業基盤とRWA（実物資産トークン化）の社会実装を通じて、日本と大阪の未来に貢献します。" />
+  <meta property="og:url" content="https://rokaizumi-tw.jp/emily/" />
+  <meta property="og:image" content="https://rokaizumi-tw.jp/emily/og-emily.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="林 吟芝 博士｜AI・ブロックチェーン政策提言" />
+  <meta name="twitter:description" content="AI戦略 × ブロックチェーン × 実体経済。日本政府・関係機関への政策提言。" />
+  <meta name="twitter:image" content="https://rokaizumi-tw.jp/emily/og-emily.jpg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    :root {
+      --ink: #1a2430;
+      --indigo: #162b47;
+      --indigo-deep: #0a1626;
+      --indigo-soft: #1e3857;
+      --gold: #b08a52;
+      --gold-light: #d8c39a;
+      --gold-pale: #ecdfc4;
+      --vermilion: #9d3b2f;
+      --paper: #f7f2e8;
+      --paper-deep: #efe6d6;
+      --line: rgba(26, 36, 48, 0.14);
+      --line-dark: rgba(247, 242, 232, 0.18);
+      --serif: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "Noto Serif JP", "Noto Serif CJK JP", "Source Han Serif JP", "Times New Roman", serif;
+      --sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", "Noto Sans CJK JP", "Source Han Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.95;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--gold); color: #fff; }
+
+    a { color: inherit; }
+
+    img, svg { max-width: 100%; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 72px));
+      margin: 0 auto;
+    }
+
+    .skip {
+      position: fixed;
+      top: -100px;
+      left: 20px;
+      z-index: 9999;
+      padding: 12px 18px;
+      background: var(--indigo-deep);
+      color: #fff;
+      font-size: 12px;
+      text-decoration: none;
+      transition: top 0.2s;
+    }
+    .skip:focus { top: 16px; }
+
+    :focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-pale));
+      box-shadow: 0 0 12px rgba(176, 138, 82, 0.5);
+    }
+
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 28px 0;
+      color: var(--paper);
+    }
+    .topbar .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-family: var(--serif);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      line-height: 1.4;
+    }
+    .brand small {
+      font-family: var(--sans);
+      font-size: 8px;
+      letter-spacing: 0.32em;
+      color: rgba(247, 242, 232, 0.5);
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: rgba(247, 242, 232, 0.65);
+    }
+    .topbar-right a {
+      color: var(--paper);
+      text-decoration: none;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(247, 242, 232, 0.35);
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .topbar-right a:hover { color: var(--gold-light); border-color: var(--gold-light); }
+
+    .side-nav {
+      position: fixed;
+      top: 50%;
+      right: 26px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      transform: translateY(-50%);
+      mix-blend-mode: difference;
+      color: #fff;
+    }
+    .side-nav a {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      font-size: 8px;
+      letter-spacing: 0.16em;
+      text-decoration: none;
+      opacity: 0.38;
+      transition: opacity 0.25s;
+    }
+    .side-nav a:hover,
+    .side-nav a.active { opacity: 1; }
+    .side-nav .label {
+      max-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      opacity: 0;
+      transition: max-width 0.4s var(--ease), opacity 0.3s;
+    }
+    .side-nav a:hover .label,
+    .side-nav a.active .label { max-width: 130px; opacity: 1; }
+    .side-nav .dot {
+      width: 5px;
+      height: 5px;
+      flex: 0 0 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .side-nav a.active .dot {
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 150px 0 90px;
+      background:
+        radial-gradient(1100px 780px at 78% 32%, #203d5f 0%, #142943 42%, #0a1626 78%);
+      color: var(--paper);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent 28%, transparent 66%, rgba(0, 0, 0, 0.42)),
+        radial-gradient(700px 500px at 12% 88%, rgba(176, 138, 82, 0.08), transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50.5%;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(216, 195, 154, 0.18) 25%, rgba(216, 195, 154, 0.18) 75%, transparent);
+      pointer-events: none;
+    }
+    .hero .wrap { position: relative; z-index: 3; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: 40px;
+      align-items: center;
+    }
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 0 0 30px;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      line-height: 1.8;
+      color: var(--gold-light);
+    }
+    .hero-kicker::before {
+      content: "";
+      width: 42px;
+      height: 1px;
+      flex: 0 0 42px;
+      background: var(--gold);
+    }
+    .hero-name {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(62px, 8.4vw, 112px);
+      font-weight: 500;
+      line-height: 1.04;
+      letter-spacing: 0.08em;
+      color: #fff;
+    }
+    .hero-name .given { margin-left: 0.14em; }
+    .hero-name em {
+      display: inline-block;
+      margin-left: 0.18em;
+      font-family: var(--serif);
+      font-style: normal;
+      font-size: 0.22em;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+      vertical-align: 0.52em;
+    }
+    .hero-en {
+      margin: 18px 0 0;
+      font-size: 10px;
+      letter-spacing: 0.34em;
+      color: rgba(247, 242, 232, 0.52);
+    }
+    .hero-title {
+      margin: 38px 0 0;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.2vw, 28px);
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: #fff;
+    }
+    .hero-lead {
+      max-width: 610px;
+      margin: 22px 0 0;
+      font-size: 14px;
+      line-height: 2.15;
+      color: rgba(247, 242, 232, 0.76);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 40px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 26px;
+      border: 1px solid var(--gold);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.3s;
+    }
+    .btn::after {
+      content: "→";
+      font-size: 13px;
+      transition: transform 0.3s;
+    }
+    .btn:hover::after { transform: translateX(4px); }
+    .btn.primary { background: var(--gold); color: #0a1626; }
+    .btn.primary:hover { background: var(--gold-light); border-color: var(--gold-light); transform: translateY(-2px); }
+    .btn.ghost { color: var(--paper); border-color: rgba(247, 242, 232, 0.32); }
+    .btn.ghost:hover { color: var(--gold-light); border-color: var(--gold); transform: translateY(-2px); }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 46px;
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(247, 242, 232, 0.14);
+    }
+    .hero-meta div { display: flex; flex-direction: column; gap: 1px; }
+    .hero-meta strong {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: var(--gold-light);
+    }
+    .hero-meta span {
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      color: rgba(247, 242, 232, 0.48);
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 540px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sun {
+      position: relative;
+      width: min(31vw, 390px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 36% 30%, #f0dfb8 0%, #d7bb86 34%, #b08a52 68%, #7f5d31 100%);
+      box-shadow: 0 0 130px rgba(216, 195, 154, 0.22);
+      opacity: 0.94;
+    }
+    .sun::before,
+    .sun::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(216, 195, 154, 0.32);
+    }
+    .sun::before { inset: -26px; }
+    .sun::after { inset: -56px; border-color: rgba(216, 195, 154, 0.14); }
+    .hero-vertical {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      margin: 0;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: var(--serif);
+      font-size: 17px;
+      letter-spacing: 0.32em;
+      line-height: 1.9;
+      color: rgba(247, 242, 232, 0.72);
+    }
+    .seal {
+      position: absolute;
+      left: 3%;
+      bottom: 2%;
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      background: var(--vermilion);
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: 33px;
+      line-height: 1;
+      letter-spacing: 0;
+      border-radius: 3px;
+      transform: rotate(-4deg);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+    }
+    .seal::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(247, 242, 232, 0.45);
+      border-radius: 1px;
+    }
+    .hero-waves {
+      position: absolute;
+      right: -80px;
+      bottom: -60px;
+      width: 78%;
+      height: auto;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .scroll-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      z-index: 4;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-size: 8px;
+      letter-spacing: 0.28em;
+      color: rgba(247, 242, 232, 0.45);
+    }
+    .scroll-hint::after {
+      content: "";
+      width: 1px;
+      height: 42px;
+      background: linear-gradient(180deg, var(--gold), transparent);
+      animation: scrollLine 2.4s var(--ease) infinite;
+      transform-origin: top;
+    }
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); opacity: 0; }
+      35% { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+
+    /* ---------- INDEX ---------- */
+    .index {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+    }
+    .index .wrap {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px 30px;
+      padding: 17px 0;
+    }
+    .index-label {
+      font-size: 8px;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      margin-right: 8px;
+    }
+    .index a {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: #4a5563;
+      text-decoration: none;
+      transition: color 0.25s;
+    }
+    .index a span {
+      font-family: var(--serif);
+      font-size: 9px;
+      color: var(--gold);
+    }
+    .index a:hover { color: var(--indigo); }
+
+    /* ---------- SECTIONS ---------- */
+    .section {
+      position: relative;
+      padding: 120px 0;
+      scroll-margin-top: 40px;
+    }
+    .section.paper { background: var(--paper); }
+    .section.alt { background: var(--paper-deep); }
+    .section.dark {
+      background:
+        radial-gradient(900px 600px at 88% 4%, rgba(176, 138, 82, 0.09), transparent 62%),
+        var(--indigo-deep);
+      color: var(--paper);
+    }
+    .section.dark::before {
+      content: "";
+      position: absolute;
+      inset: 24px;
+      border: 1px solid rgba(216, 195, 154, 0.12);
+      pointer-events: none;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 34px;
+      align-items: start;
+      margin-bottom: 52px;
+    }
+    .section-num {
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-family: var(--serif);
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+    }
+    .dark .section-num { border-color: var(--line-dark); color: var(--gold-light); }
+    .section-kicker {
+      margin: 0 0 16px;
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      line-height: 1.8;
+      color: var(--gold);
+    }
+    .dark .section-kicker { color: var(--gold-light); }
+    .section-title {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 500;
+      line-height: 1.55;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+    .dark .section-title { color: #fff; }
+    .section-title .thin {
+      display: block;
+      font-size: 0.62em;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin-top: 10px;
+    }
+    .dark .section-title .thin { color: var(--gold-light); }
+    .section-lead {
+      max-width: 860px;
+      margin: 28px 0 0;
+      font-size: 15.5px;
+      line-height: 2.15;
+      color: #3e4a57;
+    }
+    .dark .section-lead { color: rgba(247, 242, 232, 0.72); }
+
+    /* ---------- MESSAGE ---------- */
+    .message-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 150px;
+      gap: 48px;
+      align-items: start;
+    }
+    .message-copy p {
+      margin: 0 0 22px;
+      font-size: 14.5px;
+      line-height: 2.2;
+      color: #3e4a57;
+    }
+    .message-copy p:first-child {
+      font-family: var(--serif);
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 2.05;
+      color: var(--indigo);
+    }
+    .message-copy strong {
+      font-weight: 600;
+      background: linear-gradient(transparent 68%, rgba(216, 195, 154, 0.55) 68%);
+    }
+    .message-aside {
+      display: flex;
+      justify-content: flex-end;
+      min-height: 330px;
+      border-right: 1px solid var(--line);
+    }
+    .message-aside p {
+      margin: 0 18px 0 0;
+      writing-mode: vertical-rl;
+      font-family: var(--serif);
+      font-size: 16px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+    }
+    .quote {
+      margin: 66px 0 0;
+      padding: 42px 0 0;
+      border-top: 1px solid var(--line);
+      font-family: var(--serif);
+      font-size: clamp(24px, 3vw, 37px);
+      font-weight: 500;
+      line-height: 1.9;
+      letter-spacing: 0.06em;
+      color: var(--indigo);
+    }
+    .quote span { display: block; }
+    .quote span:last-child { margin-left: 1.6em; }
+
+    /* ---------- PROFILE ---------- */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 72px;
+      align-items: start;
+    }
+    .profile-card {
+      position: sticky;
+      top: 36px;
+      padding: 38px 28px;
+      background: #fff;
+      border: 1px solid var(--line);
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(26, 36, 48, 0.06);
+    }
+    .monogram {
+      position: relative;
+      width: 154px;
+      height: 154px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 26px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 62px;
+      line-height: 1;
+      color: var(--indigo);
+    }
+    .monogram::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(176, 138, 82, 0.28);
+      border-radius: 50%;
+    }
+    .monogram::after {
+      content: "LIN YIN-CHIH";
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--sans);
+      font-size: 6px;
+      letter-spacing: 0.22em;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .profile-card h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--indigo);
+    }
+    .profile-card .en-name {
+      margin: 4px 0 0;
+      font-size: 9px;
+      letter-spacing: 0.26em;
+      color: var(--gold);
+    }
+    .profile-card .role {
+      margin: 18px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      line-height: 1.9;
+      color: #4c5865;
+    }
+    .profile-facts {
+      list-style: none;
+      margin: 24px 0 0;
+      padding: 0;
+      text-align: left;
+    }
+    .profile-facts li {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      line-height: 1.8;
+      color: #4c5865;
+    }
+    .profile-facts strong {
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+    }
+    .profile-copy > p {
+      margin: 0 0 22px;
+      font-size: 14.5px;
+      line-height: 2.2;
+      color: #3e4a57;
+    }
+    .profile-copy > p.lead {
+      font-family: var(--serif);
+      font-size: clamp(19px, 2vw, 23px);
+      line-height: 2;
+      color: var(--indigo);
+    }
+    .timeline {
+      position: relative;
+      margin-top: 48px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 96px;
+      width: 1px;
+      background: var(--line);
+    }
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 34px;
+      padding-bottom: 34px;
+    }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 9px;
+      left: 92px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 4px var(--paper-deep);
+    }
+    .timeline-year {
+      padding-top: 1px;
+      text-align: right;
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    .timeline-body h4 {
+      margin: 0 0 6px;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+    .timeline-body p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 2;
+      color: #4b5764;
+    }
+
+    /* ---------- EXPERTISE ---------- */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 54px;
+    }
+    .card {
+      position: relative;
+      overflow: hidden;
+      padding: 38px 30px 30px;
+      background: #fff;
+      border: 1px solid var(--line);
+      transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.45s;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent 78%);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(176, 138, 82, 0.45);
+      box-shadow: 0 26px 60px rgba(26, 36, 48, 0.09);
+    }
+    .card-num {
+      position: absolute;
+      top: 14px;
+      right: 20px;
+      font-family: var(--serif);
+      font-size: 52px;
+      line-height: 1;
+      color: rgba(176, 138, 82, 0.16);
+    }
+    .card h3 {
+      position: relative;
+      margin: 0 0 6px;
+      padding-right: 26px;
+      font-family: var(--serif);
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.65;
+      color: var(--indigo);
+    }
+    .card .en {
+      margin: 0 0 24px;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      line-height: 1.7;
+      color: var(--gold);
+    }
+    .card ul {
+      list-style: none;
+      margin: 0 0 22px;
+      padding: 0;
+    }
+    .card li {
+      position: relative;
+      margin-bottom: 10px;
+      padding-left: 16px;
+      font-size: 12.5px;
+      line-height: 1.9;
+      color: #3e4a57;
+    }
+    .card li::before {
+      content: "";
+      position: absolute;
+      top: 0.72em;
+      left: 0;
+      width: 5px;
+      height: 5px;
+      border: 1px solid var(--gold);
+      transform: rotate(45deg);
+    }
+    .card .note {
+      margin: 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 2;
+      color: #5a6572;
+    }
+
+    /* ---------- BLOCKCHAIN ---------- */
+    .macro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 56px;
+      background: var(--line-dark);
+      border: 1px solid var(--line-dark);
+    }
+    .macro {
+      padding: 34px 32px;
+      background: var(--indigo-deep);
+    }
+    .macro .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 9px;
+      letter-spacing: 0.24em;
+      color: var(--gold-light);
+    }
+    .macro .label::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: var(--gold);
+    }
+    .macro h3 {
+      margin: 14px 0 14px;
+      font-family: var(--serif);
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.75;
+      color: #fff;
+    }
+    .macro p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 2.05;
+      color: rgba(247, 242, 232, 0.66);
+    }
+    .subhead {
+      margin: 64px 0 0;
+      font-family: var(--serif);
+      font-size: 23px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: #fff;
+    }
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 34px;
+    }
+    .principle {
+      padding-top: 18px;
+      border-top: 1px solid rgba(216, 195, 154, 0.38);
+    }
+    .principle span {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--gold-light);
+    }
+    .principle h4 {
+      margin: 8px 0 7px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--paper);
+    }
+    .principle p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.9;
+      color: rgba(247, 242, 232, 0.56);
+    }
+    .osaka {
+      display: grid;
+      grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+      gap: 44px;
+      margin-top: 64px;
+      padding: 44px;
+      border: 1px solid rgba(216, 195, 154, 0.28);
+      background:
+        linear-gradient(135deg, rgba(216, 195, 154, 0.07), transparent 54%),
+        rgba(255, 255, 255, 0.015);
+    }
+    .tag {
+      margin: 0;
+      font-size: 8px;
+      letter-spacing: 0.26em;
+      color: var(--gold-light);
+    }
+    .osaka h3 {
+      margin: 13px 0 18px;
+      font-family: var(--serif);
+      font-size: clamp(24px, 2.5vw, 30px);
+      font-weight: 500;
+      line-height: 1.72;
+      color: #fff;
+    }
+    .osaka-copy > p {
+      margin: 0 0 16px;
+      font-size: 12.5px;
+      line-height: 2.05;
+      color: rgba(247, 242, 232, 0.7);
+    }
+    .osaka .note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-left: 1px solid var(--gold);
+      background: rgba(247, 242, 232, 0.035);
+      font-size: 10.5px;
+      line-height: 1.95;
+      color: rgba(247, 242, 232, 0.54);
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 142px;
+      padding: 18px 10px;
+      text-align: center;
+      border: 1px solid rgba(216, 195, 154, 0.24);
+    }
+    .flow-step span {
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--gold-light);
+    }
+    .flow-step h4 {
+      margin: 7px 0 5px;
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+    }
+    .flow-step p {
+      margin: 0;
+      font-size: 9px;
+      line-height: 1.75;
+      color: rgba(247, 242, 232, 0.56);
+    }
+    .flow-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font-size: 12px;
+    }
+    .flow-note {
+      grid-column: 1 / -1;
+      margin: 16px 0 0;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: rgba(247, 242, 232, 0.48);
+    }
+
+    /* ---------- ROADMAP ---------- */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 54px;
+    }
+    .phase {
+      position: relative;
+      padding: 34px 28px 30px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .phase::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gold);
+      transform: scaleX(0.16);
+      transform-origin: left;
+      transition: transform 0.6s var(--ease);
+    }
+    .phase:hover::before { transform: scaleX(1); }
+    .phase .p-label {
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+    }
+    .phase h3 {
+      margin: 10px 0 14px;
+      font-family: var(--serif);
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.65;
+      color: var(--indigo);
+    }
+    .phase ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .phase li {
+      position: relative;
+      padding: 9px 0 9px 17px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.9;
+      color: #47525f;
+    }
+    .phase li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+    .policy-title {
+      margin: 76px 0 0;
+      font-family: var(--serif);
+      font-size: 23px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--indigo);
+    }
+    .policy-list {
+      list-style: none;
+      margin: 30px 0 0;
+      padding: 0;
+    }
+    .policy-list li {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 28px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+    }
+    .policy-list li > span {
+      font-family: var(--serif);
+      font-size: 36px;
+      line-height: 1;
+      color: rgba(176, 138, 82, 0.42);
+    }
+    .policy-list h4 {
+      margin: 0 0 7px;
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .policy-list p {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 2.05;
+      color: #4a5563;
+    }
+
+    /* ---------- COLLABORATION ---------- */
+    .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin-top: 48px;
+    }
+    .offer {
+      padding: 30px 28px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .offer h3 {
+      margin: 0 0 9px;
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--indigo);
+    }
+    .offer p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 2;
+      color: #4a5563;
+    }
+    .cta {
+      position: relative;
+      overflow: hidden;
+      margin-top: 56px;
+      padding: 58px 42px;
+      background:
+        radial-gradient(600px 320px at 50% 0%, rgba(176, 138, 82, 0.16), transparent 70%),
+        var(--indigo);
+      color: var(--paper);
+      text-align: center;
+    }
+    .cta::before,
+    .cta::after {
+      content: "";
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border: 1px solid rgba(216, 195, 154, 0.14);
+      border-radius: 50%;
+    }
+    .cta::before { top: -210px; left: -100px; }
+    .cta::after { right: -100px; bottom: -210px; }
+    .cta .tag { margin-bottom: 14px; }
+    .cta h3 {
+      position: relative;
+      margin: 0 0 26px;
+      font-family: var(--serif);
+      font-size: clamp(25px, 3.1vw, 36px);
+      font-weight: 500;
+      line-height: 1.7;
+      letter-spacing: 0.06em;
+      color: #fff;
+    }
+    .cta .email {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(216, 195, 154, 0.42);
+      font-family: var(--serif);
+      font-size: clamp(19px, 2.4vw, 27px);
+      letter-spacing: 0.04em;
+      color: var(--gold-light);
+      text-decoration: none;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .cta .email:hover { color: #fff; border-color: #fff; }
+    .cta .tel {
+      display: block;
+      margin-top: 16px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: rgba(247, 242, 232, 0.56);
+    }
+    .cta .pdf-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 28px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: rgba(247, 242, 232, 0.7);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(247, 242, 232, 0.24);
+      padding-bottom: 4px;
+    }
+    .cta .pdf-link:hover { color: var(--gold-light); border-color: var(--gold-light); }
+
+    /* ---------- FOOTER ---------- */
+    .footer {
+      padding: 46px 0 54px;
+      background: #07111d;
+      color: rgba(247, 242, 232, 0.46);
+      font-size: 10px;
+      line-height: 2;
+    }
+    .footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .footer .brand { color: rgba(247, 242, 232, 0.72); font-size: 13px; }
+    .footer p { margin: 0; max-width: 760px; }
+    .footer .fine { margin-top: 10px; color: rgba(247, 242, 232, 0.32); }
+    .footer a { color: rgba(247, 242, 232, 0.72); text-decoration: none; border-bottom: 1px solid rgba(247, 242, 232, 0.18); }
+    .footer a:hover { color: var(--gold-light); }
+
+    /* ---------- REVEAL ---------- */
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.95s var(--ease), transform 0.95s var(--ease);
+    }
+    .js .reveal.in {
+      opacity: 1;
+      transform: none;
+    }
+    .js .reveal[data-delay="1"] { transition-delay: 0.08s; }
+    .js .reveal[data-delay="2"] { transition-delay: 0.16s; }
+    .js .reveal[data-delay="3"] { transition-delay: 0.24s; }
+
+    .js .hero-copy > * {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: heroRise 1.1s var(--ease) forwards;
+    }
+    .js .hero-copy > *:nth-child(1) { animation-delay: 0.12s; }
+    .js .hero-copy > *:nth-child(2) { animation-delay: 0.2s; }
+    .js .hero-copy > *:nth-child(3) { animation-delay: 0.28s; }
+    .js .hero-copy > *:nth-child(4) { animation-delay: 0.36s; }
+    .js .hero-copy > *:nth-child(5) { animation-delay: 0.44s; }
+    .js .hero-copy > *:nth-child(6) { animation-delay: 0.52s; }
+    .js .hero-copy > *:nth-child(7) { animation-delay: 0.6s; }
+    .js .hero-art { opacity: 0; animation: artFade 1.8s var(--ease) 0.35s forwards; }
+    @keyframes heroRise {
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes artFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 1080px) {
+      .hero::after { left: 56%; }
+      .hero-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 20px; }
+      .hero-art { min-height: 460px; }
+      .sun { width: min(34vw, 330px); }
+      .profile-grid { grid-template-columns: 290px minmax(0, 1fr); gap: 48px; }
+      .osaka { padding: 34px; gap: 30px; }
+      .flow { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .flow-arrow { display: none; }
+    }
+
+    @media (max-width: 820px) {
+      .wrap { width: calc(100% - 44px); }
+      .side-nav { display: none; }
+      .topbar { padding: 20px 0; }
+      .topbar-right .meta { display: none; }
+      .hero { min-height: auto; padding: 130px 0 74px; }
+      .hero::after { display: none; }
+      .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+      .hero-art { min-height: 300px; margin-top: 14px; }
+      .sun { width: 210px; }
+      .hero-vertical { right: 8px; font-size: 12px; }
+      .seal { left: 6%; bottom: 0; width: 58px; height: 58px; font-size: 25px; }
+      .scroll-hint { display: none; }
+      .section { padding: 82px 0; }
+      .section.dark::before { inset: 12px; }
+      .section-title br,
+      .osaka h3 br,
+      .cta h3 br { display: none; }
+      .index .wrap { gap: 8px 20px; padding: 14px 0; }
+      .index-label { width: 100%; margin-bottom: 2px; }
+      .section-head { grid-template-columns: 1fr; gap: 14px; margin-bottom: 36px; }
+      .section-num { width: 70px; }
+      .message-layout { grid-template-columns: 1fr; gap: 18px; }
+      .message-aside { display: none; }
+      .profile-grid { grid-template-columns: 1fr; gap: 38px; }
+      .profile-card { position: static; }
+      .timeline::before { left: 76px; }
+      .timeline-item { grid-template-columns: 76px minmax(0, 1fr); gap: 24px; }
+      .timeline-item::before { left: 72px; }
+      .cards,
+      .roadmap-grid,
+      .offer-grid { grid-template-columns: 1fr; }
+      .card { padding: 32px 26px 28px; }
+      .macro-grid { grid-template-columns: 1fr; }
+      .principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .osaka { grid-template-columns: 1fr; padding: 28px; }
+      .flow { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .flow-arrow { display: none; }
+      .flow-step:nth-of-type(4) { grid-column: auto; }
+      .flow-note { grid-column: 1 / -1; }
+      .policy-list li { grid-template-columns: 54px minmax(0, 1fr); gap: 16px; }
+      .policy-list li > span { font-size: 28px; }
+      .cta { padding: 44px 24px; }
+      .footer .wrap { flex-direction: column; gap: 18px; }
+    }
+
+    @media (max-width: 520px) {
+      .hero-name { font-size: clamp(54px, 16vw, 74px); }
+      .hero-lead { font-size: 13px; }
+      .hero-meta { gap: 26px; }
+      .hero-meta strong { font-size: 24px; }
+      .hero-art { min-height: 250px; }
+      .sun { width: 170px; }
+      .hero-vertical { display: none; }
+      .quote span:last-child { margin-left: 0.8em; }
+      .principles { grid-template-columns: 1fr; }
+      .profile-card { padding: 30px 22px; }
+      .monogram { width: 132px; height: 132px; font-size: 54px; }
+      .timeline::before { left: 60px; }
+      .timeline-item { grid-template-columns: 60px minmax(0, 1fr); gap: 18px; }
+      .timeline-item::before { left: 56px; }
+      .timeline-year { font-size: 10px; }
+      .timeline-body h4 { font-size: 16px; }
+      .flow { grid-template-columns: 1fr; }
+      .flow-step { min-height: 110px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .js .reveal,
+      .js .hero-copy > *,
+      .js .hero-art { opacity: 1; transform: none; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      body::after,
+      .progress,
+      .topbar,
+      .index,
+      .side-nav,
+      .scroll-hint,
+      .hero-waves,
+      .seal { display: none !important; }
+      .hero { min-height: auto; padding: 40px 0; background: #fff !important; color: #000; }
+      .hero-name, .hero-title, .hero-lead, .hero-kicker, .hero-en, .hero-meta span { color: #000 !important; }
+      .hero-meta strong { color: #7a5a2e !important; }
+      .hero-actions, .cta .pdf-link { display: none; }
+      .section, .section.dark { padding: 30px 0; background: #fff !important; color: #000; }
+      .section.dark::before { display: none; }
+      .section-title, .dark .section-title, .macro h3, .osaka h3, .subhead, .principle h4 { color: #000 !important; }
+      .section-lead, .dark .section-lead, .macro p, .principle p, .osaka-copy > p { color: #222 !important; }
+      .js .reveal, .js .hero-copy > *, .js .hero-art { opacity: 1 !important; transform: none !important; }
+      .card, .phase, .offer, .profile-card { box-shadow: none; break-inside: avoid; }
+      .macro { background: #fff; }
+      .macro-grid { border-color: #bbb; background: #bbb; }
+      .osaka { background: #fff; border-color: #bbb; }
+      .cta { background: #fff !important; color: #000; border: 1px solid #bbb; }
+      .cta h3, .cta .email { color: #000 !important; }
+      .footer { background: #fff; color: #444; }
+      .footer .brand, .footer a { color: #000; }
+    }
+  </style>
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ</a>
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        ろかいずみ合同会社
+        <small>LIN-BO AI / ROKA IZUMI LLC / OSAKA</small>
+      </div>
+      <div class="topbar-right">
+        <span class="meta">政策提言 / 2026.11</span>
+        <a href="/">サイトへ戻る</a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="side-nav" aria-label="ページ内目次">
+    <a href="#proposal"><span class="label">提言</span><span class="dot"></span></a>
+    <a href="#profile"><span class="label">プロフィール</span><span class="dot"></span></a>
+    <a href="#expertise"><span class="label">専門領域</span><span class="dot"></span></a>
+    <a href="#blockchain"><span class="label">ブロックチェーン</span><span class="dot"></span></a>
+    <a href="#roadmap"><span class="label">ロードマップ</span><span class="dot"></span></a>
+    <a href="#collaboration"><span class="label">協働</span><span class="dot"></span></a>
+  </nav>
+
+  <main id="main">
+    <!-- HERO -->
+    <section id="top" class="hero">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="hero-kicker">日本政府・関係機関 御中 ／ POLICY PROPOSAL 2026</p>
+            <h1 class="hero-name"><span class="family">林</span><span class="given">吟芝</span><em>博士</em></h1>
+            <p class="hero-en">DR. LIN YIN-CHIH ／ EMILY LIN</p>
+            <p class="hero-title">AI戦略 × ブロックチェーン × 実体経済</p>
+            <p class="hero-lead">30年にわたる産業実装と、経済学博士としての制度研究。その両輪で、日本におけるAI産業基盤とRWA（実物資産トークン化）の社会実装に貢献します。</p>
+            <div class="hero-actions">
+              <a class="btn primary" href="#proposal">提言を読む</a>
+              <a class="btn ghost" href="#profile">プロフィール</a>
+            </div>
+            <div class="hero-meta">
+              <div><strong>30</strong><span>年 / 産業実装</span></div>
+              <div><strong>03</strong><span>専門領域</span></div>
+              <div><strong>2026</strong><span>大阪RWA研究</span></div>
+            </div>
+          </div>
+          <div class="hero-art">
+            <div class="sun" aria-hidden="true"></div>
+            <p class="hero-vertical">知と実装で、日本の未来を拓く。</p>
+            <div class="seal" aria-hidden="true">林</div>
+            <svg class="hero-waves" viewBox="0 0 800 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+              <defs>
+                <pattern id="seigaiha" width="80" height="40" patternUnits="userSpaceOnUse">
+                  <g fill="none" stroke="#d8c39a" stroke-width="1">
+                    <path d="M0 40 A39 39 0 0 1 80 40"/>
+                    <path d="M0 40 A31 31 0 0 1 80 40"/>
+                    <path d="M0 40 A23 23 0 0 1 80 40"/>
+                    <path d="M0 40 A15 15 0 0 1 80 40"/>
+                    <path d="M0 40 A7 7 0 0 1 80 40"/>
+                  </g>
+                </pattern>
+              </defs>
+              <rect width="800" height="400" fill="url(#seigaiha)"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-hint" aria-hidden="true">SCROLL</div>
+    </section>
+
+    <nav class="index" aria-label="ページ内目次">
+      <div class="wrap">
+        <span class="index-label">INDEX</span>
+        <a href="#proposal"><span>01</span>提言</a>
+        <a href="#profile"><span>02</span>プロフィール</a>
+        <a href="#expertise"><span>03</span>専門領域</a>
+        <a href="#blockchain"><span>04</span>ブロックチェーン</a>
+        <a href="#roadmap"><span>05</span>ロードマップ</a>
+        <a href="#collaboration"><span>06</span>協働</a>
+      </div>
+    </nav>
+
+    <!-- MESSAGE -->
+    <section id="proposal" class="section paper">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">01</div>
+          <div>
+            <p class="section-kicker">MESSAGE / 提言の原点</p>
+            <h2 class="section-title">技術は、制度と信頼に支えられて、<br>はじめて社会の基盤になる。</h2>
+          </div>
+        </div>
+        <div class="message-layout">
+          <div class="message-copy reveal" data-delay="1">
+            <p>AIは人を置き換えるための技術ではなく、現場の知恵を増幅するための技術です。ブロックチェーンもまた、投機のための道具ではなく、人と人、企業と地域のあいだに「検証できる信頼」を積み上げるための社会インフラです。</p>
+            <p>私は台湾で生まれ、金融、IT、小売、越境EC、ブロックチェーン、AIの現場を30年歩いてきました。その中で学んだのは、技術の価値は「実装の質」で決まるということです。どんなに優れた技術も、現場の業務、法制度、会計、人材の納得がなければ、社会には定着しません。</p>
+            <p>日本には、世界に誇る現場力、高い倫理観、そして長期の信頼があります。足りないのは、それをデジタルの力で全国へ、そして世界へつなぐ「実装の設計図」ではないでしょうか。</p>
+            <p>私は、政策と技術、事業と地域のあいだに立ち、<strong>絵に描いた政策を、動く産業に変える</strong>仕事をしたいと考えています。日本と台湾、そしてアジアの知恵を結び、次の時代の産業基盤を、ともに設計してまいります。</p>
+          </div>
+          <aside class="message-aside reveal" data-delay="2" aria-hidden="true">
+            <p>信頼を、実装する。</p>
+          </aside>
+        </div>
+        <blockquote class="quote reveal">
+          <span>信頼なき技術は、社会を変えない。</span>
+          <span>実装なき政策は、未来をつくらない。</span>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" class="section alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">02</div>
+          <div>
+            <p class="section-kicker">PROFILE / プロフィール</p>
+            <h2 class="section-title">林 吟芝 博士<span class="thin">Dr. Lin Yin-Chih / Emily Lin</span></h2>
+          </div>
+        </div>
+        <div class="profile-grid">
+          <aside class="profile-card reveal">
+            <div class="monogram" aria-hidden="true">林</div>
+            <h3>林 吟芝</h3>
+            <p class="en-name">DR. LIN YIN-CHIH</p>
+            <p class="role">経済学博士（淡江大学）<br>AI・デジタル資産戦略顧問<br>林博AI 主宰 / 企業AI戦略顧問</p>
+            <ul class="profile-facts">
+              <li><strong>専門</strong><span>AI戦略 / AI FinOps / Web3・RWA</span></li>
+              <li><strong>学位</strong><span>経済学博士（淡江大学）</span></li>
+              <li><strong>前職</strong><span>宏碁 eDC プロジェクトマネージャー</span></li>
+              <li><strong>原点</strong><span>ブロックチェーン計算資源の黎明期</span></li>
+              <li><strong>拠点</strong><span>台湾・大阪</span></li>
+            </ul>
+          </aside>
+          <div class="profile-copy">
+            <p class="lead reveal" data-delay="1">情報インフラ、事業創造、金融、ブロックチェーン、AIを横断する30年の実務家であり、STO／RWAの制度設計を研究する経済学博士。</p>
+            <p class="reveal" data-delay="2">林吟芝博士は、企業グループや金融機関、事業者に対し、AIによる事業モデルの再構築、AI計算資源のガバナンス、実物資産のトークン化を助言しています。技術を「導入する」のではなく、組織の収益構造、リスク管理、人材育成に組み込み、持続可能な運用へと変えることを得意としています。</p>
+            <div class="timeline">
+              <div class="timeline-item reveal">
+                <div class="timeline-year">1990s</div>
+                <div class="timeline-body">
+                  <h4>金融保険業・組織マネジメント</h4>
+                  <p>教育研修機関での運営を経て金融保険業へ。若くして管理職に就き、大規模営業組織を率いる。資本形成と組織運営の基礎を、現場で築く。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">1990s–2000s</div>
+                <div class="timeline-body">
+                  <h4>テクノロジー企業創業・教育情報化</h4>
+                  <p>政府の内需拡大策を捉え、教育情報化プロジェクトを獲得。宜蘭・花蓮・台東の主要ソフトウェア代理店へと成長させる。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">2000s</div>
+                <div class="timeline-body">
+                  <h4>越境ECの先駆け</h4>
+                  <p>Yahoo!奇摩オークションの主要店舗を運営。越境物流、プラットフォーム運営、データ分析を実践し、国境を越える商流を設計する。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">2006–2008</div>
+                <div class="timeline-body">
+                  <h4>宏碁eDC／新竹科学園区</h4>
+                  <p>宏碁（Acer）電子化資訊センター（eDC）プロジェクトマネージャー。新竹科学園区（サイエンスパーク）管理局の情報システムと基幹データセンターを統括し、ISO準拠の高可用性運用を徹底する。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">2009–2018</div>
+                <div class="timeline-body">
+                  <h4>実店舗チェーン・オペレーション</h4>
+                  <p>茶飲料チェーンに投資・運営。商業施設・市場での多店舗展開を通じ、人材、標準化、在庫、収益管理を実践。現場発の業務自動化システムを開発する。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">2013–</div>
+                <div class="timeline-body">
+                  <h4>ブロックチェーン計算資源の黎明期</h4>
+                  <p>中国・四川省金口河に実機マイニング施設を構築。ハードウェア、電力、運用の現場を経験。台湾に戻った後は人材育成とエコシステム形成に尽力する。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">2020s</div>
+                <div class="timeline-body">
+                  <h4>経済学博士・STO／RWA研究</h4>
+                  <p>淡江大学で経済学博士を取得。博士論文『証券型トークン規制枠組みの研究——STOからSTO+へ：トークン経済・インフラ・制度設計の三次元分析』。制度と技術の接点を学術的に深化させる。</p>
+                </div>
+              </div>
+              <div class="timeline-item reveal">
+                <div class="timeline-year">現在</div>
+                <div class="timeline-body">
+                  <h4>AI×Web3の実装</h4>
+                  <p>越境事業でマルチエージェントAIを自社運用。企業・政府・自治体向けに、AI戦略、FinOps、RWAの助言と実装支援を行う。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERTISE -->
+    <section id="expertise" class="section paper">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">03</div>
+          <div>
+            <p class="section-kicker">EXPERTISE / 専門領域</p>
+            <h2 class="section-title">三つの専門領域で、<br>経営と政策の根幹に応える。</h2>
+          </div>
+        </div>
+        <p class="section-lead reveal" data-delay="1">AI戦略、AIガバナンス、Web3／RWA。それぞれは独立した技術論ではなく、事業の収益構造、組織のリスク管理、資産の流動性という、経営と政策の根幹につながっています。</p>
+        <div class="cards">
+          <article class="card reveal">
+            <div class="card-num" aria-hidden="true">壱</div>
+            <h3>全社AI戦略と<br>事業モデルの再構築</h3>
+            <p class="en">AI STRATEGY &amp; BUSINESS RECONSTRUCTION</p>
+            <ul>
+              <li>第一原理からの価値連鎖の再設計</li>
+              <li>Agentic／Multi-Agentによるエンドツーエンドの業務パイプライン</li>
+              <li>小さく検証し、速く学ぶアジャイル実装</li>
+            </ul>
+            <p class="note">AIを既存業務の「外付け」ではなく、収益と提供価値の中心に据え直します。</p>
+          </article>
+          <article class="card reveal" data-delay="1">
+            <div class="card-num" aria-hidden="true">弐</div>
+            <h3>エンタープライズAI<br>FinOpsとガバナンス</h3>
+            <p class="en">ENTERPRISE AI FINOPS &amp; GOVERNANCE</p>
+            <ul>
+              <li>組織単位のトークン割当と権限設計</li>
+              <li>モデルの自動ルーティングとセマンティックキャッシュ</li>
+              <li>全社AIゲートウェイ・監査ログ・データ保護</li>
+            </ul>
+            <p class="note">「使った分だけ、責任をもって使う」AI運用を、コストとセキュリティの両面から設計します。</p>
+          </article>
+          <article class="card reveal" data-delay="2">
+            <div class="card-num" aria-hidden="true">参</div>
+            <h3>Web3／RWA<br>デジタル資産戦略</h3>
+            <p class="en">WEB3 &amp; REAL-WORLD ASSETS</p>
+            <ul>
+              <li>不動産・在庫・知財・売掛金のトークン化可能性評価</li>
+              <li>金商法・信託法・不特法・資金決済法の制度設計</li>
+              <li>米SEC・EU MiCA・アジア規制の比較と国際相互運用</li>
+            </ul>
+            <p class="note">規制を迂回するのではなく、規制と共に設計する。それが日本市場で信頼されるRWAの条件です。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOCKCHAIN -->
+    <section id="blockchain" class="section dark">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">04</div>
+          <div>
+            <p class="section-kicker">BLOCKCHAIN IN JAPAN / 日本での展開</p>
+            <h2 class="section-title">ブロックチェーン産業の日本での展開<span class="thin">「投機」から「実装」へ。</span></h2>
+          </div>
+        </div>
+        <p class="section-lead reveal" data-delay="1">世界のブロックチェーン産業は、投機の時代を終え、実物資産の流動化と地域経済の再構築へと向かっています。日本は、法制度、実物資産、地域金融という三つの厚みを持つ、世界でも稀な実装大国です。</p>
+
+        <div class="macro-grid">
+          <article class="macro reveal">
+            <span class="label">制度</span>
+            <h3>整備される<br>トークン化の枠組み</h3>
+            <p>金融庁を中心に、暗号資産やトークン化資産を金融商品取引法の枠組みで捉える議論が進んでいます。信託受益権を用いた不動産ST、不動産特定共同事業法に基づく商品など、実務の選択肢が広がっています。</p>
+          </article>
+          <article class="macro reveal" data-delay="1">
+            <span class="label">市場</span>
+            <h3>大阪・関西万博が<br>開いた扉</h3>
+            <p>2025年の大阪・関西万博を契機に、Web3とデジタル資産への関心は全国へ広がりました。大阪は、制度・産業・国際性を併せ持つ、アジア有数の実証拠点になり得ます。</p>
+          </article>
+          <article class="macro reveal">
+            <span class="label">課題</span>
+            <h3>実証と事業の<br>あいだにある溝</h3>
+            <p>規制の複雑さ、専門人材の不足、会計・税務・セキュリティの整備。日本には高度な実証が数多くありますが、事業として継続するための設計が不足しています。</p>
+          </article>
+          <article class="macro reveal" data-delay="1">
+            <span class="label">機会</span>
+            <h3>地域資産を、<br>地域外の長期資金へ</h3>
+            <p>地方の不動産、観光、農林水産、福祉、伝統産業。小口化と流動化によって、これまで動かなかった資産に、長期の資金と新しい担い手を呼び込めます。</p>
+          </article>
+        </div>
+
+        <h3 class="subhead reveal">日本モデルを支える四つの原則</h3>
+        <div class="principles">
+          <div class="principle reveal">
+            <span>01</span>
+            <h4>コンプライアンス・ファースト</h4>
+            <p>法務・会計・税務の専門家を起点に、制度に沿って設計する。</p>
+          </div>
+          <div class="principle reveal" data-delay="1">
+            <span>02</span>
+            <h4>実物資産に立脚</h4>
+            <p>投機的な資産ではなく、キャッシュフローのある実体資産を対象にする。</p>
+          </div>
+          <div class="principle reveal" data-delay="2">
+            <span>03</span>
+            <h4>地域金融との共存</h4>
+            <p>既存の金融機関を置き換えず、補完する存在として設計する。</p>
+          </div>
+          <div class="principle reveal" data-delay="3">
+            <span>04</span>
+            <h4>国際相互運用</h4>
+            <p>閉じた市場ではなく、世界と接続する標準を目指す。</p>
+          </div>
+        </div>
+
+        <div class="osaka reveal">
+          <div class="osaka-copy">
+            <p class="tag">CASE / OSAKA RWA PROJECT</p>
+            <h3>大阪の一戸建てから、<br>日本のRWAモデルを設計する。</h3>
+            <p>大阪の一戸建てを対象に、信託受益権を用いたRWAの執行戦略を研究し、日本語版ホワイトペーパー（v3.4）をまとめました。実物資産の所有と受益を分離し、法制度に沿って権利を記録する。その設計を通じて、小規模案件でも法務・受託コストを透明化し、地域の資産を長期資金と結ぶ方法を検証しています。</p>
+            <p class="note">現在は研究・シミュレーション段階であり、投資募集・勧誘を行うものではありません。弁護士、受託者、会計・税務の専門家による検証を通過することが、次の段階の前提です。現時点の研究設計では、海外限定、流通ロック、内部名簿を組み合わせ、規制を前提とした構造を検討しています。</p>
+          </div>
+          <div>
+            <div class="flow">
+              <div class="flow-step">
+                <span>01</span>
+                <h4>実物資産</h4>
+                <p>大阪の住宅<br>キャッシュフロー</p>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-step">
+                <span>02</span>
+                <h4>信託・SPV</h4>
+                <p>所有と受益の分離<br>法的な器の設計</p>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-step">
+                <span>03</span>
+                <h4>トークン</h4>
+                <p>権利の記録<br>譲渡条件の実装</p>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-step">
+                <span>04</span>
+                <h4>投資家・地域</h4>
+                <p>長期資金<br>地域経済の循環</p>
+              </div>
+              <p class="flow-note">海外限定 ／ 流通ロック ／ 内部名簿 ／ 専門家検証 — 規制を前提とした設計</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap" class="section paper">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">05</div>
+          <div>
+            <p class="section-kicker">ROADMAP / 日本での将来計画</p>
+            <h2 class="section-title">大阪で生まれたモデルを、<br>日本とアジアの基盤へ。</h2>
+          </div>
+        </div>
+        <p class="section-lead reveal" data-delay="1">大阪で生まれた実装モデルを、地域金融、産業、人材、国際連携へと広げます。政策と事業のあいだに、検証可能なステップをつくることが私たちの方法です。</p>
+
+        <div class="roadmap-grid">
+          <article class="phase reveal">
+            <p class="p-label">PHASE 1 / 2026–2027</p>
+            <h3>大阪モデルの実証</h3>
+            <ul>
+              <li>法務・会計・税務・セキュリティの専門家連携</li>
+              <li>大阪府ブロックチェーン協会との政策対話（予定）</li>
+              <li>募集を行わないシミュレーションと、適法な枠組みでの小規模実証</li>
+            </ul>
+          </article>
+          <article class="phase reveal" data-delay="1">
+            <p class="p-label">PHASE 2 / 2027–2028</p>
+            <h3>地域金融 × RWA</h3>
+            <ul>
+              <li>地方銀行・信用金庫・不動産業者との連携</li>
+              <li>中小企業の資産流動化モデルの確立</li>
+              <li>観光・福祉・農林水産・伝統産業への横展開</li>
+            </ul>
+          </article>
+          <article class="phase reveal" data-delay="2">
+            <p class="p-label">PHASE 3 / 2029–2030</p>
+            <h3>アジアの実装ハブへ</h3>
+            <ul>
+              <li>大阪をアジアのRWA実装ハブに</li>
+              <li>台湾・ASEAN・欧州の投資家・技術者との接続</li>
+              <li>標準化、人材育成、国際規制対話</li>
+            </ul>
+          </article>
+        </div>
+
+        <h3 class="policy-title reveal">日本政府への三つの提言</h3>
+        <ol class="policy-list">
+          <li class="reveal">
+            <span>01</span>
+            <div>
+              <h4>規制サンドボックスと専門家連携の常設化</h4>
+              <p>技術者、弁護士、会計士、税理士、監督官庁が同じテーブルで検討できる常設の場を設ける。個別案件の事前相談を、制度改善の知見へと変える仕組みが必要です。</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span>02</span>
+            <div>
+              <h4>地域資産のRWA実証支援</h4>
+              <p>中小企業・地域金融・自治体が連携する小規模実証に対し、専門家費用と法務費用を支援する。成功事例を横展開できる共通フォーマットの整備を提言します。</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span>03</span>
+            <div>
+              <h4>AIガバナンスと計算コストの標準化</h4>
+              <p>政府・自治体のAI利用において、コストの可視化、監査ログ、データ保護、人材育成を標準化する。AIを「高価な実験」から「持続可能な行政基盤」へ変えるべきです。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- COLLABORATION -->
+    <section id="collaboration" class="section alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div class="section-num">06</div>
+          <div>
+            <p class="section-kicker">COLLABORATION / 協働のご提案</p>
+            <h2 class="section-title">共に、次の基盤をつくる。</h2>
+          </div>
+        </div>
+        <p class="section-lead reveal" data-delay="1">政策の設計から、実証、事業化、人材育成まで。技術と制度のあいだに立ち、日本の現場に根づく形へと落とし込みます。</p>
+
+        <div class="offer-grid">
+          <article class="offer reveal">
+            <h3>政府・自治体</h3>
+            <p>政策設計、実証事業の設計・評価、国際連携、人材育成。規制と技術の対話を、実行可能なロードマップへ。</p>
+          </article>
+          <article class="offer reveal" data-delay="1">
+            <h3>企業・金融機関</h3>
+            <p>全社AI戦略、AI FinOps、RWA、新事業の設計と実装。技術投資を、収益とリスク管理の言葉に翻訳します。</p>
+          </article>
+          <article class="offer reveal" data-delay="2">
+            <h3>教育・研究機関</h3>
+            <p>共同研究、教育プログラム、政策対話。次世代の実務家と研究者を育てる場づくりに貢献します。</p>
+          </article>
+        </div>
+
+        <div class="cta reveal">
+          <p class="tag">CONTACT / ご相談・ご取材</p>
+          <h3>日本とアジアの未来を、<br>共に設計しませんか。</h3>
+          <a class="email" href="mailto:cia8885@gmail.com">cia8885@gmail.com</a>
+          <span class="tel">TEL 0915-888-927（台湾）／ 大阪拠点：大阪市淀川区西中島六丁目10番1の502</span>
+          <a class="pdf-link" href="./lin-yin-chih-profile-zh.pdf" target="_blank" rel="noopener">参考：履歴書（PDF・中国語）</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>
+        <div class="brand">ろかいずみ合同会社<small>LIN-BO AI / ROKA IZUMI LLC / OSAKA</small></div>
+        <p class="fine">© 2026 ROKA IZUMI LLC. All rights reserved.</p>
+      </div>
+      <div>
+        <p>本ページは、林吟芝博士の専門性と日本での事業構想を紹介する政策提言ページです。特定の政府機関・団体による推薦や承認を示すものではありません。また、投資勧誘、法律意見、税務意見を構成するものではありません。大阪RWAプロジェクトは研究・シミュレーション段階にあり、実募集・勧誘は行っていません。掲載内容は2026年11月時点のものです。</p>
+        <p class="fine">発行：ろかいずみ合同会社 ／ <a href="/">rokaizumi-tw.jp</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var progress = document.querySelector('.progress');
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.side-nav a'));
+      var sections = navLinks.map(function (link) {
+        var id = link.getAttribute('href');
+        return id ? document.querySelector(id) : null;
+      }).filter(Boolean);
+      var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      var observer = null;
+
+      function revealPassed() {
+        var limit = window.scrollY + window.innerHeight * 0.96;
+        reveals.forEach(function (el) {
+          if (!el.classList.contains('in') && el.getBoundingClientRect().top + window.scrollY < limit) {
+            el.classList.add('in');
+            if (observer) observer.unobserve(el);
+          }
+        });
+      }
+
+      function onScroll() {
+        var doc = document.documentElement;
+        var max = doc.scrollHeight - window.innerHeight;
+        var ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        if (progress) progress.style.width = (ratio * 100) + '%';
+
+        var marker = window.scrollY + window.innerHeight * 0.34;
+        var current = sections[0];
+        sections.forEach(function (section) {
+          if (section.offsetTop <= marker) current = section;
+        });
+        navLinks.forEach(function (link) {
+          var active = current && link.getAttribute('href') === '#' + current.id;
+          link.classList.toggle('active', !!active);
+          if (active) {
+            link.setAttribute('aria-current', 'true');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+
+        revealPassed();
+      }
+
+      var ticking = false;
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          onScroll();
+          ticking = false;
+        });
+      }, { passive: true });
+      onScroll();
+
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+        reveals.forEach(function (el) {
+          if (!el.classList.contains('in')) observer.observe(el);
+        });
+      } else {
+        reveals.forEach(function (el) { el.classList.add('in'); });
+      }
+      revealPassed();
+    })();
+  </script>
+</body>
+</html>
