@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, Cpu, Layers3, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
+import { AbpCTrends } from "@/components/AbpCTrends";
 import { SiteFooter } from "@/components/SiteFooter";
 
 const strengths = [
@@ -45,6 +46,7 @@ export default function LinboAI() {
               <a href="#japan" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-cyan-200 px-5 py-3 font-semibold text-[#061a33] hover:bg-white">
                 探索日本發展方向 <ArrowRight aria-hidden="true" size={17} />
               </a>
+              <a href="#abp-c" className="ml-4 mt-4 inline-flex items-center gap-2 py-3 font-semibold text-cyan-100 underline underline-offset-4 hover:text-white">看 Abp C 發展趨勢</a>
             </div>
             <aside lang="ja" className="rounded-2xl border border-sky-700 bg-[#0b2747] p-6">
               <h2 className="text-lg font-semibold text-cyan-100">日本企業の皆さまへ</h2>
@@ -67,6 +69,8 @@ export default function LinboAI() {
             ))}
           </div>
         </section>
+
+        <AbpCTrends />
 
         <section aria-labelledby="projects">
           <h2 id="projects" className="text-3xl font-bold">專案與應用</h2>
