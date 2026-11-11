@@ -1,6 +1,6 @@
 import {
   ArrowDown, Box, CheckCircle2, Cloud, Cpu, GraduationCap, Laptop,
-  ListChecks, Mic, Monitor, Network, Radio, Server, ShieldCheck, Users,
+  ListChecks, Mic, Monitor, Network, Radio, Scale, Server, ShieldCheck, Users,
 } from "lucide-react";
 
 const devices = [
@@ -12,9 +12,22 @@ const devices = [
   { icon: GraduationCap, title: "AI 小教授", text: "提問、練習與學生創作" },
 ];
 
+const principles = [
+  { icon: Users, title: "組織學", question: "誰指揮、誰執行、誰驗收？", text: "先定義每個角色的權限、交付責任與人工覆核點。" },
+  { icon: Scale, title: "經濟學", question: "每次交付花多少、創造多少價值？", text: "比較工時、算力與維運成本，從產品延伸到服務，再依場域需求組成解決方案。" },
+  { icon: ListChecks, title: "方法學", question: "怎麼把意圖變成可驗收的成果？", text: "用 Abp C 協作網路派工、執行並回傳證據，再依預先約定的標準驗收。" },
+];
+
+const roles = [
+  ["Cito", "產品與工程"],
+  ["Lulu", "行銷與銷售"],
+  ["Coco", "營運與執行"],
+  ["Milo", "媒體指揮"],
+];
+
 const execution = [
-  { icon: Users, title: "設定目標", text: "產品、行銷與營運共同定義成果、資源及驗收條件。" },
-  { icon: ListChecks, title: "拆解任務", text: "將目標拆成有負責角色、時程和狀態的任務。" },
+  { icon: Users, title: "設定目標", text: "四個角色共同確認目標、資源、優先順序及驗收條件。" },
+  { icon: ListChecks, title: "拆解任務", text: "用任務樹編排目標、任務、資源、角色和時程，並追蹤狀態。" },
   { icon: Network, title: "跨節點執行", text: "將開發、操作與品管任務交給適合的設備或代理。" },
   { icon: CheckCircle2, title: "回報與驗收", text: "回傳執行紀錄與成果，交由人員覆核和修正。" },
 ];
@@ -44,6 +57,28 @@ export function AbpCTrends() {
       </header>
 
       <figure className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <figcaption className="text-2xl font-bold">AI 是組織學 × 經濟學 × 方法學</figcaption>
+        <ul className="mt-5 grid gap-3 md:grid-cols-3">
+          {principles.map(({ icon: Icon, title, question, text }) => (
+            <li key={title} className="rounded-xl bg-[#edf6fb] p-4">
+              <Icon aria-hidden="true" className="size-7 text-sky-700" />
+              <h3 className="mt-3 text-lg font-bold">{title}</h3>
+              <p className="mt-2 text-sm font-semibold">{question}</p>
+              <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 rounded-lg bg-[#061a33] p-4 text-white">
+          <h3 className="font-semibold">官網發布流程</h3>
+          <ol className="mt-2 flex flex-wrap gap-2 text-sm text-sky-100">
+            <li>Lab 驗證</li>
+            <li><span aria-hidden="true">→ </span>人工核准</li>
+            <li><span aria-hidden="true">→ </span>正式發布</li>
+          </ol>
+        </div>
+      </figure>
+
+      <figure className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
         <figcaption className="text-2xl font-bold">六種設備角色</figcaption>
         <p className="mt-2 leading-7 text-slate-700">依任務配置設備，配合模型、組織知識與持續維運，從單機試點延伸為場域方案。</p>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -60,6 +95,14 @@ export function AbpCTrends() {
       <div className="grid gap-5 lg:grid-cols-2">
         <figure className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <figcaption className="text-2xl font-bold">從目標到驗收</figcaption>
+          <ul aria-label="指揮團隊" className="mt-4 grid grid-cols-2 gap-2">
+            {roles.map(([name, responsibility]) => (
+              <li key={name} className="rounded-lg border border-sky-200 px-3 py-2 text-sm">
+                <strong className="block text-sky-800">{name}</strong>
+                <span className="text-slate-700">{responsibility}</span>
+              </li>
+            ))}
+          </ul>
           <ol className="mt-5 space-y-2">
             {execution.map(({ icon: Icon, title, text }, index) => (
               <li key={title}>
