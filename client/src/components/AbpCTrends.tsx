@@ -51,10 +51,28 @@ export function AbpCTrends() {
   return (
     <section id="abp-c" aria-labelledby="abp-c-title" className="scroll-mt-6 space-y-8">
       <header className="overflow-hidden rounded-2xl bg-[#061a33] px-6 py-9 text-white sm:px-9">
-        <p className="text-sm font-semibold tracking-widest text-cyan-200">近期發展趨勢</p>
+        <p className="text-sm font-semibold tracking-widest text-cyan-200">日本 AI 大腦｜研發方向與目前進度</p>
         <h2 id="abp-c-title" className="mt-3 text-3xl font-bold sm:text-5xl">Abp C</h2>
-        <p className="mt-4 max-w-3xl leading-8 text-sky-100">把 AI 從單一對話視窗帶到工作現場。Abp C 的構想結合本機設備、雲端模型與多代理分工，讓企業、教室和內容團隊能從一項任務開始，逐步建立可管理的 AI 工作流程。</p>
+        <p className="mt-4 max-w-3xl leading-8 text-sky-100">Abp C 是林博 AI 在日本發展的 AI 大腦。研發方向是把組織知識、任務分工與本機及雲端算力接起來，讓企業、教室和內容團隊能在自己的工作場域指派任務、追蹤執行並驗收成果。</p>
       </header>
+
+      <section aria-labelledby="abp-c-progress" className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <h3 id="abp-c-progress" className="text-2xl font-bold">目前研發進度</h3>
+        <dl className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl bg-[#e7f6f2] p-4">
+            <dt className="font-bold text-teal-900">已有維運紀錄</dt>
+            <dd className="mt-2 text-sm leading-6 text-slate-700">部分基礎服務已有版本更新、登入與 API 健康檢查、部署回證和重啟確認。</dd>
+          </div>
+          <div className="rounded-xl bg-[#edf6fb] p-4">
+            <dt className="font-bold text-sky-900">已整理設計</dt>
+            <dd className="mt-2 text-sm leading-6 text-slate-700">已整理六種設備角色、四個指揮角色、任務樹與跨平台核心架構，以及偏鄉共學示範課流程。</dd>
+          </div>
+          <div className="rounded-xl bg-amber-50 p-4">
+            <dt className="font-bold text-amber-950">待驗證與試點</dt>
+            <dd className="mt-2 text-sm leading-6 text-slate-700">驗證 Apple M4 相容性與效能、遠端桌面整合、備份還原及開機復原，再評估日本節點成本與場域試點。</dd>
+          </div>
+        </dl>
+      </section>
 
       <figure className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
         <figcaption className="text-2xl font-bold">AI 是組織學 × 經濟學 × 方法學</figcaption>
