@@ -2277,14 +2277,14 @@ const translations = {
 
 /** 讀取上次選擇的語言；沒有的話用繁中（本站主要客群在台灣） */
 function initialLanguage(): Language {
-  if (typeof window === 'undefined') return 'zh';
+  if (typeof window === 'undefined') return 'ja';
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
     if (saved && saved in translations) return saved as Language;
   } catch {
     // Storage can be unavailable in private or restricted browsing.
   }
-  return 'zh';
+  return 'ja';
 }
 
 export function documentLanguage(language: Language): string {
