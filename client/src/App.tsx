@@ -9,6 +9,7 @@ import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { NetworkStatusBanner } from "./components/NetworkStatusBanner";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const LinboAI = lazy(() => import("./pages/LinboAI"));
 const PortalHome = lazy(() => import("./pages/PortalHome"));
 const Women = lazy(() => import("./pages/Women"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
@@ -59,6 +60,7 @@ function Router() {
       <Route path={"/admin/financial"} component={FinancialDashboard} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/"} component={PortalHome} />
+      <Route path={"/linbo-ai"} component={LinboAI} />
       <Route path={"/home"} component={HomePage} />
       <Route path={"/women"} component={Women} />
       <Route path={"/koku"} component={Koku} />

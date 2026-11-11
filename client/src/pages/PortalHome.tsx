@@ -64,7 +64,7 @@ export function PortalHome() {
             fetchPriority="high"
           />
 
-          {/* 零售與大阪不動產投資內頁尚未完成；僅開放已確認的四個入口。 */}
+          {/* 零售與大阪不動產投資內頁尚未完成；僅開放已確認的服務入口。 */}
           <nav className="absolute inset-0" aria-label="已確認的服務入口">
             <Link
               href="/ag"
@@ -89,6 +89,12 @@ export function PortalHome() {
               aria-label="屬於女人的方向"
               title="屬於女人的方向"
               className="absolute right-[2.3%] top-[72.5%] h-[12.8%] w-[31.0%] min-h-10 rounded-[1.25rem] outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
+            />
+            <Link
+              href="/linbo-ai"
+              aria-label="深入了解 林博 AI"
+              title="深入了解 林博 AI"
+              className="absolute left-[39%] top-[52.6%] h-[6.5%] w-[22%] rounded-full outline-none transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:ring-4 focus-visible:ring-yellow-300"
             />
           </nav>
         </section>
