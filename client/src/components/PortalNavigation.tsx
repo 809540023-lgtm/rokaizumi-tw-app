@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export const portalCopy = {
   zh: {
-    nav: ["首頁", "產品與服務", "林博 AI（區塊鏈產業）", "關於我們", "最新消息", "支援與資源"],
+    nav: ["首頁", "產品與服務", "林博 AI（區塊鏈產業）", "關於我們", "最新消息", "支援與資源", "出勤打卡"],
     search: "搜尋商品", login: "登入", language: "語言", hero: "以 AI 與區塊鏈技術，連接日本商品與產業服務",
     intro: "探索日本選品、跨境商務，以及林博 AI 在日本的研發與應用。",
     entries: ["日本小商品批發", "職人嚴選介護用品", "LINE 商店（代購）", "屬於女人的方向", "深入了解林博 AI", "企業合作", "購物指南", "聯絡客服"],
@@ -13,7 +13,7 @@ export const portalCopy = {
     support: "購物、代購、企業合作和網站使用問題，可從下方找到對應入口。",
   },
   cn: {
-    nav: ["首页", "产品与服务", "林博 AI（区块链产业）", "关于我们", "最新消息", "支持与资源"],
+    nav: ["首页", "产品与服务", "林博 AI（区块链产业）", "关于我们", "最新消息", "支持与资源", "考勤打卡"],
     search: "搜索商品", login: "登录", language: "语言", hero: "以 AI 与区块链技术，连接日本商品与产业服务",
     intro: "探索日本选品、跨境商务，以及林博 AI 在日本的研发与应用。",
     entries: ["日本小商品批发", "匠人精选护理用品", "LINE 商店（代购）", "女性生活精选", "深入了解林博 AI", "企业合作", "购物指南", "联系客服"],
@@ -22,7 +22,7 @@ export const portalCopy = {
     support: "购物、代购、企业合作和网站使用问题，可从下方找到对应入口。",
   },
   ja: {
-    nav: ["ホーム", "製品・サービス", "林博AI・ブロックチェーン", "会社概要", "お知らせ", "サポート・資料"],
+    nav: ["ホーム", "製品・サービス", "林博AI・ブロックチェーン", "会社概要", "お知らせ", "サポート・資料", "勤怠打刻"],
     search: "商品を検索", login: "ログイン", language: "言語", hero: "日本の商品と産業を、AIとブロックチェーンでつなぐ",
     intro: "日本の厳選商品、越境ビジネス、林博AIの日本での研究開発をご紹介します。",
     entries: ["日本の生活雑貨・卸売", "厳選介護用品", "LINEショップ（購入代行）", "女性向けセレクション", "林博AIについて", "法人のお客様", "お買い物ガイド", "お問い合わせ"],
@@ -31,7 +31,7 @@ export const portalCopy = {
     support: "お買い物、購入代行、法人連携に関するご案内はこちらからご覧ください。",
   },
   en: {
-    nav: ["Home", "Products & Services", "Linbo AI & Blockchain", "About Us", "News", "Support & Resources"],
+    nav: ["Home", "Products & Services", "Linbo AI & Blockchain", "About Us", "News", "Support & Resources", "Attendance"],
     search: "Search products", login: "Sign in", language: "Language", hero: "Japanese products and business services powered by AI",
     intro: "Explore Japanese goods, cross-border commerce, and Linbo AI’s research and applications in Japan.",
     entries: ["Japanese goods wholesale", "Curated care products", "LINE Shop · buying service", "Women’s selection", "Explore Linbo AI", "Business partnerships", "Shopping guides", "Contact support"],
@@ -46,7 +46,7 @@ export function PortalNavigation() {
   const [location, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const copy = portalCopy[language];
-  const links = ["/", "/services", "/linbo-ai", "/about", "/news", "/support"];
+  const links = ["/", "/services", "/linbo-ai", "/about", "/news", "/support", "/attendance/"];
   return (
     <header className="border-b border-sky-100 bg-white text-[#061a33]">
       <div className="mx-auto flex max-w-[1357px] flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3">
@@ -60,7 +60,11 @@ export function PortalNavigation() {
         </div>
         <nav className="order-last flex w-full flex-wrap items-center gap-x-4 gap-y-2 text-sm font-semibold lg:order-none lg:w-auto" aria-label={copy.nav[0]}>
           {links.map((href, index) => (
+            href === "/attendance/" ? (
+              <a key={href} href={href} className="rounded px-1 py-2 hover:text-sky-700">{copy.nav[index]}</a>
+            ) : (
             <Link key={href} href={href} aria-current={location === href ? "page" : undefined} className="rounded px-1 py-2 hover:text-sky-700 aria-[current=page]:text-sky-700 aria-[current=page]:underline underline-offset-4">{copy.nav[index]}</Link>
+            )
           ))}
         </nav>
         <form role="search" className="order-last flex gap-2" onSubmit={event => {
